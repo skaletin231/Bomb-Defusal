@@ -20,7 +20,7 @@ const GameScreen = (props) => {
   const { setPlayersTurn, setPlayers } = useGameStateActions()
   setPlayersTurn(users[0])
   setPlayers([users[0], users[1]])
-  MakeBoard(decks[0].cards)
+  //MakeBoard(decks[0].cards)
 
   return (
     <div style={style} className='gameScreen'>

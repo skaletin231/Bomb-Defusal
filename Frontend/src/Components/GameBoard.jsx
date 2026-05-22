@@ -1,5 +1,4 @@
 import GameCard from './GameCard'
-import { MakeBoard } from '../../MakeBoard'
 import { useState } from 'react'
 import {
   useGameStateBoard,
@@ -7,6 +6,9 @@ import {
   useGameStateTurn,
 } from '../gameStateStore'
 import { Button } from '@mui/material'
+
+import { GET_GAME } from '../queries'
+import { useQuery } from '@apollo/client/react'
 
 const style = {
   display: 'grid',
@@ -19,14 +21,26 @@ const buttonStyle = {
 }
 
 const GameBoard = () => {
-  const board = useGameStateBoard()
+  //const board = useGameStateBoard()
   const turn = useGameStateTurn()
   const { revealCard, endTurn } = useGameStateActions()
   const [selectedCard, setSelectedCard] = useState(null)
 
+  const result = useQuery(GET_GAME, {
+    variables: { id: '6a1066c6f431af3de7218448' },
+  })
+
+  if (result.loading) {
+    return <div>loading...</div>
+  }
+
+  const board = result.data.getGame.board.spots
+
+  console.log(board)
+
   const submitMove = () => {
-    revealCard(selectedCard)
-    setSelectedCard(null)
+    // revealCard(selectedCard)
+    // setSelectedCard(null)
   }
 
   return (
