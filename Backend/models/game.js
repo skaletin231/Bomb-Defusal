@@ -5,8 +5,14 @@ const spotSchema = new mongoose.Schema({
   player1Type: String,
   player2Type: String,
   typeRevealed: {
-    type: String,
-    default: null,
+    player1: {
+      type: String,
+      default: null,
+    },
+    player2: {
+      type: String,
+      default: null,
+    },
   },
 })
 
@@ -16,6 +22,7 @@ const boardSchema = new mongoose.Schema({
 
 const gameSchema = new mongoose.Schema({
   players: [String],
+  currentPlayer: String,
   board: boardSchema,
 })
 

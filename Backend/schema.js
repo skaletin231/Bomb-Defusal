@@ -1,13 +1,19 @@
 const typeDefs = /* GraphQL */ `
   type Query {
-    getGame(id: ID!): Game!
+    getGame(id: ID!, player: String!): Game
+    getUser(auth0_ID: String!): User
+    me: User
+  }
+
+  type Revealed {
+    myType: String
+    theirType: String
   }
 
   type Spot {
     word: String!
-    player1Type: String!
-    player2Type: String!
-    typeRevealed: String
+    myType: String!
+    typeRevealed: Revealed!
   }
 
   type Board {
@@ -17,19 +23,25 @@ const typeDefs = /* GraphQL */ `
   type Game {
     id: ID!
     players: [String!]!
+    currentPlayer: String
     board: Board!
   }
 
   type Mutation {
-    startGame(words: [String!]!, player: String!): Game!
+    startGame(words: [String!]!, player: String!): Game
     joinGame(gameID: ID!, player: String!): Game
-    makeMove(gameID: ID!, player: String!, index: Int): Game
+    makeMove(gameID: ID!, player: String!, index: Int!): Game
+    endTurn(gameID: ID!, player: String!): Game
+    addUser(username: String!, email: String!, auth0_ID: String!): User
+    updateUserInfo(username: String!): User
   }
 
-  # type User {
-  #   username: String!
-  #   id: ID!
-  # }
+  type User {
+    username: String
+    email: String
+    auth0_ID: String!
+    id: ID!
+  }
 
   # type Token {
   #   value: String!

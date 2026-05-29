@@ -2,20 +2,23 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
 
-import { ApolloClient, gql, HttpLink, InMemoryCache } from '@apollo/client'
-import { ApolloProvider } from '@apollo/client/react'
+import { Auth0Provider } from '@auth0/auth0-react'
 
-const client = new ApolloClient({
-  link: new HttpLink({
-    uri: 'http://localhost:4000',
-  }),
-  cache: new InMemoryCache(),
-})
+import ApolloProviderWithAuth from './Components/ApolloProviderWithAuth.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <ApolloProvider client={client}>
-      <App />
-    </ApolloProvider>
+    <Auth0Provider
+      domain={import.meta.env.VITE_AUTH0_DOMAIN}
+      clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
+      authorizationParams={{
+        redirect_uri: window.location.origin,
+        audience: import.meta.env.VITE_AUDIENCE,
+      }}
+    >
+      <ApolloProviderWithAuth>
+        <App />
+      </ApolloProviderWithAuth>
+    </Auth0Provider>
   </StrictMode>,
 )

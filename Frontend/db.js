@@ -47,12 +47,12 @@ export const decks = [
 
 export const users = [
   {
-    name: 'John',
+    name: 'Jacob',
     username: 'codePro23',
     id: 1,
   },
   {
-    name: 'Adam',
+    name: 'John',
     username: 'jeff_lover',
     id: 2,
   },

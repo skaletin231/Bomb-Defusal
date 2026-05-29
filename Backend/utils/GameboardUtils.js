@@ -18,7 +18,6 @@ const MakeBoard = (deck) => {
     word: '',
     player1Type: null,
     player2Type: null,
-    typeRevealed: null,
   })
 
   const board = Array.from({ length: 25 }, fromEmpty)

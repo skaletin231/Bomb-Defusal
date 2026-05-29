@@ -1,6 +1,5 @@
-import { decks, users } from '../../db'
+import { users } from '../../db'
 import GameBoard from './GameBoard'
-import { MakeBoard } from '../../MakeBoard'
 import { useGameStateActions } from '../gameStateStore'
 
 const styleGameboardContainer = {
@@ -17,17 +16,19 @@ const style = {
 }
 
 const GameScreen = (props) => {
-  const { setPlayersTurn, setPlayers } = useGameStateActions()
+  const { setPlayersTurn, setPlayers, setPlayer } = useGameStateActions()
   setPlayersTurn(users[0])
   setPlayers([users[0], users[1]])
-  //MakeBoard(decks[0].cards)
+  setPlayer(props.game.player)
 
   return (
     <div style={style} className='gameScreen'>
       <div className='boardContainer' style={styleGameboardContainer}>
         <GameBoard />
       </div>
-      <button onClick={() => props.setInGame(false)}>End Game</button>
+      <button onClick={() => props.setInGame({ player: -1, inGame: false })}>
+        End Game
+      </button>
     </div>
   )
 }
