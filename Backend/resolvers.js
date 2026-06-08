@@ -5,11 +5,19 @@ const { MakeBoard } = require('./utils/GameboardUtils')
 const resolvers = {
   Query: {
     getGame: async (root, args, context) => {
-      const game = await Game.findById(args.id)
+      if (!context.user) {
+        return null
+      }
 
-      if (!game.players.includes(args.player)) return null
+      const game = await Game.findById(args.id).populate('players')
 
-      return returnInfo(game, args)
+      console.log(game, context.user)
+      const isAPlayer = game.players.some((player) =>
+        player._id.equals(context.user._id),
+      )
+      if (!isAPlayer) return null
+
+      return newReturnInfo(game, context)
     },
     getUser: async (root, args) => {
       const user = await User.findOne({ auth_ID: args.auth_ID })
@@ -23,12 +31,17 @@ const resolvers = {
     },
   },
   Mutation: {
-    startGame: async (root, args) => {
+    startGame: async (root, args, context) => {
+      //console.log(context)
+      if (!context.user) {
+        return null
+      }
+
       const board = MakeBoard(args.words)
 
       const game = new Game({
-        players: [args.player],
-        currentPlayer: args.player,
+        players: [context.user],
+        currentPlayer: context.user,
         board: {
           spots: board,
         },
@@ -36,9 +49,9 @@ const resolvers = {
 
       await game.save()
 
-      return returnInfo(game, args)
+      return newReturnInfo(game, context)
     },
-    joinGame: async (root, args) => {
+    joinGame: async (root, args, context) => {
       const game = await Game.findById(args.gameID)
 
       if (game.players.includes(args.player)) {
@@ -165,6 +178,44 @@ const returnInfo = (game, args) => {
                 myType: spot.typeRevealed.player2,
                 theirType: spot.typeRevealed.player1,
               },
+      })),
+    },
+  }
+}
+
+const newReturnInfo = (game, context) => {
+  return {
+    id: game.id,
+
+    players: game.players.map((player) => ({
+      username: player.username,
+      id: player._id,
+    })),
+
+    currentPlayer: {
+      username: context.user.equals(game.players[0])
+        ? game.players[0].username
+        : game.players[1].username,
+      id: game.currentPlayer._id,
+    },
+
+    board: {
+      spots: game.board.spots.map((spot) => ({
+        word: spot.word,
+
+        myType: context.user.equals(game.players[0])
+          ? spot.player1Type
+          : spot.player2Type,
+
+        typeRevealed: context.user.equals(game.players[0])
+          ? {
+              myType: spot.typeRevealed.player1,
+              theirType: spot.typeRevealed.player2,
+            }
+          : {
+              myType: spot.typeRevealed.player2,
+              theirType: spot.typeRevealed.player1,
+            },
       })),
     },
   }

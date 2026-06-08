@@ -1,6 +1,6 @@
 const typeDefs = /* GraphQL */ `
   type Query {
-    getGame(id: ID!, player: String!): Game
+    getGame(id: ID!): Game
     getUser(auth0_ID: String!): User
     me: User
   }
@@ -22,13 +22,13 @@ const typeDefs = /* GraphQL */ `
 
   type Game {
     id: ID!
-    players: [String!]!
-    currentPlayer: String
+    players: [GameUser!]!
+    currentPlayer: GameUser
     board: Board!
   }
 
-  type Mutation {
-    startGame(words: [String!]!, player: String!): Game
+  type Mutation { #player should be obtainable from context now if player is me
+    startGame(words: [String!]!): Game
     joinGame(gameID: ID!, player: String!): Game
     makeMove(gameID: ID!, player: String!, index: Int!): Game
     endTurn(gameID: ID!, player: String!): Game
@@ -40,6 +40,11 @@ const typeDefs = /* GraphQL */ `
     username: String
     email: String
     auth0_ID: String!
+    id: ID!
+  }
+
+  type GameUser {
+    username: String
     id: ID!
   }
 

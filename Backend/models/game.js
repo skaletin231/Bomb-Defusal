@@ -21,8 +21,16 @@ const boardSchema = new mongoose.Schema({
 })
 
 const gameSchema = new mongoose.Schema({
-  players: [String],
-  currentPlayer: String,
+  players: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+    },
+  ],
+  currentPlayer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
   board: boardSchema,
 })
 

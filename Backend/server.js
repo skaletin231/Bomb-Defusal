@@ -54,9 +54,9 @@ const startServer = async (port) => {
     checkJwtOptional,
     expressMiddleware(server, {
       context: async ({ req }) => {
-        //console.log('auth', req)
+        //console.log('starting context middleware')
         if (!req.auth) {
-          console.log('not logged in')
+          //console.log('not logged in')
           return {
             auth: null,
             user: null,
@@ -67,16 +67,19 @@ const startServer = async (port) => {
         //console.log(auth, id)
 
         if (!id) {
+          //console.log('no id')
           return {
             auth: null,
             user: null,
           }
         }
 
+        //console.log('finding user')
+
         const user = await User.findOne({ auth0_ID: id })
 
         if (!user) {
-          console.log('no user found')
+          //console.log('no user found')
 
           const token = req.auth.token
           if (!token) return null
@@ -88,10 +91,7 @@ const startServer = async (port) => {
             },
           }).then((r) => r.json())
 
-          user = await User.create({
-            auth0Id,
-            email: profile.email,
-          })
+          //console.log(profile)
 
           const newUser = new User({
             username: null,
