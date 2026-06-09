@@ -7,8 +7,8 @@ import AccountSetup from './Components/AccountSetup'
 import { useAuth0 } from '@auth0/auth0-react'
 
 function App() {
-  const [screen, setScreen] = useState('Main')
-  const [game, setGame] = useState({ player: -1, inGame: false })
+  //const [screen, setScreen] = useState('Main')
+  const [ingame, setIngame] = useState(false)
   const { loginWithRedirect } = useAuth0()
 
   const result = useQuery(ME, {})
@@ -23,27 +23,29 @@ function App() {
       console.log('need initial setup')
       return <AccountSetup />
     } else {
-      console.log(result)
+      //console.log(result)
     }
   }
 
-  const startGame = (thisPlayer) => {
-    setGame({ player: thisPlayer, inGame: true })
+  const startGame = () => {
+    setIngame(true)
   }
 
   if (screen === 'Login') {
     return <LoginPage />
   }
 
-  if (game.inGame) return <GameScreen game={game} setInGame={setGame} />
+  if (ingame) return <GameScreen setInGame={setIngame} />
 
   return (
     <div>
       {!result.data?.me && (
         <button onClick={() => loginWithRedirect()}>Login</button>
       )}
-      <button onClick={() => startGame(0)}>Start Game player 1</button>
-      <button onClick={() => startGame(1)}>Start Game player 2</button>
+      {result.data?.me && (
+        <button onClick={() => startGame()}>Look For Game</button>
+      )}
+      {/* <button onClick={() => startGame(1)}>Start Game player 2</button> */}
     </div>
   )
 }

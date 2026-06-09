@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useGameStateCurrentPlayer } from '../gameStateStore'
 import { Button, Card, CardContent } from '@mui/material'
 
-import { GET_GAME, MAKE_MOVE, END_TURN } from '../queries'
+import { ME, GET_GAME, MAKE_MOVE, END_TURN } from '../queries'
 import { useMutation, useQuery } from '@apollo/client/react'
 
 const style = {
@@ -22,12 +22,15 @@ const buttonStyle = {
   marginTop: '10px',
 }
 
-const GameBoard = () => {
-  const me = useGameStateCurrentPlayer()
+const GameBoard = ({ gameID }) => {
+  console.log('ID IS:', gameID)
+  //const me = useGameStateCurrentPlayer()
+  const { data: meData } = useQuery(ME, {})
+  const me = meData.me
   const [selectedCard, setSelectedCard] = useState(null)
 
-  const result = useQuery(GET_GAME, {
-    variables: { id: '6a170c97fd7f273aec8da7b9', player: me.name },
+  const gameResult = useQuery(GET_GAME, {
+    variables: { id: gameID },
   })
 
   const [makeMove] = useMutation(MAKE_MOVE, {
@@ -35,7 +38,7 @@ const GameBoard = () => {
       cache.updateQuery(
         {
           query: GET_GAME,
-          variables: { id: '6a170c97fd7f273aec8da7b9', player: me.name },
+          variables: { id: gameID },
         },
         () => {
           return {
@@ -52,7 +55,7 @@ const GameBoard = () => {
       cache.updateQuery(
         {
           query: GET_GAME,
-          variables: { id: '6a170c97fd7f273aec8da7b9', player: me.name },
+          variables: { id: gameID },
         },
         () => {
           return {
@@ -67,21 +70,20 @@ const GameBoard = () => {
   const tryEndTurn = () => {
     endTurn({
       variables: {
-        gameID: '6a170c97fd7f273aec8da7b9',
-        player: me.name,
+        gameID: gameID,
       },
     })
   }
 
-  if (result.loading) {
+  if (gameResult.loading) {
     return <div>loading...</div>
   }
 
-  const game = result.data.getGame
+  const game = gameResult.data.getGame
   const boardSpots = game.board.spots
 
   const trySetSelected = (selected) => {
-    if (me.name === game.currentPlayer) {
+    if (me.id === game.currentPlayer.id) {
       setSelectedCard(selected)
     }
   }
@@ -92,8 +94,7 @@ const GameBoard = () => {
     )
     makeMove({
       variables: {
-        gameID: '6a170c97fd7f273aec8da7b9',
-        player: me.name,
+        gameID: gameID,
         index: index,
       },
     })
@@ -153,9 +154,9 @@ const GameBoard = () => {
           Submit
         </Button>
       )}
-      <p>current player: {game.currentPlayer}</p>
-      <p>you: {me.name}</p>
-      {me.name === game.currentPlayer && (
+      <p>current player: {game.currentPlayer.username}</p>
+      <p>you: {me.username}</p>
+      {me.id === game.currentPlayer.id && (
         <Button onClick={tryEndTurn} variant='contained'>
           End Turn
         </Button>

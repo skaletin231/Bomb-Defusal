@@ -1,8 +1,8 @@
 import { gql } from '@apollo/client'
 
 export const GET_GAME = gql`
-  query getGame($id: ID!, $player: String!) {
-    getGame(id: $id, player: $player) {
+  query getGame($id: ID!) {
+    getGame(id: $id) {
       board {
         spots {
           word
@@ -13,13 +13,25 @@ export const GET_GAME = gql`
           }
         }
       }
-      currentPlayer
+      currentPlayer {
+        username
+        id
+      }
     }
   }
 `
+
+export const JOIN_GAME = gql`
+  mutation joinGame($gameID: ID!) {
+    joinGame(gameID: $gameID) {
+      id
+    }
+  }
+`
+
 export const MAKE_MOVE = gql`
-  mutation makeMove($gameID: ID!, $player: String!, $index: Int!) {
-    makeMove(gameID: $gameID, player: $player, index: $index) {
+  mutation makeMove($gameID: ID!, $index: Int!) {
+    makeMove(gameID: $gameID, index: $index) {
       board {
         spots {
           word
@@ -30,13 +42,16 @@ export const MAKE_MOVE = gql`
           }
         }
       }
-      currentPlayer
+      currentPlayer {
+        username
+        id
+      }
     }
   }
 `
 export const END_TURN = gql`
-  mutation endTurn($gameID: ID!, $player: String!) {
-    endTurn(gameID: $gameID, player: $player) {
+  mutation endTurn($gameID: ID!) {
+    endTurn(gameID: $gameID) {
       board {
         spots {
           word
@@ -47,14 +62,17 @@ export const END_TURN = gql`
           }
         }
       }
-      currentPlayer
+      currentPlayer {
+        username
+        id
+      }
     }
   }
 `
 
 export const START_GAME = gql`
-  mutation startGame($words: [String!]!, $player: String!) {
-    startGame(words: $words, player: $player) {
+  mutation startGame($words: [String!]!) {
+    startGame(words: $words) {
       board {
         spots {
           word
@@ -65,7 +83,10 @@ export const START_GAME = gql`
           }
         }
       }
-      currentPlayer
+      currentPlayer {
+        username
+        id
+      }
     }
   }
 `
