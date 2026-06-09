@@ -29,8 +29,8 @@ const typeDefs = /* GraphQL */ `
 
   type Mutation { #player should be obtainable from context now if player is me
     startGame(words: [String!]!): Game
-    joinGame(gameID: ID!, player: String!): Game
-    makeMove(gameID: ID!, player: String!, index: Int!): Game
+    joinGame(gameID: ID!): Game
+    makeMove(gameID: ID!, index: Int!): Game
     endTurn(gameID: ID!, player: String!): Game
     addUser(username: String!, email: String!, auth0_ID: String!): User
     updateUserInfo(username: String!): User

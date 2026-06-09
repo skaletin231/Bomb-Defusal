@@ -11,7 +11,7 @@ const resolvers = {
 
       const game = await Game.findById(args.id).populate('players')
 
-      console.log(game, context.user)
+      //console.log(game, context.user)
       const isAPlayer = game.players.some((player) =>
         player._id.equals(context.user._id),
       )
@@ -52,39 +52,60 @@ const resolvers = {
       return newReturnInfo(game, context)
     },
     joinGame: async (root, args, context) => {
-      const game = await Game.findById(args.gameID)
+      if (!context.user) {
+        return null
+      }
+      const game = await Game.findById(args.gameID).populate('players')
+      if (!game) return null
 
-      if (game.players.includes(args.player)) {
-        return returnInfo(game, args)
+      //console.log(game)
+
+      const isAPlayer = game.players.some((player) =>
+        player._id.equals(context.user._id),
+      )
+      if (isAPlayer) {
+        return newReturnInfo(game, context)
       }
 
       if (game.players.length == 2) {
         return null
       }
 
-      game.players = game.players.concat(args.player)
+      game.players = game.players.concat(context.user)
 
       await game.save()
 
-      return returnInfo(game, args)
+      return newReturnInfo(game, context)
     },
-    makeMove: async (root, args) => {
-      const game = await Game.findById(args.gameID)
-
-      if (!game.players.includes(args.player))
-        //not a player in this game
+    makeMove: async (root, args, context) => {
+      if (!context.user) {
         return null
+      }
+      const game = await Game.findById(args.gameID).populate('players')
 
-      const myTypeRevealed =
-        game.players[0] === args.player
-          ? game.board.spots[args.index].typeRevealed.player1
-          : game.board.spots[args.index].typeRevealed.player2
+      const isAPlayer = game.players.some((player) =>
+        player._id.equals(context.user._id),
+      )
+      if (!isAPlayer) {
+        return false
+      }
 
-      if (myTypeRevealed !== null || game.currentPlayer !== args.player)
-        //already made this move, nothing should happen
-        return returnInfo(game, args)
+      const isPlayer1 = context.user.equals(game.players[0])
 
-      if (game.players[0] === args.player) //player 1 move
+      const myTypeRevealed = isPlayer1
+        ? game.board.spots[args.index].typeRevealed.player1
+        : game.board.spots[args.index].typeRevealed.player2
+
+      if (
+        myTypeRevealed !== null ||
+        !game.currentPlayer.equals(context.user._id)
+      ) //already made this move or can't make a move
+      {
+        console.log('cant make move')
+        return newReturnInfo(game, context)
+      }
+
+      if (isPlayer1) //player 1 move
       {
         if (game.board.spots[args.index].player2Type !== 'dud') {
           game.board.spots[args.index].typeRevealed.player2 =
@@ -106,7 +127,7 @@ const resolvers = {
 
       await game.save()
 
-      return returnInfo(game, args)
+      return newReturnInfo(game, context)
     },
     endTurn: async (root, args) => {
       const game = await Game.findById(args.gameID)
@@ -193,7 +214,7 @@ const newReturnInfo = (game, context) => {
     })),
 
     currentPlayer: {
-      username: context.user.equals(game.players[0])
+      username: game.currentPlayer.equals(game.players[0]._id)
         ? game.players[0].username
         : game.players[1].username,
       id: game.currentPlayer._id,

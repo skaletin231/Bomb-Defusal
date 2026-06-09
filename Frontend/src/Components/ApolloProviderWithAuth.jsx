@@ -20,7 +20,7 @@ function ApolloProviderWithAuth({ children }) {
         console.log('no token available yet', error)
       }
 
-      //console.log(token)
+      console.log(token)
 
       return {
         headers: {

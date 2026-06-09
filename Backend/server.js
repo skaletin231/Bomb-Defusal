@@ -104,7 +104,7 @@ const startServer = async (port) => {
           return newUser
         }
 
-        console.log('user found')
+        //console.log('user found')
 
         return { auth, user }
       },
