@@ -1,6 +1,5 @@
 import GameCard from './GameCard'
 import { useState } from 'react'
-import { useGameStateCurrentPlayer } from '../gameStateStore'
 import { Button, Card, CardContent } from '@mui/material'
 
 import { ME, GET_GAME, MAKE_MOVE, END_TURN } from '../queries'
@@ -23,8 +22,6 @@ const buttonStyle = {
 }
 
 const GameBoard = ({ gameID }) => {
-  console.log('ID IS:', gameID)
-  //const me = useGameStateCurrentPlayer()
   const { data: meData } = useQuery(ME, {})
   const me = meData.me
   const [selectedCard, setSelectedCard] = useState(null)
