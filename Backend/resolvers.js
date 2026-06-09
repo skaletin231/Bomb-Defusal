@@ -60,10 +60,7 @@ const resolvers = {
 
       //console.log(game)
 
-      const isAPlayer = game.players.some((player) =>
-        player._id.equals(context.user._id),
-      )
-      if (isAPlayer) {
+      if (includesPlayer(game, context.user)) {
         return newReturnInfo(game, context)
       }
 
@@ -83,12 +80,7 @@ const resolvers = {
       }
       const game = await Game.findById(args.gameID).populate('players')
 
-      const isAPlayer = game.players.some((player) =>
-        player._id.equals(context.user._id),
-      )
-      if (!isAPlayer) {
-        return false
-      }
+      if (!includesPlayer(game, context.user)) return null
 
       const isPlayer1 = context.user.equals(game.players[0])
 
@@ -129,21 +121,21 @@ const resolvers = {
 
       return newReturnInfo(game, context)
     },
-    endTurn: async (root, args) => {
-      const game = await Game.findById(args.gameID)
+    endTurn: async (root, args, context) => {
+      const game = await Game.findById(args.gameID).populate('players')
 
-      if (!game.players.includes(args.player))
-        //not a player in this game
-        return null
+      if (!includesPlayer(game, context.user)) return null
 
-      if (game.currentPlayer !== args.player) returnInfo(game, args)
+      if (!game.currentPlayer.equals(context.user._id))
+        return newReturnInfo(game, context)
 
-      game.currentPlayer =
-        args.player === game.players[0] ? game.players[1] : game.players[0]
+      game.currentPlayer = context.user.equals(game.players[0])
+        ? game.players[1]
+        : game.players[0]
 
       await game.save()
 
-      return returnInfo(game, args)
+      return newReturnInfo(game, context)
     },
     addUser: async (root, args) => {
       const user = await User.findOne({ auth_ID: args.auth_ID })
@@ -240,6 +232,15 @@ const newReturnInfo = (game, context) => {
       })),
     },
   }
+}
+
+const includesPlayer = (game, user) => {
+  const isAPlayer = game.players.some((player) => player._id.equals(user._id))
+  if (isAPlayer) {
+    return true
+  }
+
+  return false
 }
 
 module.exports = resolvers

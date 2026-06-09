@@ -31,7 +31,7 @@ const typeDefs = /* GraphQL */ `
     startGame(words: [String!]!): Game
     joinGame(gameID: ID!): Game
     makeMove(gameID: ID!, index: Int!): Game
-    endTurn(gameID: ID!, player: String!): Game
+    endTurn(gameID: ID!): Game
     addUser(username: String!, email: String!, auth0_ID: String!): User
     updateUserInfo(username: String!): User
   }
