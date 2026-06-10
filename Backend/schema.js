@@ -48,6 +48,25 @@ const typeDefs = /* GraphQL */ `
     id: ID!
   }
 
+  type SpotPatch {
+    spotUpdate: Spot!
+  }
+
+  type GamePatch {
+    turnUpdate: GameUser!
+  }
+
+  type GameUpdate {
+    gameID: ID!
+    type: String!
+    changedSpots: [SpotPatch!]
+    turnChange: GamePatch
+  }
+
+  type Subscription {
+    gameUpdate: GameUpdate!
+  }
+
   # type Token {
   #   value: String!
   # }

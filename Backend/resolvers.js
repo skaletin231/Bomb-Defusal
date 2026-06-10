@@ -2,6 +2,9 @@ const Game = require('./models/game')
 const User = require('./models/user')
 const { MakeBoard } = require('./utils/GameboardUtils')
 
+const { PubSub } = require('graphql-subscriptions')
+const pubsub = new PubSub()
+
 const resolvers = {
   Query: {
     getGame: async (root, args, context) => {
@@ -119,6 +122,36 @@ const resolvers = {
 
       await game.save()
 
+      const newSpot = {
+        word: game.board.spots[args.index].word,
+
+        myType: context.user.equals(game.players[0])
+          ? game.board.spots[args.index].player1Type
+          : game.board.spots[args.index].player2Type,
+
+        typeRevealed: context.user.equals(game.players[0])
+          ? {
+              myType: game.board.spots[args.index].typeRevealed.player1,
+              theirType: game.board.spots[args.index].typeRevealed.player2,
+            }
+          : {
+              myType: game.board.spots[args.index].typeRevealed.player2,
+              theirType: game.board.spots[args.index].typeRevealed.player1,
+            },
+      }
+
+      const gameUpdate = {
+        gameID: game.id,
+        type: 'Move Made',
+        changedSpots: [
+          {
+            spotUpdate: newSpot,
+          },
+        ],
+      }
+
+      pubsub.publish('GAME_UPDATE', { gameUpdate: gameUpdate })
+
       return newReturnInfo(game, context)
     },
     endTurn: async (root, args, context) => {
@@ -134,6 +167,20 @@ const resolvers = {
         : game.players[0]
 
       await game.save()
+
+      const gameUpdate = {
+        gameID: game.id,
+        type: 'Turn End',
+        changedSpots: null,
+        turnChange: {
+          turnUpdate: {
+            username: game.currentPlayer.username,
+            id: game.currentPlayer.id,
+          },
+        },
+      }
+
+      pubsub.publish('GAME_UPDATE', { gameUpdate })
 
       return newReturnInfo(game, context)
     },
@@ -162,6 +209,11 @@ const resolvers = {
       await user.save()
 
       return user
+    },
+  },
+  Subscription: {
+    gameUpdate: {
+      subscribe: () => pubsub.asyncIterableIterator('GAME_UPDATE'),
     },
   },
 }

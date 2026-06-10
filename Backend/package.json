@@ -14,11 +14,15 @@
   "dependencies": {
     "@apollo/server": "^5.5.1",
     "@as-integrations/express5": "^1.1.2",
+    "@graphql-tools/schema": "^10.0.33",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-oauth2-jwt-bearer": "^1.9.0",
     "graphql": "^16.14.0",
-    "mongoose": "^9.6.2"
+    "graphql-subscriptions": "^3.0.0",
+    "graphql-ws": "^6.0.8",
+    "mongoose": "^9.6.2",
+    "ws": "^8.21.0"
   }
 }

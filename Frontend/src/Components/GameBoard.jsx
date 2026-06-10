@@ -2,8 +2,13 @@ import GameCard from './GameCard'
 import { useState } from 'react'
 import { Button, Card, CardContent } from '@mui/material'
 
-import { ME, GET_GAME, MAKE_MOVE, END_TURN } from '../queries'
-import { useMutation, useQuery } from '@apollo/client/react'
+import { GAME_UPDATE, ME, GET_GAME, MAKE_MOVE, END_TURN } from '../queries'
+import {
+  useApolloClient,
+  useMutation,
+  useQuery,
+  useSubscription,
+} from '@apollo/client/react'
 
 const style = {
   display: 'grid',
@@ -22,12 +27,71 @@ const buttonStyle = {
 }
 
 const GameBoard = ({ gameID }) => {
+  const client = useApolloClient()
+
   const { data: meData } = useQuery(ME, {})
   const me = meData.me
   const [selectedCard, setSelectedCard] = useState(null)
 
   const gameResult = useQuery(GET_GAME, {
     variables: { id: gameID },
+  })
+
+  useSubscription(GAME_UPDATE, {
+    onData: ({ data }) => {
+      const update = data.data.gameUpdate
+      console.log('gameUpdate', update)
+      if (update.turnChange !== null) {
+        //the update is a spot change
+        client.cache.updateQuery(
+          {
+            query: GET_GAME,
+            variables: { id: update.gameID },
+          },
+          (data) => {
+            console.log('exists?', data)
+            if (!data) return data
+
+            return {
+              ...data,
+              getGame: {
+                ...data.getGame,
+                currentPlayer: {
+                  username: update.turnChange.turnUpdate.username,
+                  id: update.turnChange.turnUpdate.id,
+                },
+              },
+            }
+          },
+        )
+      } else {
+        //the update is a turn change
+        client.cache.updateQuery(
+          {
+            query: GET_GAME,
+            variables: { id: update.gameID },
+          },
+          (data) => {
+            console.log('exists?', data)
+            if (!data) return data
+            return {
+              ...data,
+              getGame: {
+                ...data.getGame,
+                board: {
+                  ...data.getGame.board,
+                  spots: data.getGame.board.spots.map((spot) =>
+                    spot.word === update.changedSpots[0].spotUpdate.word
+                      ? update.changedSpots[0].spotUpdate
+                      : spot,
+                  ),
+                },
+              },
+            }
+          },
+        )
+      }
+    },
   })
 
   const [makeMove] = useMutation(MAKE_MOVE, {
