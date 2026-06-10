@@ -129,44 +129,28 @@ export const UPDATE_USER_INFO = gql`
     }
   }
 `
-// export const ADD_BOOK = gql`
-//   mutation addBook(
-//     $title: String!
-//     $author: String!
-//     $published: Int!
-//     $genres: [String!]!
-//   ) {
-//     addBook(
-//       title: $title
-//       author: $author
-//       published: $published
-//       genres: $genres
-//     ) {
-//       title
-//       published
-//       author {
-//         name
-//         born
-//       }
-//       id
-//       genres
-//     }
-//   }
-// `
 
-// export const BOOK_ADDED = gql`
-//   subscription {
-//     bookAdded {
-//       title
-//       published
-//       author {
-//         name
-//         born
-//         id
-//         bookCount
-//       }
-//       id
-//       genres
-//     }
-//   }
-// `
+export const GAME_UPDATE = gql`
+  subscription {
+    gameUpdate {
+      gameID
+      type
+      changedSpots {
+        spotUpdate {
+          word
+          myType
+          typeRevealed {
+            myType
+            theirType
+          }
+        }
+      }
+      turnChange {
+        turnUpdate {
+          username
+          id
+        }
+      }
+    }
+  }
+`

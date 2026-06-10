@@ -72,7 +72,7 @@ const GameScreen = ({ setInGame }) => {
           variant='contained'
           style={{ marginTop: 10 }}
         >
-          BAck To Home
+          Back To Home
         </Button>
       </>
     )

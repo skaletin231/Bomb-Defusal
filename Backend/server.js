@@ -52,15 +52,16 @@ const startServer = async (port) => {
 
   const schema = makeExecutableSchema({ typeDefs, resolvers })
 
-  const serverCleanup = useServer({
-    schema,
-    // context: () => { //not sure what context is needed, if any, yet
-    //   return {
-
-    //   }
-    // },
+  const serverCleanup = useServer(
+    {
+      schema,
+      context: () => {
+        //not sure what context is needed, if any, yet
+        return {}
+      },
+    },
     wsServer,
-  })
+  )
 
   const server = new ApolloServer({
     schema,
