@@ -7,10 +7,16 @@ const typeDefs = require('./schema')
 const { expressMiddleware } = require('@as-integrations/express5')
 const http = require('http')
 const { makeExecutableSchema } = require('@graphql-tools/schema')
+const {
+  ApolloServerPluginDrainHttpServer,
+} = require('@apollo/server/plugin/drainHttpServer')
 
 const { auth } = require('express-oauth2-jwt-bearer')
 
 const User = require('./models/user')
+
+const { WebSocketServer } = require('ws')
+const { useServer } = require('graphql-ws/use/ws')
 
 const checkJwtOptional = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1]
@@ -35,14 +41,41 @@ const checkJwt = auth({
   tokenSigningAlg: 'RS256',
 })
 
-const schema = makeExecutableSchema({ typeDefs, resolvers })
-
 const startServer = async (port) => {
   const app = express()
   const httpServer = http.createServer(app)
 
+  const wsServer = new WebSocketServer({
+    server: httpServer,
+    path: '/',
+  })
+
+  const schema = makeExecutableSchema({ typeDefs, resolvers })
+
+  const serverCleanup = useServer({
+    schema,
+    // context: () => { //not sure what context is needed, if any, yet
+    //   return {
+
+    //   }
+    // },
+    wsServer,
+  })
+
   const server = new ApolloServer({
     schema,
+    plugins: [
+      ApolloServerPluginDrainHttpServer({ httpServer }),
+      {
+        async serverWillStart() {
+          return {
+            async drainServer() {
+              await serverCleanup.dispose()
+            },
+          }
+        },
+      },
+    ],
   })
 
   await server.start()
@@ -54,9 +87,7 @@ const startServer = async (port) => {
     checkJwtOptional,
     expressMiddleware(server, {
       context: async ({ req }) => {
-        //console.log('starting context middleware')
         if (!req.auth) {
-          //console.log('not logged in')
           return {
             auth: null,
             user: null,
@@ -64,23 +95,17 @@ const startServer = async (port) => {
         }
         const auth = req.auth.payload
         const id = auth?.sub
-        //console.log(auth, id)
 
         if (!id) {
-          //console.log('no id')
           return {
             auth: null,
             user: null,
           }
         }
 
-        //console.log('finding user')
-
         const user = await User.findOne({ auth0_ID: id })
 
         if (!user) {
-          //console.log('no user found')
-
           const token = req.auth.token
           if (!token) return null
 
@@ -90,8 +115,6 @@ const startServer = async (port) => {
               Authorization: `Bearer ${token}`,
             },
           }).then((r) => r.json())
-
-          //console.log(profile)
 
           const newUser = new User({
             username: null,
@@ -103,8 +126,6 @@ const startServer = async (port) => {
 
           return newUser
         }
-
-        //console.log('user found')
 
         return { auth, user }
       },
