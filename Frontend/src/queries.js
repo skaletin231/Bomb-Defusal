@@ -17,6 +17,7 @@ export const GET_GAME = gql`
         username
         id
       }
+      gameState
     }
   }
 `
@@ -46,6 +47,7 @@ export const MAKE_MOVE = gql`
         username
         id
       }
+      gameState
     }
   }
 `
@@ -66,6 +68,7 @@ export const END_TURN = gql`
         username
         id
       }
+      gameState
     }
   }
 `
@@ -87,6 +90,7 @@ export const START_GAME = gql`
         username
         id
       }
+      gameState
     }
   }
 `
@@ -149,6 +153,7 @@ export const GAME_UPDATE = gql`
           id
         }
       }
+      gameState
     }
   }
 `

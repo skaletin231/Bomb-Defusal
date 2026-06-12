@@ -5,6 +5,8 @@ const { MakeBoard } = require('./utils/GameboardUtils')
 const { PubSub } = require('graphql-subscriptions')
 const pubsub = new PubSub()
 
+const gameStates = { win: 'Win', lose: 'Lose', playing: 'Playing' }
+
 const resolvers = {
   Query: {
     getGame: async (root, args, context) => {
@@ -46,6 +48,7 @@ const resolvers = {
         board: {
           spots: board,
         },
+        gameState: gameStates.playing,
       })
 
       await game.save()
@@ -236,36 +239,6 @@ const resolvers = {
   },
 }
 
-const returnInfo = (game, args) => {
-  return {
-    id: game.id,
-
-    players: game.players,
-
-    currentPlayer: game.currentPlayer,
-
-    board: {
-      spots: game.board.spots.map((spot) => ({
-        word: spot.word,
-
-        myType:
-          args.player === game.players[0] ? spot.player1Type : spot.player2Type,
-
-        typeRevealed:
-          args.player === game.players[0]
-            ? {
-                myType: spot.typeRevealed.player1,
-                theirType: spot.typeRevealed.player2,
-              }
-            : {
-                myType: spot.typeRevealed.player2,
-                theirType: spot.typeRevealed.player1,
-              },
-      })),
-    },
-  }
-}
-
 const newReturnInfo = (game, context) => {
   return {
     id: game.id,
@@ -301,6 +274,7 @@ const newReturnInfo = (game, context) => {
             },
       })),
     },
+    gameState: game.gameState,
   }
 }
 

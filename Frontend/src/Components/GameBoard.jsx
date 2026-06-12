@@ -37,6 +37,8 @@ const GameBoard = ({ gameID }) => {
     variables: { id: gameID },
   })
 
+  console.log(gameResult)
+
   useSubscription(GAME_UPDATE, {
     onData: ({ data }) => {
       const update = data.data.gameUpdate

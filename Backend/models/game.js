@@ -32,6 +32,10 @@ const gameSchema = new mongoose.Schema({
     ref: 'User',
   },
   board: boardSchema,
+  gameState: {
+    type: String,
+    enum: ['Win', 'Lose', 'Playing'],
+  },
 })
 
 module.exports = mongoose.model('Game', gameSchema)
