@@ -49,7 +49,8 @@ const typeDefs = /* GraphQL */ `
   }
 
   type SpotPatch {
-    spotUpdate: Spot!
+    word: String!
+    typeRevealed: Revealed!
   }
 
   type GamePatch {
@@ -58,6 +59,7 @@ const typeDefs = /* GraphQL */ `
 
   type GameUpdate {
     gameID: ID!
+    playerID: ID!
     type: String!
     changedSpots: [SpotPatch!]
     turnChange: GamePatch

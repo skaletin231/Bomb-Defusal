@@ -40,16 +40,13 @@ const GameBoard = ({ gameID }) => {
   useSubscription(GAME_UPDATE, {
     onData: ({ data }) => {
       const update = data.data.gameUpdate
-      console.log('gameUpdate', update)
       if (update.turnChange !== null) {
-        //the update is a spot change
         client.cache.updateQuery(
           {
             query: GET_GAME,
             variables: { id: update.gameID },
           },
           (data) => {
-            console.log('exists?', data)
             if (!data) return data
 
             return {
@@ -64,16 +61,22 @@ const GameBoard = ({ gameID }) => {
             }
           },
         )
-      } else {
-        //the update is a turn change
+      }
+
+      if (update.changedSpots !== null) {
         client.cache.updateQuery(
           {
             query: GET_GAME,
             variables: { id: update.gameID },
           },
           (data) => {
-            console.log('exists?', data)
             if (!data) return data
+
+            const newTypeRevealed = {
+              myType: update.changedSpots[0].typeRevealed.theirType,
+              theirType: update.changedSpots[0].typeRevealed.myType,
+            }
+
             return {
               ...data,
               getGame: {
@@ -81,9 +84,9 @@ const GameBoard = ({ gameID }) => {
                 board: {
                   ...data.getGame.board,
                   spots: data.getGame.board.spots.map((spot) =>
-                    spot.word === update.changedSpots[0].spotUpdate.word
-                      ? update.changedSpots[0].spotUpdate
-                      : spot,
+                    spot.word !== update.changedSpots[0].word
+                      ? spot
+                      : { ...spot, typeRevealed: newTypeRevealed },
                   ),
                 },
               },

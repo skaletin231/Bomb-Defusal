@@ -14,7 +14,6 @@ const resolvers = {
 
       const game = await Game.findById(args.id).populate('players')
 
-      //console.log(game, context.user)
       const isAPlayer = game.players.some((player) =>
         player._id.equals(context.user._id),
       )
@@ -35,7 +34,6 @@ const resolvers = {
   },
   Mutation: {
     startGame: async (root, args, context) => {
-      //console.log(context)
       if (!context.user) {
         return null
       }
@@ -60,8 +58,6 @@ const resolvers = {
       }
       const game = await Game.findById(args.gameID).populate('players')
       if (!game) return null
-
-      //console.log(game)
 
       if (includesPlayer(game, context.user)) {
         return newReturnInfo(game, context)
@@ -100,21 +96,40 @@ const resolvers = {
         return newReturnInfo(game, context)
       }
 
+      let turnChangeMade = null
       if (isPlayer1) //player 1 move
       {
         if (game.board.spots[args.index].player2Type !== 'dud') {
+          //update board
           game.board.spots[args.index].typeRevealed.player2 =
             game.board.spots[args.index].player2Type
-        } //Bombs and Wires lock both players out of that spot
+        } else {
+          game.currentPlayer = game.players[1]
+          turnChangeMade = {
+            turnUpdate: {
+              username: game.players[1].username,
+              id: game.players[1].id,
+            },
+          }
+        }
 
         game.board.spots[args.index].typeRevealed.player1 =
           game.board.spots[args.index].player2Type
       } else //player 2 move
       {
         if (game.board.spots[args.index].player1Type !== 'dud') {
+          //update board
           game.board.spots[args.index].typeRevealed.player1 =
             game.board.spots[args.index].player1Type
-        } //Bombs and Wires lock both players out of that spot
+        } else {
+          game.currentPlayer = game.players[0]
+          turnChangeMade = {
+            turnUpdate: {
+              username: game.players[0].username,
+              id: game.players[0].id,
+            },
+          }
+        }
 
         game.board.spots[args.index].typeRevealed.player2 =
           game.board.spots[args.index].player1Type
@@ -142,12 +157,15 @@ const resolvers = {
 
       const gameUpdate = {
         gameID: game.id,
+        playerID: context.user.id,
         type: 'Move Made',
         changedSpots: [
           {
-            spotUpdate: newSpot,
+            word: newSpot.word,
+            typeRevealed: newSpot.typeRevealed,
           },
         ],
+        turnChange: turnChangeMade,
       }
 
       pubsub.publish('GAME_UPDATE', { gameUpdate: gameUpdate })
@@ -170,8 +188,8 @@ const resolvers = {
 
       const gameUpdate = {
         gameID: game.id,
+        playerID: context.user.id,
         type: 'Turn End',
-        changedSpots: null,
         turnChange: {
           turnUpdate: {
             username: game.currentPlayer.username,

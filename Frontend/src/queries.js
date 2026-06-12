@@ -134,15 +134,13 @@ export const GAME_UPDATE = gql`
   subscription {
     gameUpdate {
       gameID
+      playerID
       type
       changedSpots {
-        spotUpdate {
-          word
+        word
+        typeRevealed {
           myType
-          typeRevealed {
-            myType
-            theirType
-          }
+          theirType
         }
       }
       turnChange {
