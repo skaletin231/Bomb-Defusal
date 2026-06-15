@@ -102,40 +102,52 @@ const resolvers = {
       let turnChangeMade = null
       if (isPlayer1) //player 1 move
       {
+        game.board.spots[args.index].typeRevealed.player1 =
+          game.board.spots[args.index].player2Type
+
         if (game.board.spots[args.index].player2Type !== 'dud') {
           //update board
           game.board.spots[args.index].typeRevealed.player2 =
             game.board.spots[args.index].player2Type
-        } else {
-          game.currentPlayer = game.players[1]
-          turnChangeMade = {
-            turnUpdate: {
-              username: game.players[1].username,
-              id: game.players[1].id,
-            },
-          }
-        }
 
-        game.board.spots[args.index].typeRevealed.player1 =
-          game.board.spots[args.index].player2Type
+          const greenCount = game.board.spots.filter(
+            //this filter checks for spots that are player 2's revealed green
+            (thisSpot) =>
+              thisSpot.typeRevealed.player1 === 'wire' &&
+              thisSpot.player2Type === 'wire',
+          ).length
+
+          if (greenCount === 9) //this player can't take any more actions
+          {
+            turnChangeMade = changeTurn(game, game.players[1])
+          }
+        } else {
+          turnChangeMade = changeTurn(game, game.players[1])
+        }
       } else //player 2 move
       {
+        game.board.spots[args.index].typeRevealed.player2 =
+          game.board.spots[args.index].player1Type
+
         if (game.board.spots[args.index].player1Type !== 'dud') {
           //update board
           game.board.spots[args.index].typeRevealed.player1 =
             game.board.spots[args.index].player1Type
-        } else {
-          game.currentPlayer = game.players[0]
-          turnChangeMade = {
-            turnUpdate: {
-              username: game.players[0].username,
-              id: game.players[0].id,
-            },
-          }
-        }
 
-        game.board.spots[args.index].typeRevealed.player2 =
-          game.board.spots[args.index].player1Type
+          const greenCount = game.board.spots.filter(
+            //this filter checks for spots that are player 2's revealed green
+            (thisSpot) =>
+              thisSpot.typeRevealed.player2 === 'wire' &&
+              thisSpot.player1Type === 'wire',
+          ).length
+
+          if (greenCount === 9) //this player can't take any more actions
+          {
+            turnChangeMade = changeTurn(game, game.players[0])
+          }
+        } else {
+          turnChangeMade = changeTurn(game, game.players[0])
+        }
       }
 
       await game.save()
@@ -287,4 +299,30 @@ const includesPlayer = (game, user) => {
   return false
 }
 
+const checkIfGameEnd = (game) => {}
+
+const changeTurn = (game, user) => {
+  game.currentPlayer = user
+  turnChangeMade = {
+    turnUpdate: {
+      username: user.username,
+      id: user.id,
+    },
+  }
+
+  return turnChangeMade
+}
+
 module.exports = resolvers
+
+/*
+    ok when a player makes a move i need to check: 
+      1. are they out of moves
+          - end their turn
+      2. are both players out of moves
+          - end game in a win
+      3. was it a bomb
+          - end game in a loss
+      4. was it a dud
+          - end their turn
+*/
