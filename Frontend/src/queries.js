@@ -18,6 +18,7 @@ export const GET_GAME = gql`
         id
       }
       gameState
+      turnsRemaining
     }
   }
 `
@@ -48,6 +49,7 @@ export const MAKE_MOVE = gql`
         id
       }
       gameState
+      turnsRemaining
     }
   }
 `
@@ -69,6 +71,7 @@ export const END_TURN = gql`
         id
       }
       gameState
+      turnsRemaining
     }
   }
 `
@@ -91,6 +94,7 @@ export const START_GAME = gql`
         id
       }
       gameState
+      turnsRemaining
     }
   }
 `
@@ -153,7 +157,8 @@ export const GAME_UPDATE = gql`
           id
         }
       }
-      gameState
+      gameStateChange
+      turnsRemainingChange
     }
   }
 `

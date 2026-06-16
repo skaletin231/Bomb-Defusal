@@ -26,6 +26,7 @@ const typeDefs = /* GraphQL */ `
     currentPlayer: GameUser
     board: Board!
     gameState: String!
+    turnsRemaining: Int!
   }
 
   type Mutation { #player should be obtainable from context now if player is me
@@ -64,7 +65,8 @@ const typeDefs = /* GraphQL */ `
     type: String!
     changedSpots: [SpotPatch!]
     turnChange: GamePatch
-    gameState: String
+    gameStateChange: String
+    turnsRemainingChange: Int
   }
 
   type Subscription {

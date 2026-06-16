@@ -99,7 +99,6 @@ const resolvers = {
         return newReturnInfo(game, context)
       }
 
-      let turnChangeMade = null
       if (isPlayer1) //player 1 move
       {
         game.board.spots[args.index].typeRevealed.player1 =
@@ -110,19 +109,28 @@ const resolvers = {
           game.board.spots[args.index].typeRevealed.player2 =
             game.board.spots[args.index].player2Type
 
-          const greenCount = game.board.spots.filter(
-            //this filter checks for spots that are player 2's revealed green
-            (thisSpot) =>
-              thisSpot.typeRevealed.player1 === 'wire' &&
-              thisSpot.player2Type === 'wire',
-          ).length
-
-          if (greenCount === 9) //this player can't take any more actions
-          {
-            turnChangeMade = changeTurn(game, game.players[1])
+          if (game.board.spots[args.index].player2Type === 'bomb') {
+            let returnVal = updateSpotBomb(
+              context,
+              game,
+              game.board.spots[args.index],
+              isPlayer1,
+            )
+            await game.save()
+            pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
+            return newReturnInfo(game, context)
           }
-        } else {
-          turnChangeMade = changeTurn(game, game.players[1])
+
+          //updateSpot(game, game.board.spots[args.index], isPlayer1)
+          let returnVal = updateSpotWire(
+            context,
+            game,
+            game.board.spots[args.index],
+            isPlayer1,
+          )
+          await game.save()
+          pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
+          return newReturnInfo(game, context)
         }
       } else //player 2 move
       {
@@ -134,56 +142,42 @@ const resolvers = {
           game.board.spots[args.index].typeRevealed.player1 =
             game.board.spots[args.index].player1Type
 
-          const greenCount = game.board.spots.filter(
-            //this filter checks for spots that are player 2's revealed green
-            (thisSpot) =>
-              thisSpot.typeRevealed.player2 === 'wire' &&
-              thisSpot.player1Type === 'wire',
-          ).length
+          if (game.board.spots[args.index].player1Type === 'bomb') {
+            let returnVal = updateSpotBomb(
+              context,
+              game,
+              game.board.spots[args.index],
+              isPlayer1,
+            )
+            await game.save()
+            pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
 
-          if (greenCount === 9) //this player can't take any more actions
-          {
-            turnChangeMade = changeTurn(game, game.players[0])
+            return newReturnInfo(game, context)
           }
-        } else {
-          turnChangeMade = changeTurn(game, game.players[0])
+
+          let returnVal = updateSpotWire(
+            context,
+            game,
+            game.board.spots[args.index],
+            isPlayer1,
+          )
+          await game.save()
+          pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
+          return newReturnInfo(game, context)
         }
       }
 
+      let returnValDud = updateSpotDud(
+        context,
+        game,
+        game.board.spots[args.index],
+        isPlayer1,
+      )
+      console.log('BEFORE SAVE')
       await game.save()
-
-      const newSpot = {
-        word: game.board.spots[args.index].word,
-
-        myType: context.user.equals(game.players[0])
-          ? game.board.spots[args.index].player1Type
-          : game.board.spots[args.index].player2Type,
-
-        typeRevealed: context.user.equals(game.players[0])
-          ? {
-              myType: game.board.spots[args.index].typeRevealed.player1,
-              theirType: game.board.spots[args.index].typeRevealed.player2,
-            }
-          : {
-              myType: game.board.spots[args.index].typeRevealed.player2,
-              theirType: game.board.spots[args.index].typeRevealed.player1,
-            },
-      }
-
-      const gameUpdate = {
-        gameID: game.id,
-        playerID: context.user.id,
-        type: 'Move Made',
-        changedSpots: [
-          {
-            word: newSpot.word,
-            typeRevealed: newSpot.typeRevealed,
-          },
-        ],
-        turnChange: turnChangeMade,
-      }
-
-      pubsub.publish('GAME_UPDATE', { gameUpdate: gameUpdate })
+      console.log('AFTER SAVE')
+      pubsub.publish('GAME_UPDATE', { gameUpdate: returnValDud })
+      console.log('AFTER PUBLISH:', returnValDud)
 
       return newReturnInfo(game, context)
     },
@@ -194,6 +188,8 @@ const resolvers = {
 
       if (!game.currentPlayer.equals(context.user._id))
         return newReturnInfo(game, context)
+
+      if (game.turnsRemaining > 0) game.turnsRemaining -= 1
 
       game.currentPlayer = context.user.equals(game.players[0])
         ? game.players[1]
@@ -211,7 +207,10 @@ const resolvers = {
             id: game.currentPlayer.id,
           },
         },
+        turnsRemainingChange: game.turnsRemaining,
       }
+
+      console.log('gameUpdate', gameUpdate)
 
       pubsub.publish('GAME_UPDATE', { gameUpdate })
 
@@ -287,6 +286,7 @@ const newReturnInfo = (game, context) => {
       })),
     },
     gameState: game.gameState,
+    turnsRemaining: game.turnsRemaining,
   }
 }
 
@@ -311,6 +311,124 @@ const changeTurn = (game, user) => {
   }
 
   return turnChangeMade
+}
+
+const endGame = (game, endState) => {
+  game.gameState = endState
+  //currently commenting this out to make testing easier, later i should make there be no turn player
+  //game.currentPlayer = null
+}
+
+const updateSpotWire = (context, game, spot, isPlayer1) => {
+  //player 1's count goes down if it is on player 2's score card
+  if (spot.player1Type === 'wire') game.playerState.player2RemainingWires -= 1
+
+  if (spot.player2Type === 'wire') game.playerState.player1RemainingWires -= 1
+
+  let turnChangeMade = null
+  let gameStateChangeMade = null
+
+  if (
+    game.playerState.player1RemainingWires > 0 ||
+    game.playerState.player2RemainingWires > 0
+  ) {
+    if (isPlayer1 && game.playerState.player1RemainingWires === 0) {
+      turnChangeMade = changeTurn(game, game.players[1])
+      game.turnsRemaining -= 1
+    } else if (!isPlayer1 && game.playerState.player2RemainingWires === 0) {
+      turnChangeMade = changeTurn(game, game.players[0])
+      game.turnsRemaining -= 1
+    }
+  } else {
+    gameStateChangeMade = 'Win'
+    endGame(game, 'Win')
+  }
+
+  const gameUpdate = {
+    gameID: game.id,
+    playerID: context.user.id,
+    type: 'Move Made',
+    changedSpots: [
+      {
+        word: spot.word,
+        typeRevealed: {
+          myType: 'wire',
+          theirType: 'wire',
+        },
+      },
+    ],
+    turnChange: turnChangeMade,
+    gameStateChange: gameStateChangeMade,
+    turnsRemainingChange: game.turnsRemaining,
+  }
+
+  return gameUpdate
+}
+
+const updateSpotDud = (context, game, spot, isPlayer1) => {
+  let turnChangeMade = null
+  let gameStateChangeMade = null
+
+  if (isPlayer1) turnChangeMade = changeTurn(game, game.players[1])
+  else turnChangeMade = changeTurn(game, game.players[0])
+
+  if (game.turnsRemaining === 0) {
+    gameStateChangeMade = 'Lose'
+    endGame(game, 'Lose')
+  } else {
+    game.turnsRemaining -= 1
+  }
+
+  const typeRevealed = isPlayer1
+    ? {
+        myType: spot.typeRevealed.player1,
+        theirType: spot.typeRevealed.player2,
+      }
+    : {
+        myType: spot.typeRevealed.player2,
+        theirType: spot.typeRevealed.player1,
+      }
+
+  const gameUpdate = {
+    gameID: game.id,
+    playerID: context.user.id,
+    type: 'Move Made',
+    changedSpots: [
+      {
+        word: spot.word,
+        typeRevealed: typeRevealed,
+      },
+    ],
+    turnChange: turnChangeMade,
+    gameStateChange: gameStateChangeMade,
+    turnsRemainingChange: game.turnsRemaining,
+  }
+
+  console.log('before return: ', gameUpdate)
+
+  return gameUpdate
+}
+
+const updateSpotBomb = (context, game, spot, isPlayer1) => {
+  endGame(game, 'Lose')
+
+  const gameUpdate = {
+    gameID: game.id,
+    playerID: context.user.id,
+    type: 'Move Made',
+    changedSpots: [
+      {
+        word: spot.word,
+        typeRevealed: {
+          myType: 'bomb',
+          theirType: 'bomb',
+        },
+      },
+    ],
+    gameStateChange: 'Lose',
+  }
+
+  return gameUpdate
 }
 
 module.exports = resolvers

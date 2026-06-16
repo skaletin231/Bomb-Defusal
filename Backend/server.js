@@ -19,15 +19,21 @@ const { WebSocketServer } = require('ws')
 const { useServer } = require('graphql-ws/use/ws')
 
 const checkJwtOptional = (req, res, next) => {
+  //console.log('token', req.headers.authorization)
+  //console.log('token', req.headers.authorization?.split(' '))
   const token = req.headers.authorization?.split(' ')[1]
+  //console.log('token', token)
 
   if (!token) {
+    //console.log('null')
     req.user = null
     return next()
   }
 
   return checkJwt(req, res, (err) => {
+    //console.log(err)
     if (err) {
+      //console.log('null 2')
       req.user = null
       return next()
     }
@@ -88,6 +94,7 @@ const startServer = async (port) => {
     checkJwtOptional,
     expressMiddleware(server, {
       context: async ({ req }) => {
+        //console.log('request', req.auth)
         if (!req.auth) {
           return {
             auth: null,

@@ -36,6 +36,21 @@ const gameSchema = new mongoose.Schema({
     type: String,
     enum: ['Win', 'Lose', 'Playing'],
   },
+  playerState: {
+    //this may be best tracked as green count remaining
+    player1RemainingWires: {
+      type: Number,
+      default: 9,
+    },
+    player2RemainingWires: {
+      type: Number,
+      default: 9,
+    },
+  },
+  turnsRemaining: {
+    type: Number,
+    default: 9,
+  },
 })
 
 module.exports = mongoose.model('Game', gameSchema)

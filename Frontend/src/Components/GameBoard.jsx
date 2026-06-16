@@ -37,11 +37,33 @@ const GameBoard = ({ gameID }) => {
     variables: { id: gameID },
   })
 
-  console.log(gameResult)
+  //console.log(gameResult)
 
   useSubscription(GAME_UPDATE, {
     onData: ({ data }) => {
+      console.log('update loop')
       const update = data.data.gameUpdate
+      console.log('update check', update)
+
+      if (update.gameStateChange !== null) {
+        client.cache.updateQuery(
+          {
+            query: GET_GAME,
+            variables: { id: update.gameID },
+          },
+          (data) => {
+            if (!data) return data
+
+            return {
+              ...data,
+              getGame: {
+                ...data.getGame,
+                gameState: update.gameStateChange,
+              },
+            }
+          },
+        )
+      }
       if (update.turnChange !== null) {
         client.cache.updateQuery(
           {
@@ -59,6 +81,7 @@ const GameBoard = ({ gameID }) => {
                   username: update.turnChange.turnUpdate.username,
                   id: update.turnChange.turnUpdate.id,
                 },
+                turnsRemaining: update.turnsRemainingChange,
               },
             }
           },
@@ -149,7 +172,7 @@ const GameBoard = ({ gameID }) => {
   const boardSpots = game.board.spots
 
   const trySetSelected = (selected) => {
-    if (me.id === game.currentPlayer.id) {
+    if (me.id === game.currentPlayer.id && game.gameState === 'Playing') {
       setSelectedCard(selected)
     }
   }
@@ -222,7 +245,7 @@ const GameBoard = ({ gameID }) => {
       )}
       <p>current player: {game.currentPlayer.username}</p>
       <p>you: {me.username}</p>
-      {me.id === game.currentPlayer.id && (
+      {me.id === game.currentPlayer.id && game.gameState === 'Playing' && (
         <Button onClick={tryEndTurn} variant='contained'>
           End Turn
         </Button>
