@@ -43,7 +43,6 @@ const GameBoard = ({ gameID }) => {
     onData: ({ data }) => {
       console.log('update loop')
       const update = data.data.gameUpdate
-      console.log('update check', update)
 
       if (update.gameStateChange !== null) {
         client.cache.updateQuery(
@@ -251,6 +250,7 @@ const GameBoard = ({ gameID }) => {
         </Button>
       )}
       {makeCard()}
+      <p>Turns Reamining: {game.turnsRemaining}</p>
     </div>
   )
 }
