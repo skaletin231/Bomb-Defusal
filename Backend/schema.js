@@ -29,6 +29,14 @@ const typeDefs = /* GraphQL */ `
     turnsRemaining: Int!
   }
 
+  scalar DateTime
+
+  type ChatMessage {
+    user: GameUser!
+    text: String!
+    createdAt: DateTime!
+  }
+
   type Mutation { #player should be obtainable from context now if player is me
     startGame(words: [String!]!): Game
     joinGame(gameID: ID!): Game
@@ -36,6 +44,7 @@ const typeDefs = /* GraphQL */ `
     endTurn(gameID: ID!): Game
     addUser(username: String!, email: String!, auth0_ID: String!): User
     updateUserInfo(username: String!): User
+    sendMessage(gameID: ID!, text: String!): ChatMessage
   }
 
   type User {

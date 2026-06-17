@@ -79,22 +79,7 @@ export const END_TURN = gql`
 export const START_GAME = gql`
   mutation startGame($words: [String!]!) {
     startGame(words: $words) {
-      board {
-        spots {
-          word
-          myType
-          typeRevealed {
-            myType
-            theirType
-          }
-        }
-      }
-      currentPlayer {
-        username
-        id
-      }
-      gameState
-      turnsRemaining
+      id
     }
   }
 `
