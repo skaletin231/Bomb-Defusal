@@ -1,4 +1,12 @@
 import { Button, Box, Stack, Paper, Typography, TextField } from '@mui/material'
+import { GET_MESSAGES, ME, SEND_MESSAGE, MESSAGE_UPDATE } from '../queries'
+import {
+  useApolloClient,
+  useMutation,
+  useQuery,
+  useSubscription,
+} from '@apollo/client/react'
+import { useState, useEffect, useRef } from 'react'
 
 const containerSX = {
   display: 'flex',
@@ -29,43 +37,124 @@ const stackSX = {
   overflowY: 'auto',
 }
 
-const message1 = {
+const theirMessages = {
   alignSelf: 'flex-start',
   backgroundColor: '#a3a3a3',
 }
 
-const message2 = {
+const myMessages = {
   alignSelf: 'flex-end',
   backgroundColor: '#8bff3e',
 }
 
-const ChatWindow = () => {
+const ChatWindow = ({ gameID }) => {
+  const client = useApolloClient()
+  const [messageToSend, setMessageToSend] = useState('')
+  const bottomRef = useRef(null)
+
+  const chatResults = useQuery(GET_MESSAGES, {
+    variables: { gameID: gameID },
+  })
+
+  const { data: meData } = useQuery(ME, {})
+  const me = meData.me
+
+  const [sendMessage] = useMutation(SEND_MESSAGE, {
+    update: (cache, response) => {
+      cache.updateQuery(
+        {
+          query: GET_MESSAGES,
+          variables: { gameID: gameID },
+        },
+        (data) => {
+          if (!data) return data
+
+          return {
+            ...data,
+            getMessages: [...data.getMessages, response.data.sendMessage],
+          }
+        },
+      )
+      setMessageToSend('')
+    },
+  })
+
+  useSubscription(MESSAGE_UPDATE, {
+    onData: ({ data }) => {
+      const update = data.data.messageUpdate
+      if (update.user.id === me.id) return
+      client.cache.updateQuery(
+        {
+          query: GET_MESSAGES,
+          variables: { gameID: gameID },
+        },
+        (cacheData) => {
+          if (!cacheData) return data
+          return {
+            ...cacheData,
+            getMessages: [...cacheData.getMessages, update],
+          }
+        },
+      )
+    },
+  })
+
+  const chatHistory = chatResults.data?.getMessages
+
+  useEffect(() => {
+    if (chatResults.loading) return
+    bottomRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'end',
+    })
+  }, [chatResults.loading, chatHistory, bottomRef])
+
+  if (chatResults.loading) return
+
+  const trySendMessage = async (event) => {
+    event.preventDefault()
+
+    sendMessage({
+      variables: {
+        gameID: gameID,
+        text: messageToSend,
+      },
+    })
+  }
+
   return (
     <Box sx={containerSX}>
       <Paper sx={paperSX} elevation={1}>
         Chat
       </Paper>
       <Stack sx={stackSX} spacing={1}>
-        {dataTest.map((message, id) => (
+        {chatHistory.map((message, id) => (
           <Typography
             key={id}
-            sx={[textSX, message.player === 0 ? message1 : message2]}
+            sx={[
+              textSX,
+              message.user.id === me.id ? myMessages : theirMessages,
+            ]}
           >
-            {message.message}
+            {message.text}
           </Typography>
         ))}
+        <div ref={bottomRef} />
       </Stack>
       <Box
         sx={{ display: 'flex', border: 'solid', borderWidth: '.1rem 0 0 0' }}
       >
-        <TextField
-          sx={{ margin: '.4rem .1rem' }}
-          variant='outlined'
-          label='Message'
-        ></TextField>
-        <Button sx={{ margin: '.4rem' }} variant='contained'>
-          Send
-        </Button>
+        <form onSubmit={trySendMessage}>
+          <TextField
+            sx={{ margin: '.4rem .1rem' }}
+            variant='outlined'
+            label='Message'
+            onChange={({ target }) => setMessageToSend(target.value)}
+          ></TextField>
+          <Button type='submit' sx={{ margin: '.4rem' }} variant='contained'>
+            Send
+          </Button>
+        </form>
       </Box>
     </Box>
   )
@@ -85,38 +174,3 @@ export default ChatWindow
           Button
 
 */
-
-const dataTest = [
-  {
-    player: 1,
-    message: 'This is a test',
-  },
-  {
-    player: 0,
-    message: 'You sure?',
-  },
-  {
-    player: 0,
-    message: 'I mean REALLY sure?',
-  },
-  {
-    player: 1,
-    message: 'Yes',
-  },
-  {
-    player: 1,
-    message: 'This should work',
-  },
-  {
-    player: 1,
-    message: 'But it is hard coded a bit for now',
-  },
-  {
-    player: 0,
-    message: 'hmmm',
-  },
-  {
-    player: 1,
-    message: '?',
-  },
-]

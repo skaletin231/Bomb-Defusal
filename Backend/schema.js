@@ -2,6 +2,7 @@ const typeDefs = /* GraphQL */ `
   type Query {
     getGame(id: ID!): Game
     getUser(auth0_ID: String!): User
+    getMessages(gameID: ID!): [ChatMessage!]
     me: User
   }
 
@@ -80,6 +81,7 @@ const typeDefs = /* GraphQL */ `
 
   type Subscription {
     gameUpdate: GameUpdate!
+    messageUpdate: ChatMessage!
   }
 
   # type Token {

@@ -23,6 +23,32 @@ export const GET_GAME = gql`
   }
 `
 
+export const GET_MESSAGES = gql`
+  query getMessages($gameID: ID!) {
+    getMessages(gameID: $gameID) {
+      user {
+        username
+        id
+      }
+      text
+      createdAt
+    }
+  }
+`
+
+export const SEND_MESSAGE = gql`
+  mutation sendMessage($gameID: ID!, $text: String!) {
+    sendMessage(gameID: $gameID, text: $text) {
+      user {
+        username
+        id
+      }
+      text
+      createdAt
+    }
+  }
+`
+
 export const JOIN_GAME = gql`
   mutation joinGame($gameID: ID!) {
     joinGame(gameID: $gameID) {
@@ -144,6 +170,19 @@ export const GAME_UPDATE = gql`
       }
       gameStateChange
       turnsRemainingChange
+    }
+  }
+`
+
+export const MESSAGE_UPDATE = gql`
+  subscription {
+    messageUpdate {
+      user {
+        username
+        id
+      }
+      text
+      createdAt
     }
   }
 `

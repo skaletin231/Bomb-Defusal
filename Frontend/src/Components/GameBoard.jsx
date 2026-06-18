@@ -252,7 +252,7 @@ const GameBoard = ({ gameID }) => {
       )}
       {makeCard()}
       <p>Turns Reamining: {game.turnsRemaining}</p>
-      <ChatWindow />
+      <ChatWindow gameID={gameID} />
     </div>
   )
 }

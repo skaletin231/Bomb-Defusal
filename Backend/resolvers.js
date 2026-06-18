@@ -37,6 +37,26 @@ const resolvers = {
     me: (root, args, context) => {
       return context.user
     },
+    getMessages: async (root, args, context) => {
+      const game = await Game.findById(args.gameID).populate('players')
+
+      if (!game || !context.user || !includesPlayer(game, context.user)) {
+        return null
+      }
+
+      const messages = await Message.find({ gameID: args.gameID }).populate(
+        'user',
+      )
+      console.log(messages)
+      return messages.map((message) => ({
+        user: {
+          username: message.user.username,
+          id: message.user._id,
+        },
+        text: message.text,
+        createdAt: message.createdAt,
+      }))
+    },
   },
   Mutation: {
     startGame: async (root, args, context) => {
@@ -266,16 +286,23 @@ const resolvers = {
 
       await message.save()
 
-      return {
+      const returnMessage = {
         user: { username: context.user.username, id: context.user._id },
         text: message.text,
         createdAt: message.createdAt,
       }
+
+      pubsub.publish('MESSAGE_UPDATE', { messageUpdate: returnMessage })
+
+      return returnMessage
     },
   },
   Subscription: {
     gameUpdate: {
       subscribe: () => pubsub.asyncIterableIterator('GAME_UPDATE'),
+    },
+    messageUpdate: {
+      subscribe: () => pubsub.asyncIterableIterator('MESSAGE_UPDATE'),
     },
   },
 }
