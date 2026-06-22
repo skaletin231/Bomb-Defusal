@@ -1,6 +1,7 @@
 const Game = require('./models/game')
 const User = require('./models/user')
 const Message = require('./models/message')
+
 const { MakeBoard } = require('./utils/GameboardUtils')
 
 const { PubSub } = require('graphql-subscriptions')
@@ -47,7 +48,6 @@ const resolvers = {
       const messages = await Message.find({ gameID: args.gameID }).populate(
         'user',
       )
-      console.log(messages)
       return messages.map((message) => ({
         user: {
           username: message.user.username,
@@ -55,6 +55,31 @@ const resolvers = {
         },
         text: message.text,
         createdAt: message.createdAt,
+      }))
+    },
+    getHints: async (root, args, context) => {
+      const game = await Game.findById(args.gameID).populate('players')
+
+      if (!game || !context.user || !includesPlayer(game, context.user)) {
+        return null
+      }
+
+      //console.log('user', context.user)
+      const players = game.players
+
+      return game.hints.map((fullHint) => ({
+        player: {
+          username:
+            fullHint.player === players[0]._id
+              ? players[0].username
+              : players[1].username,
+          id:
+            fullHint.player === players[0]._id
+              ? players[0]._id
+              : players[1]._id,
+        },
+        hint: fullHint.hint,
+        count: fullHint.count,
       }))
     },
   },
@@ -269,7 +294,6 @@ const resolvers = {
     },
     sendMessage: async (root, args, context) => {
       const game = await Game.findById(args.gameID)
-      //console.log(game)
       if (!game) return null
 
       if (!context.user || !includesPlayer(game, context.user)) {
@@ -281,8 +305,6 @@ const resolvers = {
         user: context.user,
         text: args.text,
       })
-
-      //console.log(message)
 
       await message.save()
 
@@ -296,6 +318,41 @@ const resolvers = {
 
       return returnMessage
     },
+    sendHint: async (root, args, context) => {
+      const game = await Game.findById(args.gameID)
+      if (!game) return null
+
+      if (!context.user || !includesPlayer(game, context.user)) {
+        return null
+      }
+
+      const hint = {
+        player: context.user._id,
+        hint: args.hint,
+        count: args.count,
+      }
+
+      game.hints = game.hints.concat(hint)
+
+      await game.save()
+
+      const returnHint = {
+        player: { username: context.user.username, id: context.user._id },
+        hint: hint.hint,
+        count: hint.count,
+      }
+
+      const gameUpdate = {
+        gameID: game.id,
+        playerID: context.user.id,
+        type: 'Hint',
+        hintChange: returnHint,
+      }
+
+      pubsub.publish('HINT_UPDATE', { hintUpdate: gameUpdate })
+
+      return returnHint
+    },
   },
   Subscription: {
     gameUpdate: {
@@ -303,6 +360,9 @@ const resolvers = {
     },
     messageUpdate: {
       subscribe: () => pubsub.asyncIterableIterator('MESSAGE_UPDATE'),
+    },
+    hintUpdate: {
+      subscribe: () => pubsub.asyncIterableIterator('HINT_UPDATE'),
     },
   },
 }

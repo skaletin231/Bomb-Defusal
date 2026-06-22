@@ -8,27 +8,33 @@ import {
 } from '@apollo/client/react'
 import { useState, useEffect, useRef } from 'react'
 
-const containerSX = {
-  display: 'flex',
-  flexDirection: 'column',
-  position: 'absolute',
-  right: '2rem',
-  bottom: '2rem',
-  backgroundColor: '#e3e3e3',
-  border: 'solid',
-  borderWidth: '.1rem',
-}
+// const containerSX = {
+//   display: 'flex',
+//   flexDirection: 'column',
+//   position: 'absolute',
+//   right: '2rem',
+//   bottom: '2rem',
+//   backgroundColor: '#e3e3e3',
+//   border: 'solid',
+//   borderWidth: '.1rem',
+// }
 
-const paperSX = {
-  backgroundColor: '#d4d4d4',
-  margin: '.1rem',
-}
+// const paperSX = {
+//   backgroundColor: '#d4d4d4',
+//   margin: '.1rem',
+// }
 
 const textSX = {
   width: 'auto',
   maxWidth: '50%',
   borderRadius: '5px',
   padding: '.4rem',
+}
+
+const formStyle = {
+  justifyContent: 'flex-start',
+  flexDirection: 'row',
+  display: 'flex',
 }
 
 const stackSX = {
@@ -123,10 +129,41 @@ const ChatWindow = ({ gameID }) => {
   }
 
   return (
-    <Box sx={containerSX}>
-      <Paper sx={paperSX} elevation={1}>
-        Chat
-      </Paper>
+    // <Box sx={containerSX} className='chatbox'>
+    //   <Paper sx={paperSX} elevation={1}>
+    //     Chat
+    //   </Paper>
+    //   <Stack sx={stackSX} spacing={1}>
+    //     {chatHistory.map((message, id) => (
+    //       <Typography
+    //         key={id}
+    //         sx={[
+    //           textSX,
+    //           message.user.id === me.id ? myMessages : theirMessages,
+    //         ]}
+    //       >
+    //         {message.text}
+    //       </Typography>
+    //     ))}
+    //     <div ref={bottomRef} />
+    //   </Stack>
+    //   <Box
+    //     sx={{ display: 'flex', border: 'solid', borderWidth: '.1rem 0 0 0' }}
+    //   >
+    //     <form onSubmit={trySendMessage}>
+    //       <TextField
+    //         sx={{ margin: '.4rem .1rem' }}
+    //         variant='outlined'
+    //         label='Message'
+    //         onChange={({ target }) => setMessageToSend(target.value)}
+    //       ></TextField>
+    //       <Button type='submit' sx={{ margin: '.4rem' }} variant='contained'>
+    //         Send
+    //       </Button>
+    //     </form>
+    //   </Box>
+    // </Box>
+    <>
       <Stack sx={stackSX} spacing={1}>
         {chatHistory.map((message, id) => (
           <Typography
@@ -144,19 +181,26 @@ const ChatWindow = ({ gameID }) => {
       <Box
         sx={{ display: 'flex', border: 'solid', borderWidth: '.1rem 0 0 0' }}
       >
-        <form onSubmit={trySendMessage}>
-          <TextField
-            sx={{ margin: '.4rem .1rem' }}
-            variant='outlined'
-            label='Message'
-            onChange={({ target }) => setMessageToSend(target.value)}
-          ></TextField>
-          <Button type='submit' sx={{ margin: '.4rem' }} variant='contained'>
+        <form onSubmit={trySendMessage} style={formStyle}>
+          <div style={{ width: '70%' }}>
+            <TextField
+              sx={{ margin: '.4rem .1rem' }}
+              variant='outlined'
+              label='Message'
+              onChange={({ target }) => setMessageToSend(target.value)}
+            ></TextField>
+          </div>
+
+          <Button
+            type='submit'
+            sx={{ marginLeft: 'auto', margin: '.4rem' }}
+            variant='contained'
+          >
             Send
           </Button>
         </form>
       </Box>
-    </Box>
+    </>
   )
 }
 

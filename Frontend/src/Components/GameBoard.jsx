@@ -10,6 +10,7 @@ import {
   useSubscription,
 } from '@apollo/client/react'
 import ChatWindow from './ChatWindow'
+import ChatHintContainer from './ChatHintContainer'
 
 const style = {
   display: 'grid',
@@ -252,7 +253,8 @@ const GameBoard = ({ gameID }) => {
       )}
       {makeCard()}
       <p>Turns Reamining: {game.turnsRemaining}</p>
-      <ChatWindow gameID={gameID} />
+      {/* <ChatWindow gameID={gameID} /> */}
+      <ChatHintContainer gameID={gameID} />
     </div>
   )
 }

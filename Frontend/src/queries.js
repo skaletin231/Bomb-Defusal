@@ -36,6 +36,19 @@ export const GET_MESSAGES = gql`
   }
 `
 
+export const GET_HINTS = gql`
+  query getHints($gameID: ID!) {
+    getHints(gameID: $gameID) {
+      player {
+        username
+        id
+      }
+      hint
+      count
+    }
+  }
+`
+
 export const SEND_MESSAGE = gql`
   mutation sendMessage($gameID: ID!, $text: String!) {
     sendMessage(gameID: $gameID, text: $text) {
@@ -149,6 +162,19 @@ export const UPDATE_USER_INFO = gql`
   }
 `
 
+export const SEND_HINT = gql`
+  mutation sendHint($gameID: ID!, $hint: String!, $count: Int!) {
+    sendHint(gameID: $gameID, hint: $hint, count: $count) {
+      player {
+        username
+        id
+      }
+      hint
+      count
+    }
+  }
+`
+
 export const GAME_UPDATE = gql`
   subscription {
     gameUpdate {
@@ -183,6 +209,24 @@ export const MESSAGE_UPDATE = gql`
       }
       text
       createdAt
+    }
+  }
+`
+
+export const HINT_UPDATE = gql`
+  subscription {
+    hintUpdate {
+      gameID
+      playerID
+      type
+      hintChange {
+        player {
+          username
+          id
+        }
+        hint
+        count
+      }
     }
   }
 `
