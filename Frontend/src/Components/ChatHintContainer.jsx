@@ -20,6 +20,10 @@ const paperSX = {
   margin: '.1rem',
 }
 
+const selectedButton = {
+  backgroundColor: '#f3f0f0',
+}
+
 const ChatHintContainer = ({ gameID }) => {
   const [chatView, setChatView] = useState('Chat')
 
@@ -38,8 +42,18 @@ const ChatHintContainer = ({ gameID }) => {
   return (
     <Box sx={containerSX} className='chatbox'>
       <Paper sx={paperSX} elevation={1}>
-        <Button onClick={() => changeView('Chat')}>Chat</Button>
-        <Button onClick={() => changeView('Hint')}>Hint</Button>
+        <Button
+          sx={chatView === 'Chat' ? selectedButton : null}
+          onClick={() => changeView('Chat')}
+        >
+          Chat
+        </Button>
+        <Button
+          sx={chatView === 'Hint' ? selectedButton : null}
+          onClick={() => changeView('Hint')}
+        >
+          Hint
+        </Button>
       </Paper>
       {chatView === 'Chat' && chatContainer()}
       {chatView === 'Hint' && hintContainer()}

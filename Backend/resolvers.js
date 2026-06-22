@@ -64,19 +64,20 @@ const resolvers = {
         return null
       }
 
-      //console.log('user', context.user)
+      console.log('hints', game.hints)
+
       const players = game.players
+
+      console.log('players', players)
 
       return game.hints.map((fullHint) => ({
         player: {
-          username:
-            fullHint.player === players[0]._id
-              ? players[0].username
-              : players[1].username,
-          id:
-            fullHint.player === players[0]._id
-              ? players[0]._id
-              : players[1]._id,
+          username: fullHint.player.equals(players[0]._id)
+            ? players[0].username
+            : players[1].username,
+          id: fullHint.player.equals(players[0]._id)
+            ? players[0]._id
+            : players[1]._id,
         },
         hint: fullHint.hint,
         count: fullHint.count,

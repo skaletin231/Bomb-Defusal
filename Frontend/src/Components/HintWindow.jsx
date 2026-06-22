@@ -128,6 +128,8 @@ const HintWindow = ({ gameID }) => {
     })
   }
 
+  console.log(hintHistory, me)
+
   return (
     <>
       <Stack sx={stackSX} spacing={1}>
