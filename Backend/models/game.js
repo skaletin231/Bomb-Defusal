@@ -16,6 +16,21 @@ const spotSchema = new mongoose.Schema({
   },
 })
 
+const hintSchema = new mongoose.Schema({
+  player: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  },
+  hint: {
+    type: String,
+    required: true,
+  },
+  count: {
+    type: Number,
+    required: true,
+  },
+})
+
 const boardSchema = new mongoose.Schema({
   spots: [spotSchema],
 })
@@ -51,6 +66,7 @@ const gameSchema = new mongoose.Schema({
     type: Number,
     default: 9,
   },
+  hints: [hintSchema],
 })
 
 module.exports = mongoose.model('Game', gameSchema)

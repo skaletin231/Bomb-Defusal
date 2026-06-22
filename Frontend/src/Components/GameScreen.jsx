@@ -1,10 +1,10 @@
-import { users } from '../../db'
 import GameBoard from './GameBoard'
-import { useGameStateActions } from '../gameStateStore'
-import { JOIN_GAME } from '../queries'
+import { JOIN_GAME, START_GAME } from '../queries'
 import { useMutation } from '@apollo/client/react'
 import { useState } from 'react'
 import { TextField, Button } from '@mui/material'
+import DecksScreen from './DecksScreen'
+import ChatWindow from './ChatWindow'
 
 const styleGameboardContainer = {
   width: 'auto',
@@ -21,20 +21,41 @@ const style = {
 
 const GameScreen = ({ setInGame }) => {
   const [realGameID, setRealGameID] = useState(null)
+  const [screen, setScreen] = useState(null)
   const [gameID, setGameID] = useState('')
   const [joinGame] = useMutation(JOIN_GAME)
 
+  const [startGame] = useMutation(START_GAME)
+
   const tryJoinGame = async (event) => {
     event.preventDefault()
-    //console.log('try join', gameID)
     const result = await joinGame({
       variables: {
         gameID: gameID,
       },
     })
-    //console.log('joined: ', result.data)
 
     if (result.data !== null) setRealGameID(result.data.joinGame.id)
+  }
+
+  const tryCreateGame = async (deck) => {
+    event.preventDefault()
+
+    const result = await startGame({
+      variables: {
+        words: deck.cards,
+      },
+    })
+
+    if (result.data === null) return
+
+    setScreen(null)
+
+    setRealGameID(result.data.startGame.id)
+  }
+
+  const openNewGameScreen = () => {
+    setScreen('Make Game')
   }
 
   const inGame = () => {
@@ -46,6 +67,10 @@ const GameScreen = ({ setInGame }) => {
         <button onClick={() => setRealGameID(null)}>End Game</button>
       </div>
     )
+  }
+
+  if (screen === 'Make Game') {
+    return <DecksScreen tryCreateGame={tryCreateGame} />
   }
 
   const notInGame = () => {
@@ -67,6 +92,14 @@ const GameScreen = ({ setInGame }) => {
             Join Game
           </Button>
         </form>
+        <Button
+          type='contained'
+          variant='contained'
+          style={{ marginTop: 10 }}
+          onClick={openNewGameScreen}
+        >
+          Make New Game
+        </Button>
         <Button
           onClick={() => setInGame(false)}
           variant='contained'

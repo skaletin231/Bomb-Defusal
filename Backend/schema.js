@@ -2,6 +2,8 @@ const typeDefs = /* GraphQL */ `
   type Query {
     getGame(id: ID!): Game
     getUser(auth0_ID: String!): User
+    getMessages(gameID: ID!): [ChatMessage!]
+    getHints(gameID: ID!): [Hint!]
     me: User
   }
 
@@ -20,6 +22,12 @@ const typeDefs = /* GraphQL */ `
     spots: [Spot!]!
   }
 
+  type Hint {
+    player: GameUser!
+    hint: String!
+    count: Int!
+  }
+
   type Game {
     id: ID!
     players: [GameUser!]!
@@ -27,6 +35,15 @@ const typeDefs = /* GraphQL */ `
     board: Board!
     gameState: String!
     turnsRemaining: Int!
+    hints: [Hint!]!
+  }
+
+  scalar DateTime
+
+  type ChatMessage {
+    user: GameUser!
+    text: String!
+    createdAt: DateTime!
   }
 
   type Mutation { #player should be obtainable from context now if player is me
@@ -36,6 +53,8 @@ const typeDefs = /* GraphQL */ `
     endTurn(gameID: ID!): Game
     addUser(username: String!, email: String!, auth0_ID: String!): User
     updateUserInfo(username: String!): User
+    sendMessage(gameID: ID!, text: String!): ChatMessage
+    sendHint(gameID: ID!, hint: String!, count: Int!): Hint
   }
 
   type User {
@@ -67,10 +86,13 @@ const typeDefs = /* GraphQL */ `
     turnChange: GamePatch
     gameStateChange: String
     turnsRemainingChange: Int
+    hintChange: Hint
   }
 
   type Subscription {
     gameUpdate: GameUpdate!
+    messageUpdate: ChatMessage!
+    hintUpdate: GameUpdate!
   }
 
   # type Token {

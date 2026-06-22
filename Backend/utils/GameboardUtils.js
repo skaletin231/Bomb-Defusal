@@ -101,14 +101,6 @@ const MakeBoard = (deck) => {
     board[i].word = deck[word]
   })
 
-  console.log(board)
-  // const newBoard = new Game({
-  //   players: [],
-  //   board: {
-  //     spots: board,
-  //   },
-  // })
-
   return board
 }
 
