@@ -230,3 +230,67 @@ export const HINT_UPDATE = gql`
     }
   }
 `
+
+//#region Deck Related Stuff
+
+export const GET_MY_DECKS = gql`
+  query {
+    getMyDecks {
+      owner {
+        username
+        id
+      }
+      name
+      public
+      cards
+    }
+  }
+`
+
+export const GET_ALL_DECKS = gql`
+  query {
+    getAllDecks {
+      owner {
+        username
+        id
+      }
+      name
+      public
+      cards
+    }
+  }
+`
+
+export const MAKE_DECK = gql`
+  mutation makeDeck($name: String!, $public: Boolean!, $cards: [String!]!) {
+    makeDeck(name: $name, public: $public, cards: $cards) {
+      owner {
+        username
+        id
+      }
+      name
+      public
+      cards
+    }
+  }
+`
+
+export const UPDATE_DECK = gql`
+  mutation updateDeck(
+    $deckID: ID!
+    $name: String!
+    $public: Boolean!
+    $cards: [String!]!
+  ) {
+    updateDeck(deckID: $deckID, name: $name, public: $public, cards: $cards) {
+      owner {
+        username
+        id
+      }
+      name
+      public
+      cards
+    }
+  }
+`
+//#endregions
