@@ -1,24 +1,31 @@
-//import { decks } from '../../db'
 import DecksDropdown from './DeckDropdowns'
 import { useQuery } from '@apollo/client/react'
-import { GET_MY_DECKS } from '../queries'
-import { Button } from '@mui/material'
+import { GET_ALL_DECKS } from '../queries'
+import { Button, Card, CardContent } from '@mui/material'
 
 const DecksScreen = ({ tryCreateGame, setScreen }) => {
-  const myDeckResults = useQuery(GET_MY_DECKS)
+  const deckResults = useQuery(GET_ALL_DECKS)
 
-  if (myDeckResults.loading) return <div>LOADING...</div>
+  if (deckResults.loading) return <div>LOADING...</div>
 
-  const decks = myDeckResults.data.getMyDecks
+  const decks = deckResults.data.getAllDecks
 
   return (
     <>
       {decks.map((deck) => (
-        <DecksDropdown
-          deck={deck}
-          key={deck.name}
-          tryCreateGame={tryCreateGame}
-        />
+        <Card>
+          <CardContent>
+            <DecksDropdown
+              deck={deck}
+              key={deck.name}
+              tryCreateGame={tryCreateGame}
+            />
+            <Button variant='contained' onClick={() => tryCreateGame(deck)}>
+              {' '}
+              Use Deck
+            </Button>
+          </CardContent>
+        </Card>
       ))}
       <Button onClick={() => setScreen('')}>Go Back</Button>
     </>

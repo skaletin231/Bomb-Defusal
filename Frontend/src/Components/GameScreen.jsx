@@ -6,6 +6,7 @@ import { TextField, Button } from '@mui/material'
 import DecksScreen from './DecksScreen'
 import ChatWindow from './ChatWindow'
 import MakeDeckScreen from './MakeDeckScreen'
+import MyDecks from './MyDecks'
 
 const styleGameboardContainer = {
   width: 'auto',
@@ -75,7 +76,7 @@ const GameScreen = ({ setInGame }) => {
   }
 
   if (screen === 'Make Deck') {
-    return <MakeDeckScreen setScreen={setScreen} />
+    return <MyDecks setScreen={setScreen} />
   }
 
   const notInGame = () => {

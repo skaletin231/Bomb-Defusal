@@ -49,6 +49,7 @@ const typeDefs = /* GraphQL */ `
   }
 
   type Deck {
+    id: ID
     owner: GameUser!
     name: String!
     public: Boolean!

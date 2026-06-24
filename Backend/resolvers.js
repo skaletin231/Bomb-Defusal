@@ -65,11 +65,7 @@ const resolvers = {
         return null
       }
 
-      console.log('hints', game.hints)
-
       const players = game.players
-
-      console.log('players', players)
 
       return game.hints.map((fullHint) => ({
         player: {
@@ -94,6 +90,7 @@ const resolvers = {
       )
 
       return (await myDecks).map((deck) => ({
+        id: deck._id,
         owner: {
           username: deck.owner.username,
           id: deck.owner._id,
@@ -422,10 +419,7 @@ const resolvers = {
         return null
       }
 
-      console.log('user found', context.user)
-
       const deck = await Deck.findById(args.deckID)
-      console.log(deck)
       if (!deck || !deck.owner.equals(context.user._id)) return null
 
       deck.name = args.name ? args.name : deck.name

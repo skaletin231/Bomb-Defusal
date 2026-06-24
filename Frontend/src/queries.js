@@ -236,6 +236,7 @@ export const HINT_UPDATE = gql`
 export const GET_MY_DECKS = gql`
   query {
     getMyDecks {
+      id
       owner {
         username
         id
