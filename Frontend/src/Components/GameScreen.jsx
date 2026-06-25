@@ -5,6 +5,8 @@ import { useState } from 'react'
 import { TextField, Button } from '@mui/material'
 import DecksScreen from './DecksScreen'
 import ChatWindow from './ChatWindow'
+import MakeDeckScreen from './MakeDeckScreen'
+import MyDecks from './MyDecks'
 
 const styleGameboardContainer = {
   width: 'auto',
@@ -70,7 +72,11 @@ const GameScreen = ({ setInGame }) => {
   }
 
   if (screen === 'Make Game') {
-    return <DecksScreen tryCreateGame={tryCreateGame} />
+    return <DecksScreen tryCreateGame={tryCreateGame} setScreen={setScreen} />
+  }
+
+  if (screen === 'Make Deck') {
+    return <MyDecks setScreen={setScreen} />
   }
 
   const notInGame = () => {
@@ -99,6 +105,14 @@ const GameScreen = ({ setInGame }) => {
           onClick={openNewGameScreen}
         >
           Make New Game
+        </Button>
+        <Button
+          type='contained'
+          variant='contained'
+          style={{ marginTop: 10 }}
+          onClick={() => setScreen('Make Deck')}
+        >
+          My Decks
         </Button>
         <Button
           onClick={() => setInGame(false)}

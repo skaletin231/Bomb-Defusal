@@ -4,6 +4,8 @@ const typeDefs = /* GraphQL */ `
     getUser(auth0_ID: String!): User
     getMessages(gameID: ID!): [ChatMessage!]
     getHints(gameID: ID!): [Hint!]
+    getMyDecks: [Deck!]
+    getAllDecks: [Deck!]
     me: User
   }
 
@@ -46,6 +48,14 @@ const typeDefs = /* GraphQL */ `
     createdAt: DateTime!
   }
 
+  type Deck {
+    id: ID
+    owner: GameUser!
+    name: String!
+    public: Boolean!
+    cards: [String!]!
+  }
+
   type Mutation { #player should be obtainable from context now if player is me
     startGame(words: [String!]!): Game
     joinGame(gameID: ID!): Game
@@ -55,6 +65,13 @@ const typeDefs = /* GraphQL */ `
     updateUserInfo(username: String!): User
     sendMessage(gameID: ID!, text: String!): ChatMessage
     sendHint(gameID: ID!, hint: String!, count: Int!): Hint
+    makeDeck(name: String!, public: Boolean!, cards: [String!]!): Deck
+    updateDeck(
+      deckID: ID!
+      name: String
+      public: Boolean
+      cards: [String!]
+    ): Deck
   }
 
   type User {
@@ -94,14 +111,6 @@ const typeDefs = /* GraphQL */ `
     messageUpdate: ChatMessage!
     hintUpdate: GameUpdate!
   }
-
-  # type Token {
-  #   value: String!
-  # }
-
-  # type Subscription {
-  #
-  # }
 `
 
 module.exports = typeDefs

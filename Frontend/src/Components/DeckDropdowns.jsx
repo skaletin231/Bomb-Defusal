@@ -30,24 +30,24 @@ const DecksDropdown = ({ deck, tryCreateGame }) => {
 
   return (
     <div>
-      <Card variant='outlined'>
-        <CardContent>
-          {deck.name}
-          <Button
+      {/* <Card>
+        <CardContent> */}
+      {deck.name}
+      {/* <Button
             style={{ marginLeft: '20px' }}
             variant='contained'
             onClick={createGame}
           >
             Use Deck
-          </Button>
-          <br />
-          {isDropedDown && dropDownView()}
-          <Button variant='contained' onClick={changeDropdown}>
-            {isDropedDown && '˄'}
-            {!isDropedDown && '˅'}
-          </Button>
-        </CardContent>
-      </Card>
+          </Button> */}
+      <br />
+      {isDropedDown && dropDownView()}
+      <Button variant='contained' onClick={changeDropdown}>
+        {isDropedDown && '˄'}
+        {!isDropedDown && '˅'}
+      </Button>
+      {/* </CardContent>
+      </Card> */}
     </div>
   )
 }

@@ -1,5 +1,6 @@
 const Game = require('./models/game')
 const User = require('./models/user')
+const Deck = require('./models/decks')
 const Message = require('./models/message')
 
 const { MakeBoard } = require('./utils/GameboardUtils')
@@ -64,11 +65,7 @@ const resolvers = {
         return null
       }
 
-      console.log('hints', game.hints)
-
       const players = game.players
-
-      console.log('players', players)
 
       return game.hints.map((fullHint) => ({
         player: {
@@ -81,6 +78,45 @@ const resolvers = {
         },
         hint: fullHint.hint,
         count: fullHint.count,
+      }))
+    },
+    getMyDecks: async (root, __, context) => {
+      if (!context.user) {
+        return null
+      }
+
+      const myDecks = await Deck.find({ owner: context.user._id }).populate(
+        'owner',
+      )
+
+      return (await myDecks).map((deck) => ({
+        id: deck._id,
+        owner: {
+          username: deck.owner.username,
+          id: deck.owner._id,
+        },
+        name: deck.name,
+        public: deck.public,
+        cards: deck.cards,
+      }))
+    },
+    getAllDecks: async (root, __, context) => {
+      if (!context.user) {
+        return null
+      }
+
+      const decks = await Deck.find({
+        $or: [{ public: true }, { owner: context.user._id }],
+      }).populate('owner')
+
+      return (await decks).map((deck) => ({
+        owner: {
+          username: deck.owner.username,
+          id: deck.owner._id,
+        },
+        name: deck.name,
+        public: deck.public,
+        cards: deck.cards,
       }))
     },
   },
@@ -353,6 +389,54 @@ const resolvers = {
       pubsub.publish('HINT_UPDATE', { hintUpdate: gameUpdate })
 
       return returnHint
+    },
+    makeDeck: async (root, args, context) => {
+      if (!context.user) {
+        return null
+      }
+
+      const newDeck = new Deck({
+        owner: context.user._id,
+        name: args.name,
+        public: args.public,
+        cards: args.cards,
+      })
+
+      await newDeck.save()
+
+      return {
+        owner: {
+          username: context.user.username,
+          id: context.user._id,
+        },
+        name: newDeck.name,
+        public: newDeck.public,
+        cards: newDeck.cards,
+      }
+    },
+    updateDeck: async (root, args, context) => {
+      if (!context.user) {
+        return null
+      }
+
+      const deck = await Deck.findById(args.deckID)
+      if (!deck || !deck.owner.equals(context.user._id)) return null
+
+      deck.name = args.name ? args.name : deck.name
+      deck.public = args.public ? args.public : deck.public
+      deck.cards = args.cards ? args.cards : deck.cards
+
+      await deck.save()
+
+      return {
+        owner: {
+          username: context.user.username,
+          id: context.user._id,
+        },
+        name: deck.name,
+        public: deck.public,
+        cards: deck.cards,
+      }
     },
   },
   Subscription: {

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { Button, Box, Stack, Paper, Typography, TextField } from '@mui/material'
 import ChatWindow from './ChatWindow'
 import HintWindow from './HintWindow'

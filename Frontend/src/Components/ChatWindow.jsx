@@ -8,22 +8,6 @@ import {
 } from '@apollo/client/react'
 import { useState, useEffect, useRef } from 'react'
 
-// const containerSX = {
-//   display: 'flex',
-//   flexDirection: 'column',
-//   position: 'absolute',
-//   right: '2rem',
-//   bottom: '2rem',
-//   backgroundColor: '#e3e3e3',
-//   border: 'solid',
-//   borderWidth: '.1rem',
-// }
-
-// const paperSX = {
-//   backgroundColor: '#d4d4d4',
-//   margin: '.1rem',
-// }
-
 const textSX = {
   width: 'auto',
   maxWidth: '50%',
@@ -129,40 +113,6 @@ const ChatWindow = ({ gameID }) => {
   }
 
   return (
-    // <Box sx={containerSX} className='chatbox'>
-    //   <Paper sx={paperSX} elevation={1}>
-    //     Chat
-    //   </Paper>
-    //   <Stack sx={stackSX} spacing={1}>
-    //     {chatHistory.map((message, id) => (
-    //       <Typography
-    //         key={id}
-    //         sx={[
-    //           textSX,
-    //           message.user.id === me.id ? myMessages : theirMessages,
-    //         ]}
-    //       >
-    //         {message.text}
-    //       </Typography>
-    //     ))}
-    //     <div ref={bottomRef} />
-    //   </Stack>
-    //   <Box
-    //     sx={{ display: 'flex', border: 'solid', borderWidth: '.1rem 0 0 0' }}
-    //   >
-    //     <form onSubmit={trySendMessage}>
-    //       <TextField
-    //         sx={{ margin: '.4rem .1rem' }}
-    //         variant='outlined'
-    //         label='Message'
-    //         onChange={({ target }) => setMessageToSend(target.value)}
-    //       ></TextField>
-    //       <Button type='submit' sx={{ margin: '.4rem' }} variant='contained'>
-    //         Send
-    //       </Button>
-    //     </form>
-    //   </Box>
-    // </Box>
     <>
       <Stack sx={stackSX} spacing={1}>
         {chatHistory.map((message, id) => (
@@ -205,16 +155,3 @@ const ChatWindow = ({ gameID }) => {
 }
 
 export default ChatWindow
-
-/*
-  Layout:
-
-  Outside Box
-      Header Bar of some kind
-      Stack
-          Messages
-      Input area
-          Inpout Field
-          Button
-
-*/
