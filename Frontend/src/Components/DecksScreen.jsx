@@ -12,8 +12,8 @@ const DecksScreen = ({ tryCreateGame, setScreen }) => {
 
   return (
     <>
-      {decks.map((deck) => (
-        <Card>
+      {decks.map((deck, i) => (
+        <Card key={i}>
           <CardContent>
             <DecksDropdown
               deck={deck}

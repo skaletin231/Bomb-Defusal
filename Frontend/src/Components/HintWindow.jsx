@@ -48,7 +48,7 @@ const myHints = {
   backgroundColor: '#8bff3e',
 }
 
-const HintWindow = ({ gameID }) => {
+const HintWindow = ({ gameID, show }) => {
   const client = useApolloClient()
   const [hintToSend, setHintToSend] = useState('')
   const [countToSend, setCountToSend] = useState(0)
@@ -70,7 +70,7 @@ const HintWindow = ({ gameID }) => {
           variables: { gameID: gameID },
         },
         (data) => {
-          if (!data) return data
+          if (!data || !response.data?.sendHint) return data
 
           return {
             ...data,
@@ -85,8 +85,9 @@ const HintWindow = ({ gameID }) => {
 
   useSubscription(HINT_UPDATE, {
     onData: ({ data }) => {
+      console.log('hint subscription fired')
+
       const update = data.data.hintUpdate
-      console.log('try to update')
       if (update.playerID === me.id) return
       client.cache.updateQuery(
         {
@@ -94,7 +95,7 @@ const HintWindow = ({ gameID }) => {
           variables: { gameID: gameID },
         },
         (cacheData) => {
-          if (!cacheData) return data
+          if (!cacheData) return cacheData
           return {
             ...cacheData,
             getHints: [...cacheData.getHints, update],
@@ -128,7 +129,7 @@ const HintWindow = ({ gameID }) => {
     })
   }
 
-  console.log(hintHistory, me)
+  console.log(hintHistory)
 
   return (
     <>
@@ -143,48 +144,44 @@ const HintWindow = ({ gameID }) => {
         ))}
         <div ref={bottomRef} />
       </Stack>
-      <Box
-        sx={{ display: 'flex', border: 'solid', borderWidth: '.1rem 0 0 0' }}
-      >
-        <form onSubmit={trySendHint} style={formStyle}>
-          <div style={{ display: 'flex', width: '70%' }}>
-            <TextField
-              sx={{ width: '70%', margin: '.4rem .1rem' }}
-              variant='outlined'
-              label='Hint'
-              onChange={({ target }) => setHintToSend(target.value)}
-            ></TextField>
-            {/* <TextField
-              sx={{ width: '30%', margin: '.4rem .1rem' }}
-              variant='outlined'
-              label='Count'
-              onChange={({ target }) => setCountToSend(target.value)}
-            ></TextField> */}
-            <FormControl sx={{ width: '30%', margin: '.4rem .1rem' }}>
-              <InputLabel>Count</InputLabel>
-              <Select
-                value={countToSend}
-                label='Count'
-                onChange={(e) => setCountToSend(e.target.value)}
-              >
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-                  <MenuItem key={n} value={n}>
-                    {n}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </div>
+      {show && (
+        <Box
+          sx={{ display: 'flex', border: 'solid', borderWidth: '.1rem 0 0 0' }}
+        >
+          <form onSubmit={trySendHint} style={formStyle}>
+            <div style={{ display: 'flex', width: '70%' }}>
+              <TextField
+                sx={{ width: '70%', margin: '.4rem .1rem' }}
+                variant='outlined'
+                label='Hint'
+                onChange={({ target }) => setHintToSend(target.value)}
+              ></TextField>
+              <FormControl sx={{ width: '30%', margin: '.4rem .1rem' }}>
+                <InputLabel>Count</InputLabel>
+                <Select
+                  value={countToSend}
+                  label='Count'
+                  onChange={(e) => setCountToSend(e.target.value)}
+                >
+                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
+                    <MenuItem key={n} value={n}>
+                      {n}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
 
-          <Button
-            type='submit'
-            sx={{ marginLeft: 'auto', margin: '.4rem' }}
-            variant='contained'
-          >
-            Send
-          </Button>
-        </form>
-      </Box>
+            <Button
+              type='submit'
+              sx={{ marginLeft: 'auto', margin: '.4rem' }}
+              variant='contained'
+            >
+              Send
+            </Button>
+          </form>
+        </Box>
+      )}
     </>
   )
 }

@@ -24,7 +24,7 @@ const selectedButton = {
   backgroundColor: '#f3f0f0',
 }
 
-const ChatHintContainer = ({ gameID }) => {
+const ChatHintContainer = ({ gameID, show }) => {
   const [chatView, setChatView] = useState('Chat')
 
   const changeView = (newView) => {
@@ -36,7 +36,7 @@ const ChatHintContainer = ({ gameID }) => {
   }
 
   const hintContainer = () => {
-    return <HintWindow gameID={gameID} />
+    return <HintWindow gameID={gameID} show={show} />
   }
 
   return (
