@@ -112,7 +112,7 @@ const GameScreen = ({ setInGame }) => {
           style={{ marginTop: 10 }}
           onClick={() => setScreen('Make Deck')}
         >
-          Make New Deck
+          My Decks
         </Button>
         <Button
           onClick={() => setInGame(false)}

@@ -221,7 +221,7 @@ const MakeDeckScreen = ({ setMakeNewDeck, startingDeck, setDeckToUpdate }) => {
               </form>
             </div>
 
-            <Button onClick={tryVerifyDeckChanges}>
+            <Button variant='contained' onClick={tryVerifyDeckChanges}>
               {startingDeck && 'Update Deck'}
               {!startingDeck && 'Create Deck'}
             </Button>
