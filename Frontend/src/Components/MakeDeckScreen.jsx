@@ -24,6 +24,8 @@ const center = {
   display: 'flex',
 }
 
+const maxCardSize = 15
+
 //this can possible take an ID for reference.
 //it will use that id to update if it does
 const MakeDeckScreen = ({ setMakeNewDeck, startingDeck, setDeckToUpdate }) => {
@@ -77,10 +79,22 @@ const MakeDeckScreen = ({ setMakeNewDeck, startingDeck, setDeckToUpdate }) => {
     // }
   }
 
+  function capitalizeWords(str) {
+    return str
+      .split(' ')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ')
+  }
+
   const tryAddCardsToList = (event) => {
     event.preventDefault()
-    if (cardToAdd === '' || !allCards.includes(cardToAdd)) {
-      setAllCards(allCards.concat(cardToAdd))
+    const formattedWord = capitalizeWords(cardToAdd.trim())
+    if (
+      formattedWord !== '' &&
+      formattedWord.length <= maxCardSize &&
+      !allCards.includes(formattedWord)
+    ) {
+      setAllCards(allCards.concat(formattedWord))
     }
     setCardToAdd('')
     //console.log(allCards)
@@ -112,7 +126,10 @@ const MakeDeckScreen = ({ setMakeNewDeck, startingDeck, setDeckToUpdate }) => {
             onChange={({ target }) => setDeckName(target.value)}
           ></TextField>
         </Box>
-        <div className={'cardsHolder'} style={{ height: '30rem' }}>
+        <div
+          className={'cardsHolder'}
+          style={{ height: '30rem', overflow: 'hidden' }}
+        >
           <Box
             sx={{
               display: 'grid',
@@ -136,6 +153,10 @@ const MakeDeckScreen = ({ setMakeNewDeck, startingDeck, setDeckToUpdate }) => {
                     '&:last-child': {
                       padding: '16px',
                     },
+                    height: '4rem',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    display: 'flex',
                   }}
                 >
                   <IconButton
@@ -151,7 +172,15 @@ const MakeDeckScreen = ({ setMakeNewDeck, startingDeck, setDeckToUpdate }) => {
                   >
                     X
                   </IconButton>
-                  <Typography sx={{ textAlign: 'center' }}>{card}</Typography>
+                  <Typography
+                    sx={{
+                      lineHeight: '1.2',
+                      textAlign: 'center',
+                      overflowWrap: 'anywhere',
+                    }}
+                  >
+                    {card}
+                  </Typography>
                 </CardContent>
               </Card>
             ))}
