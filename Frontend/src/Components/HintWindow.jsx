@@ -10,7 +10,7 @@ import {
   Select,
   MenuItem,
 } from '@mui/material'
-import { GET_HINTS, ME, SEND_HINT, HINT_UPDATE } from '../queries'
+import { GET_HINTS, ME, SEND_HINT, HINT_UPDATE, GET_GAME } from '../queries'
 import {
   useApolloClient,
   useMutation,
@@ -62,7 +62,7 @@ const HintWindow = ({ gameID, show }) => {
   const { data: meData } = useQuery(ME, {})
   const me = meData.me
 
-  const [sendMessage] = useMutation(SEND_HINT, {
+  const [sendHint] = useMutation(SEND_HINT, {
     update: (cache, response) => {
       cache.updateQuery(
         {
@@ -78,6 +78,29 @@ const HintWindow = ({ gameID, show }) => {
           }
         },
       )
+
+      cache.updateQuery(
+        {
+          query: GET_GAME,
+          variables: { id: gameID },
+        },
+        (cacheData) => {
+          if (!cacheData) return cacheData
+          const newPlayer =
+            me.id === cacheData.getGame.players[0].id
+              ? cacheData.getGame.players[1]
+              : cacheData.getGame.players[0]
+          return {
+            ...cacheData,
+            getGame: {
+              ...cacheData.getGame,
+              currentPlayer: newPlayer,
+              gameState: 'Playing',
+            },
+          }
+        },
+      )
+
       setHintToSend('')
       setCountToSend(0)
     },
@@ -85,7 +108,7 @@ const HintWindow = ({ gameID, show }) => {
 
   useSubscription(HINT_UPDATE, {
     onData: ({ data }) => {
-      console.log('hint subscription fired')
+      console.log('hint subscription fired', data)
 
       const update = data.data.hintUpdate
       if (update.playerID === me.id) return
@@ -98,7 +121,32 @@ const HintWindow = ({ gameID, show }) => {
           if (!cacheData) return cacheData
           return {
             ...cacheData,
-            getHints: [...cacheData.getHints, update],
+            getHints: [...cacheData.getHints, update.hintChange],
+          }
+        },
+      )
+
+      console.log('about to update getgame')
+
+      client.cache.updateQuery(
+        {
+          query: GET_GAME,
+          variables: { id: gameID },
+        },
+        (cacheData) => {
+          console.log('at cache')
+          if (!cacheData) return cacheData
+          console.log('there was cache: ', cacheData)
+          return {
+            ...cacheData,
+            getGame: {
+              ...cacheData.getGame,
+              currentPlayer: {
+                username: update.turnChange.turnUpdate.username,
+                id: update.turnChange.turnUpdate.id,
+              },
+              gameState: update.gameStateChange,
+            },
           }
         },
       )
@@ -120,7 +168,7 @@ const HintWindow = ({ gameID, show }) => {
   const trySendHint = async (event) => {
     event.preventDefault()
 
-    sendMessage({
+    sendHint({
       variables: {
         gameID: gameID,
         hint: hintToSend,
@@ -128,8 +176,6 @@ const HintWindow = ({ gameID, show }) => {
       },
     })
   }
-
-  console.log(hintHistory)
 
   return (
     <>

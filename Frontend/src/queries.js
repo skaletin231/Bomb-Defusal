@@ -13,6 +13,10 @@ export const GET_GAME = gql`
           }
         }
       }
+      players {
+        username
+        id
+      }
       currentPlayer {
         username
         id
@@ -83,6 +87,10 @@ export const MAKE_MOVE = gql`
           }
         }
       }
+      players {
+        username
+        id
+      }
       currentPlayer {
         username
         id
@@ -104,6 +112,10 @@ export const END_TURN = gql`
             theirType
           }
         }
+      }
+      players {
+        username
+        id
       }
       currentPlayer {
         username
@@ -227,6 +239,13 @@ export const HINT_UPDATE = gql`
         hint
         count
       }
+      turnChange {
+        turnUpdate {
+          username
+          id
+        }
+      }
+      gameStateChange
     }
   }
 `

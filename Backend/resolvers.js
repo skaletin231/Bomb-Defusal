@@ -208,6 +208,7 @@ const resolvers = {
               isPlayer1(game, context.user._id),
             )
             await game.save()
+            console.log('about to publish make move bomb', returnVal)
             pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
             return newReturnInfo(game, context)
           }
@@ -219,6 +220,7 @@ const resolvers = {
             isPlayer1(game, context.user._id),
           )
           await game.save()
+          console.log('about to publish make move wire', returnVal)
           pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
           return newReturnInfo(game, context)
         }
@@ -240,6 +242,7 @@ const resolvers = {
               isPlayer1(game, context.user._id),
             )
             await game.save()
+            console.log('about to publish make move bomb', returnVal)
             pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
 
             return newReturnInfo(game, context)
@@ -252,6 +255,7 @@ const resolvers = {
             isPlayer1(game, context.user._id),
           )
           await game.save()
+          console.log('about to publish make move wire', returnVal)
           pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
           return newReturnInfo(game, context)
         }
@@ -269,6 +273,8 @@ const resolvers = {
       console.log('269')
 
       await game.save()
+      console.log('about to publish make move dud', returnValDud)
+
       pubsub.publish('GAME_UPDATE', { gameUpdate: returnValDud })
 
       return newReturnInfo(game, context)
@@ -291,7 +297,7 @@ const resolvers = {
         gameID: game.id,
         playerID: context.user.id,
         type: 'Turn End',
-        turnChange: turnChange,
+        turnChange: turnChangeMade,
         turnsRemainingChange: game.turnsRemaining,
         gameStateChange: game.gameState,
       }
@@ -348,6 +354,7 @@ const resolvers = {
         createdAt: message.createdAt,
       }
 
+      console.log('about to publish make message', returnMessage)
       pubsub.publish('MESSAGE_UPDATE', { messageUpdate: returnMessage })
 
       return returnMessage
@@ -373,9 +380,10 @@ const resolvers = {
 
       const turnChange = changeTurn(game)
       game.hints = game.hints.concat(hint)
-      game.gameState = gameStates.playing
 
+      console.log('about to save game sendHint')
       await game.save()
+      console.log('saved')
 
       const returnHint = {
         player: { username: context.user.username, id: context.user._id },
@@ -392,7 +400,9 @@ const resolvers = {
         gameStateChange: game.gameState,
       }
 
+      console.log('about to publish sendHint', gameUpdate)
       pubsub.publish('HINT_UPDATE', { hintUpdate: gameUpdate })
+      console.log('published')
 
       return returnHint
     },
@@ -512,11 +522,11 @@ const changeToHint = (game) => {
   //when going to hint mode, the player who just moved is the hinter now
   //unless only they have wires left
   if (isPlayer1(game, game.currentPlayer._id)) {
-    if (player2IsDone(game)) game.currentPlayer = game.players[0]
-    else game.currentPlayer = game.players[1]
-  } else {
-    if (player1IsDone(game)) game.currentPlayer = game.players[1]
+    if (player2IsDone(game)) game.currentPlayer = game.players[1]
     else game.currentPlayer = game.players[0]
+  } else {
+    if (player1IsDone(game)) game.currentPlayer = game.players[0]
+    else game.currentPlayer = game.players[1]
   }
 
   turnChangeMade = {
@@ -525,6 +535,8 @@ const changeToHint = (game) => {
       id: game.currentPlayer.id,
     },
   }
+
+  game.gameState = gameStates.hint
 
   return turnChangeMade
 }
@@ -544,6 +556,8 @@ const changeToPlaying = (game) => {
     },
   }
 
+  game.gameState = gameStates.playing
+
   return turnChangeMade
 }
 
@@ -552,6 +566,7 @@ const changeTurn = (game) => {
   if (game.turnsRemaining > 0) //may be hint or playing
   {
     if (game.gameState === gameStates.playing) {
+      console.log('about to try change to hint')
       return changeToHint(game)
     } else {
       console.log('about to try change to playing')
