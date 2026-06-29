@@ -53,6 +53,7 @@ const myHints = {
 const HintWindow = ({ gameID, show }) => {
   const client = useApolloClient()
   const [hintToSend, setHintToSend] = useState('')
+  const [error, setError] = useState(false)
   const [countToSend, setCountToSend] = useState(0)
 
   const bottomRef = useRef(null)
@@ -169,7 +170,7 @@ const HintWindow = ({ gameID, show }) => {
 
   const trySendHint = async (event) => {
     event.preventDefault()
-    //console.log(countToSend)
+    if (error) return
     sendHint({
       variables: {
         gameID: gameID,
@@ -179,14 +180,9 @@ const HintWindow = ({ gameID, show }) => {
     })
   }
 
-  const handleValueChange = (event, val) => {
-    // If a floating number somehow makes it through, convert it to an integer
-    console.log('trye change')
-    if (val !== null) {
-      setCountToSend(Math.floor(val))
-    } else {
-      setCountToSend(null)
-    }
+  const formatHint = (hint) => {
+    setHintToSend(hint)
+    setError(hint.includes(' '))
   }
 
   return (
@@ -211,10 +207,11 @@ const HintWindow = ({ gameID, show }) => {
               style={{ display: 'flex', width: '70%', alignItems: 'center' }}
             >
               <TextField
+                error={error}
                 sx={{ width: '70%', margin: '.4rem .1rem' }}
                 variant='outlined'
                 label='Hint'
-                onChange={({ target }) => setHintToSend(target.value)}
+                onChange={({ target }) => formatHint(target.value)}
               ></TextField>
               <NumberField
                 style={{ width: '30%', margin: '.4rem .1rem' }}
