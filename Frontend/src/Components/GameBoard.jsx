@@ -28,6 +28,13 @@ const buttonStyle = {
   marginTop: '10px',
 }
 
+const gameStates = {
+  hint: 'Hint',
+  win: 'Win',
+  lose: 'Lose',
+  playing: 'Playing',
+}
+
 const GameBoard = ({ gameID }) => {
   const client = useApolloClient()
 
@@ -38,8 +45,6 @@ const GameBoard = ({ gameID }) => {
   const gameResult = useQuery(GET_GAME, {
     variables: { id: gameID },
   })
-
-  //console.log(gameResult)
 
   useSubscription(GAME_UPDATE, {
     onData: ({ data }) => {
@@ -173,7 +178,10 @@ const GameBoard = ({ gameID }) => {
   const boardSpots = game.board.spots
 
   const trySetSelected = (selected) => {
-    if (me.id === game.currentPlayer.id && game.gameState === 'Playing') {
+    if (
+      me.id === game.currentPlayer.id &&
+      game.gameState === gameStates.playing
+    ) {
       setSelectedCard(selected)
     }
   }
@@ -226,7 +234,6 @@ const GameBoard = ({ gameID }) => {
       </div>
     )
   }
-
   return (
     <div>
       <div style={style}>
@@ -246,15 +253,20 @@ const GameBoard = ({ gameID }) => {
       )}
       <p>current player: {game.currentPlayer.username}</p>
       <p>you: {me.username}</p>
-      {me.id === game.currentPlayer.id && game.gameState === 'Playing' && (
-        <Button onClick={tryEndTurn} variant='contained'>
-          End Turn
-        </Button>
-      )}
+      {me.id === game.currentPlayer.id &&
+        game.gameState === gameStates.playing && (
+          <Button onClick={tryEndTurn} variant='contained'>
+            End Turn
+          </Button>
+        )}
       {makeCard()}
       <p>Turns Reamining: {game.turnsRemaining}</p>
-      {/* <ChatWindow gameID={gameID} /> */}
-      <ChatHintContainer gameID={gameID} />
+      <ChatHintContainer
+        gameID={gameID}
+        show={
+          game.gameState === gameStates.hint && game.currentPlayer.id === me.id
+        }
+      />
     </div>
   )
 }

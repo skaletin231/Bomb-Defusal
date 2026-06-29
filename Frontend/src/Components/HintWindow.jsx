@@ -10,7 +10,9 @@ import {
   Select,
   MenuItem,
 } from '@mui/material'
-import { GET_HINTS, ME, SEND_HINT, HINT_UPDATE } from '../queries'
+import NumberField from './NumberField'
+
+import { GET_HINTS, ME, SEND_HINT, HINT_UPDATE, GET_GAME } from '../queries'
 import {
   useApolloClient,
   useMutation,
@@ -48,9 +50,10 @@ const myHints = {
   backgroundColor: '#8bff3e',
 }
 
-const HintWindow = ({ gameID }) => {
+const HintWindow = ({ gameID, show }) => {
   const client = useApolloClient()
   const [hintToSend, setHintToSend] = useState('')
+  const [error, setError] = useState(false)
   const [countToSend, setCountToSend] = useState(0)
 
   const bottomRef = useRef(null)
@@ -62,7 +65,7 @@ const HintWindow = ({ gameID }) => {
   const { data: meData } = useQuery(ME, {})
   const me = meData.me
 
-  const [sendMessage] = useMutation(SEND_HINT, {
+  const [sendHint] = useMutation(SEND_HINT, {
     update: (cache, response) => {
       cache.updateQuery(
         {
@@ -70,7 +73,7 @@ const HintWindow = ({ gameID }) => {
           variables: { gameID: gameID },
         },
         (data) => {
-          if (!data) return data
+          if (!data || !response.data?.sendHint) return data
 
           return {
             ...data,
@@ -78,6 +81,29 @@ const HintWindow = ({ gameID }) => {
           }
         },
       )
+
+      cache.updateQuery(
+        {
+          query: GET_GAME,
+          variables: { id: gameID },
+        },
+        (cacheData) => {
+          if (!cacheData) return cacheData
+          const newPlayer =
+            me.id === cacheData.getGame.players[0].id
+              ? cacheData.getGame.players[1]
+              : cacheData.getGame.players[0]
+          return {
+            ...cacheData,
+            getGame: {
+              ...cacheData.getGame,
+              currentPlayer: newPlayer,
+              gameState: 'Playing',
+            },
+          }
+        },
+      )
+
       setHintToSend('')
       setCountToSend(0)
     },
@@ -85,8 +111,9 @@ const HintWindow = ({ gameID }) => {
 
   useSubscription(HINT_UPDATE, {
     onData: ({ data }) => {
+      console.log('hint subscription fired', data)
+
       const update = data.data.hintUpdate
-      console.log('try to update')
       if (update.playerID === me.id) return
       client.cache.updateQuery(
         {
@@ -94,10 +121,35 @@ const HintWindow = ({ gameID }) => {
           variables: { gameID: gameID },
         },
         (cacheData) => {
-          if (!cacheData) return data
+          if (!cacheData) return cacheData
           return {
             ...cacheData,
-            getHints: [...cacheData.getHints, update],
+            getHints: [...cacheData.getHints, update.hintChange],
+          }
+        },
+      )
+
+      console.log('about to update getgame')
+
+      client.cache.updateQuery(
+        {
+          query: GET_GAME,
+          variables: { id: gameID },
+        },
+        (cacheData) => {
+          console.log('at cache')
+          if (!cacheData) return cacheData
+          console.log('there was cache: ', cacheData)
+          return {
+            ...cacheData,
+            getGame: {
+              ...cacheData.getGame,
+              currentPlayer: {
+                username: update.turnChange.turnUpdate.username,
+                id: update.turnChange.turnUpdate.id,
+              },
+              gameState: update.gameStateChange,
+            },
           }
         },
       )
@@ -118,8 +170,8 @@ const HintWindow = ({ gameID }) => {
 
   const trySendHint = async (event) => {
     event.preventDefault()
-
-    sendMessage({
+    if (error) return
+    sendHint({
       variables: {
         gameID: gameID,
         hint: hintToSend,
@@ -128,7 +180,10 @@ const HintWindow = ({ gameID }) => {
     })
   }
 
-  console.log(hintHistory, me)
+  const formatHint = (hint) => {
+    setHintToSend(hint)
+    setError(hint.includes(' '))
+  }
 
   return (
     <>
@@ -143,48 +198,41 @@ const HintWindow = ({ gameID }) => {
         ))}
         <div ref={bottomRef} />
       </Stack>
-      <Box
-        sx={{ display: 'flex', border: 'solid', borderWidth: '.1rem 0 0 0' }}
-      >
-        <form onSubmit={trySendHint} style={formStyle}>
-          <div style={{ display: 'flex', width: '70%' }}>
-            <TextField
-              sx={{ width: '70%', margin: '.4rem .1rem' }}
-              variant='outlined'
-              label='Hint'
-              onChange={({ target }) => setHintToSend(target.value)}
-            ></TextField>
-            {/* <TextField
-              sx={{ width: '30%', margin: '.4rem .1rem' }}
-              variant='outlined'
-              label='Count'
-              onChange={({ target }) => setCountToSend(target.value)}
-            ></TextField> */}
-            <FormControl sx={{ width: '30%', margin: '.4rem .1rem' }}>
-              <InputLabel>Count</InputLabel>
-              <Select
-                value={countToSend}
+      {show && (
+        <Box
+          sx={{ display: 'flex', border: 'solid', borderWidth: '.1rem 0 0 0' }}
+        >
+          <form onSubmit={trySendHint} style={formStyle}>
+            <div
+              style={{ display: 'flex', width: '70%', alignItems: 'center' }}
+            >
+              <TextField
+                error={error}
+                sx={{ width: '70%', margin: '.4rem .1rem' }}
+                variant='outlined'
+                label='Hint'
+                onChange={({ target }) => formatHint(target.value)}
+              ></TextField>
+              <NumberField
+                style={{ width: '30%', margin: '.4rem .1rem' }}
                 label='Count'
-                onChange={(e) => setCountToSend(e.target.value)}
-              >
-                {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-                  <MenuItem key={n} value={n}>
-                    {n}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </div>
+                value={countToSend}
+                min={0}
+                max={10}
+                onValueChange={(val) => setCountToSend(Math.trunc(val))}
+              />
+            </div>
 
-          <Button
-            type='submit'
-            sx={{ marginLeft: 'auto', margin: '.4rem' }}
-            variant='contained'
-          >
-            Send
-          </Button>
-        </form>
-      </Box>
+            <Button
+              type='submit'
+              sx={{ marginLeft: 'auto', margin: '.4rem' }}
+              variant='contained'
+            >
+              Send
+            </Button>
+          </form>
+        </Box>
+      )}
     </>
   )
 }
