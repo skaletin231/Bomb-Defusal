@@ -10,6 +10,8 @@ import {
   Select,
   MenuItem,
 } from '@mui/material'
+import NumberField from './NumberField'
+
 import { GET_HINTS, ME, SEND_HINT, HINT_UPDATE, GET_GAME } from '../queries'
 import {
   useApolloClient,
@@ -167,7 +169,7 @@ const HintWindow = ({ gameID, show }) => {
 
   const trySendHint = async (event) => {
     event.preventDefault()
-
+    //console.log(countToSend)
     sendHint({
       variables: {
         gameID: gameID,
@@ -175,6 +177,16 @@ const HintWindow = ({ gameID, show }) => {
         count: countToSend,
       },
     })
+  }
+
+  const handleValueChange = (event, val) => {
+    // If a floating number somehow makes it through, convert it to an integer
+    console.log('trye change')
+    if (val !== null) {
+      setCountToSend(Math.floor(val))
+    } else {
+      setCountToSend(null)
+    }
   }
 
   return (
@@ -195,27 +207,23 @@ const HintWindow = ({ gameID, show }) => {
           sx={{ display: 'flex', border: 'solid', borderWidth: '.1rem 0 0 0' }}
         >
           <form onSubmit={trySendHint} style={formStyle}>
-            <div style={{ display: 'flex', width: '70%' }}>
+            <div
+              style={{ display: 'flex', width: '70%', alignItems: 'center' }}
+            >
               <TextField
                 sx={{ width: '70%', margin: '.4rem .1rem' }}
                 variant='outlined'
                 label='Hint'
                 onChange={({ target }) => setHintToSend(target.value)}
               ></TextField>
-              <FormControl sx={{ width: '30%', margin: '.4rem .1rem' }}>
-                <InputLabel>Count</InputLabel>
-                <Select
-                  value={countToSend}
-                  label='Count'
-                  onChange={(e) => setCountToSend(e.target.value)}
-                >
-                  {[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-                    <MenuItem key={n} value={n}>
-                      {n}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
+              <NumberField
+                style={{ width: '30%', margin: '.4rem .1rem' }}
+                label='Count'
+                value={countToSend}
+                min={0}
+                max={10}
+                onValueChange={(val) => setCountToSend(Math.trunc(val))}
+              />
             </div>
 
             <Button

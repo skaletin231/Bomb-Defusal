@@ -12,8 +12,10 @@
   "dependencies": {
     "@apollo/client": "^4.2.0",
     "@auth0/auth0-react": "^2.17.0",
+    "@base-ui/react": "^1.6.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^9.1.1",
     "@mui/material": "^9.0.1",
     "graphql": "^16.14.0",
     "graphql-ws": "^6.0.8",
