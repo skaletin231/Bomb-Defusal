@@ -4,9 +4,9 @@ import { ME } from './queries'
 import { useQuery } from '@apollo/client/react'
 import AccountSetup from './Components/AccountSetup'
 import { useAuth0 } from '@auth0/auth0-react'
+import HomePage from './Components/HomePage'
 
 function App() {
-  //const [screen, setScreen] = useState('Main')
   const [ingame, setIngame] = useState(false)
   const { loginWithRedirect, logout } = useAuth0()
 
@@ -21,14 +21,14 @@ function App() {
     {
       console.log('need initial setup')
       return <AccountSetup />
-    } else {
-      //console.log(result)
     }
   }
 
   const startGame = () => {
     setIngame(true)
   }
+
+  // return <HomePage />
 
   if (ingame) return <GameScreen setInGame={setIngame} />
 
@@ -38,10 +38,11 @@ function App() {
         <button onClick={() => loginWithRedirect()}>Login</button>
       )}
       {result.data?.me && (
-        <>
-          <button onClick={() => startGame()}>Look For Game</button>
-          <button onClick={() => logout()}>Logout</button>
-        </>
+        <HomePage startGame={startGame} logout={logout} />
+        // <>
+        //   <button onClick={() => startGame()}>Look For Game</button>
+        //   <button onClick={() => logout()}>Logout</button>
+        // </>
       )}
       {/* <button onClick={() => startGame(1)}>Start Game player 2</button> */}
     </div>
