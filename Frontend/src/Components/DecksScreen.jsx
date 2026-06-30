@@ -1,14 +1,32 @@
 import DecksDropdown from './DeckDropdowns'
-import { useQuery } from '@apollo/client/react'
-import { GET_ALL_DECKS } from '../queries'
+import { useMutation, useQuery } from '@apollo/client/react'
+import { GET_ALL_DECKS, START_GAME } from '../queries'
 import { Button, Card, CardContent } from '@mui/material'
+import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 
-const DecksScreen = ({ tryCreateGame, setScreen }) => {
+const DecksScreen = () => {
   const deckResults = useQuery(GET_ALL_DECKS)
+  const navigate = useNavigate()
+
+  const [startGame] = useMutation(START_GAME)
 
   if (deckResults.loading) return <div>LOADING...</div>
 
   const decks = deckResults.data.getAllDecks
+
+  const tryCreateGame = async (deck) => {
+    event.preventDefault()
+
+    const result = await startGame({
+      variables: {
+        words: deck.cards,
+      },
+    })
+
+    if (result.data === null) return
+    navigate(`/playing/${result.data.startGame.id}`)
+  }
 
   return (
     <>
@@ -27,7 +45,9 @@ const DecksScreen = ({ tryCreateGame, setScreen }) => {
           </CardContent>
         </Card>
       ))}
-      <Button onClick={() => setScreen('')}>Go Back</Button>
+      <Button component={Link} to='/'>
+        Go Back
+      </Button>
     </>
   )
 }

@@ -28,8 +28,6 @@ const GameScreen = () => {
   const [gameID, setGameID] = useState('')
   const [joinGame] = useMutation(JOIN_GAME)
 
-  const [startGame] = useMutation(START_GAME)
-
   const tryJoinGame = async (event) => {
     event.preventDefault()
     const result = await joinGame({
@@ -41,26 +39,6 @@ const GameScreen = () => {
     if (result.data !== null) setRealGameID(result.data.joinGame.id)
   }
 
-  const tryCreateGame = async (deck) => {
-    event.preventDefault()
-
-    const result = await startGame({
-      variables: {
-        words: deck.cards,
-      },
-    })
-
-    if (result.data === null) return
-
-    setScreen(null)
-
-    setRealGameID(result.data.startGame.id)
-  }
-
-  const openNewGameScreen = () => {
-    setScreen('Make Game')
-  }
-
   const inGame = () => {
     return (
       <div style={style} className='gameScreen'>
@@ -70,10 +48,6 @@ const GameScreen = () => {
         <button onClick={() => setRealGameID(null)}>End Game</button>
       </div>
     )
-  }
-
-  if (screen === 'Make Game') {
-    return <DecksScreen tryCreateGame={tryCreateGame} setScreen={setScreen} />
   }
 
   if (screen === 'Make Deck') {
@@ -99,14 +73,6 @@ const GameScreen = () => {
             Join Game
           </Button>
         </form>
-        <Button
-          type='contained'
-          variant='contained'
-          style={{ marginTop: 10 }}
-          onClick={openNewGameScreen}
-        >
-          Make New Game
-        </Button>
         <Button
           type='contained'
           variant='contained'

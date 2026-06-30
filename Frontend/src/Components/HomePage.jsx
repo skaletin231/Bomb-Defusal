@@ -1,5 +1,8 @@
 import { Button, Box, Container } from '@mui/material'
 import { Link } from 'react-router-dom'
+import JoinGameDialogue from './JoinGameDialogue'
+import bomb from '../../images/bomb.svg'
+import { useState } from 'react'
 
 const containerStyle = {
   height: '100dvh',
@@ -57,9 +60,9 @@ const backgroundStyle = {
   zIndex: '-2',
 }
 
-import bomb from '../../images/bomb.svg'
-
 const HomePage = () => {
+  const [open, setOpen] = useState(false)
+
   return (
     <>
       <div style={backgroundStyle} className={'backgroundBottom'}></div>
@@ -69,6 +72,7 @@ const HomePage = () => {
         </Box>
         <Box sx={boxStyle}>
           <Button
+            className='StartGameButton'
             sx={buttonStyle}
             variant='contained'
             component={Link}
@@ -76,11 +80,17 @@ const HomePage = () => {
           >
             Start Game
           </Button>
-          <Button sx={buttonStyle} variant='contained'>
+          <Button
+            className='JoinGameButton'
+            sx={buttonStyle}
+            variant='contained'
+            onClick={() => setOpen(true)}
+          >
             Join Game
           </Button>
         </Box>
       </Container>
+      <JoinGameDialogue open={open} setOpen={setOpen} />
     </>
   )
 }
