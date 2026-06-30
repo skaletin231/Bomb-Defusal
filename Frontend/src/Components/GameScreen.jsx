@@ -7,6 +7,7 @@ import DecksScreen from './DecksScreen'
 import ChatWindow from './ChatWindow'
 import MakeDeckScreen from './MakeDeckScreen'
 import MyDecks from './MyDecks'
+import { Link } from 'react-router-dom'
 
 const styleGameboardContainer = {
   width: 'auto',
@@ -21,7 +22,7 @@ const style = {
   height: '80vh',
 }
 
-const GameScreen = ({ setInGame }) => {
+const GameScreen = () => {
   const [realGameID, setRealGameID] = useState(null)
   const [screen, setScreen] = useState(null)
   const [gameID, setGameID] = useState('')
@@ -115,9 +116,10 @@ const GameScreen = ({ setInGame }) => {
           My Decks
         </Button>
         <Button
-          onClick={() => setInGame(false)}
           variant='contained'
           style={{ marginTop: 10 }}
+          component={Link}
+          to='/'
         >
           Back To Home
         </Button>

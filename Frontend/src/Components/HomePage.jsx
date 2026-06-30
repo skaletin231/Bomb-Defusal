@@ -1,4 +1,5 @@
 import { Button, Box, Container } from '@mui/material'
+import { Link } from 'react-router-dom'
 
 const containerStyle = {
   height: '100dvh',
@@ -58,7 +59,7 @@ const backgroundStyle = {
 
 import bomb from '../../images/bomb.svg'
 
-const HomePage = ({ startGame, logout }) => {
+const HomePage = () => {
   return (
     <>
       <div style={backgroundStyle} className={'backgroundBottom'}></div>
@@ -67,7 +68,12 @@ const HomePage = ({ startGame, logout }) => {
           <img style={{ width: '20rem' }} src={bomb} alt='Logo' />{' '}
         </Box>
         <Box sx={boxStyle}>
-          <Button sx={buttonStyle} variant='contained' onClick={startGame}>
+          <Button
+            sx={buttonStyle}
+            variant='contained'
+            component={Link}
+            to='/startgame'
+          >
             Start Game
           </Button>
           <Button sx={buttonStyle} variant='contained'>
