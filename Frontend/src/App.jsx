@@ -3,12 +3,11 @@ import GameScreen from './Components/GameScreen'
 import { ME } from './queries'
 import { useQuery } from '@apollo/client/react'
 import AccountSetup from './Components/AccountSetup'
-import { useAuth0 } from '@auth0/auth0-react'
 import HomePage from './Components/HomePage'
+import BasicMenu from './Components/BasicMenu'
 
 function App() {
   const [ingame, setIngame] = useState(false)
-  const { loginWithRedirect, logout } = useAuth0()
 
   const result = useQuery(ME, {})
 
@@ -28,23 +27,17 @@ function App() {
     setIngame(true)
   }
 
-  // return <HomePage />
-
-  if (ingame) return <GameScreen setInGame={setIngame} />
-
+  if (ingame)
+    return (
+      <>
+        <BasicMenu loggedIn={result.data?.me !== null} />
+        <GameScreen setInGame={setIngame} />
+      </>
+    )
   return (
     <div>
-      {!result.data?.me && (
-        <button onClick={() => loginWithRedirect()}>Login</button>
-      )}
-      {result.data?.me && (
-        <HomePage startGame={startGame} logout={logout} />
-        // <>
-        //   <button onClick={() => startGame()}>Look For Game</button>
-        //   <button onClick={() => logout()}>Logout</button>
-        // </>
-      )}
-      {/* <button onClick={() => startGame(1)}>Start Game player 2</button> */}
+      <BasicMenu loggedIn={result.data?.me !== null} />
+      {result.data?.me && <HomePage startGame={startGame} />}
     </div>
   )
 }
