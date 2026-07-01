@@ -11,12 +11,10 @@ import {
   Card,
   CardContent,
 } from '@mui/material'
-import { useState } from 'react'
 import MakeDeckScreen from './MakeDeckScreen'
+import { Link } from 'react-router-dom'
 
-const MyDecks = ({ tryCreateGame, setScreen }) => {
-  const [makeNewDeck, setMakeNewDeck] = useState(false)
-  const [deckToUpdate, setDeckToUpdate] = useState(null)
+const MyDecks = () => {
   const deckResults = useQuery(GET_MY_DECKS)
 
   if (deckResults.loading) return <div>LOADING...</div>
@@ -24,40 +22,27 @@ const MyDecks = ({ tryCreateGame, setScreen }) => {
 
   const decks = deckResults.data.getMyDecks
 
-  if (makeNewDeck) {
-    return <MakeDeckScreen setMakeNewDeck={setMakeNewDeck} />
-  }
-
-  if (deckToUpdate) {
-    return (
-      <MakeDeckScreen
-        setMakeNewDeck={setMakeNewDeck}
-        startingDeck={deckToUpdate}
-        setDeckToUpdate={setDeckToUpdate}
-      />
-    )
-  }
-
   return (
     <>
+      <h1>My Decks</h1>
       {decks.map((deck) => (
         <Card key={deck.name} sx={{ marginTop: '1rem' }}>
           <CardContent>
-            <DecksDropdown
-              deck={deck}
-              tryCreateGame={tryCreateGame}
-              isDeckCreation={true}
-            />
-            <Button variant='contained' onClick={() => setDeckToUpdate(deck)}>
+            <DecksDropdown deck={deck} isDeckCreation={true} />
+            <Button
+              variant='contained'
+              component={Link}
+              to={`/mydecks/${deck.id}`}
+            >
               {' '}
               Update Deck
             </Button>
           </CardContent>
         </Card>
       ))}
-      <Button onClick={() => setMakeNewDeck(true)}>Make New Deck</Button>
-
-      <Button onClick={() => setScreen('')}>Go Back</Button>
+      <Button component={Link} to={'/mydecks/new'}>
+        Make New Deck
+      </Button>
     </>
   )
 }

@@ -30,6 +30,7 @@ const DecksScreen = () => {
 
   return (
     <>
+      <h1>Start Game</h1>
       {decks.map((deck, i) => (
         <Card key={i}>
           <CardContent>

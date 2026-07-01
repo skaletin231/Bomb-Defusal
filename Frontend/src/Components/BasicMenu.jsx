@@ -5,6 +5,7 @@ import MenuItem from '@mui/material/MenuItem'
 import { useAuth0 } from '@auth0/auth0-react'
 import IconButton from '@mui/material/IconButton'
 import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline'
+import { useNavigate } from 'react-router-dom'
 
 const divStyle = {
   position: 'absolute',
@@ -14,6 +15,7 @@ const divStyle = {
 
 export default function BasicMenu({ loggedIn }) {
   const { loginWithRedirect, logout } = useAuth0()
+  const navigate = useNavigate()
 
   const id = React.useId()
   const buttonId = `${id}-button`
@@ -47,6 +49,16 @@ export default function BasicMenu({ loggedIn }) {
     loginWithRedirect()
   }
 
+  const handleMyDeckTransition = () => {
+    handleClose()
+    navigate('/mydecks')
+  }
+
+  const handleBackToHome = () => {
+    handleClose()
+    navigate('/')
+  }
+
   const loggedOutMenu = () => {
     return <MenuItem onClick={handleLogin}>Login</MenuItem>
   }
@@ -54,8 +66,10 @@ export default function BasicMenu({ loggedIn }) {
   const loggedInMenu = () => {
     return (
       <>
-        <MenuItem onClick={handleProfileTransition}>Profile</MenuItem>
-        <MenuItem onClick={handleAccountTransition}>My account</MenuItem>
+        {/* <MenuItem onClick={handleProfileTransition}>Profile</MenuItem> */}
+        {/* <MenuItem onClick={handleAccountTransition}>My account</MenuItem> */}
+        <MenuItem onClick={handleBackToHome}>Home</MenuItem>
+        <MenuItem onClick={handleMyDeckTransition}>My deck</MenuItem>
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </>
     )

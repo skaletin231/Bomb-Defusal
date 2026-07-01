@@ -36,7 +36,7 @@ const buttonStyle = {
     },
   },
   '&:after': {
-    content: `''`,
+    content: '""',
     position: 'absolute',
     top: '4px',
     left: '0px',

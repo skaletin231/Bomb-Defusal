@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button, Card, CardContent, Box } from '@mui/material'
 
-const DecksDropdown = ({ deck, tryCreateGame }) => {
+const DecksDropdown = ({ deck }) => {
   const [isDropedDown, setIsDropedDown] = useState(false)
 
   const changeDropdown = () => {
@@ -24,30 +24,15 @@ const DecksDropdown = ({ deck, tryCreateGame }) => {
     )
   }
 
-  const createGame = () => {
-    tryCreateGame(deck)
-  }
-
   return (
     <div>
-      {/* <Card>
-        <CardContent> */}
       {deck.name}
-      {/* <Button
-            style={{ marginLeft: '20px' }}
-            variant='contained'
-            onClick={createGame}
-          >
-            Use Deck
-          </Button> */}
       <br />
       {isDropedDown && dropDownView()}
       <Button variant='contained' onClick={changeDropdown}>
         {isDropedDown && '˄'}
         {!isDropedDown && '˅'}
       </Button>
-      {/* </CardContent>
-      </Card> */}
     </div>
   )
 }

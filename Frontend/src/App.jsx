@@ -1,5 +1,3 @@
-import { useState } from 'react'
-import GameScreen from './Components/GameScreen'
 import { ME } from './queries'
 import { useQuery } from '@apollo/client/react'
 import AccountSetup from './Components/AccountSetup'
@@ -9,10 +7,9 @@ import { Routes, Route } from 'react-router-dom'
 import GameBoard from './Components/GameBoard'
 import DecksScreen from './Components/DecksScreen'
 import JoinGame from './Components/JoinGameDialogue'
-
+import MyDecks from './Components/MyDecks'
+import MakeDeckScreen from './Components/MakeDeckScreen'
 function App() {
-  const [ingame, setIngame] = useState(false)
-
   const result = useQuery(ME, {})
 
   if (!result.loading) {
@@ -31,21 +28,16 @@ function App() {
     return <h1>Error 404: Page Not Found</h1>
   }
 
-  if (ingame)
-    return (
-      <>
-        <BasicMenu loggedIn={result.data?.me !== null} />
-        <GameScreen setInGame={setIngame} />
-      </>
-    )
   return (
     <div>
       <BasicMenu loggedIn={result.data?.me !== null} />
       <Routes>
         <Route path='/' element={<HomePage />} />
         <Route path='/startgame' element={<DecksScreen />} />
-        {/* <Route path='/joingame' element={<joingam />} /> */}
         <Route path='/playing/:id' element={<GameBoard />} />
+        <Route path='/mydecks' element={<MyDecks />} />
+        <Route path='/mydecks/new' element={<MakeDeckScreen />} />
+        <Route path='/mydecks/:id' element={<MakeDeckScreen />} />
         <Route path='*' element={noPageError()} />
       </Routes>
     </div>

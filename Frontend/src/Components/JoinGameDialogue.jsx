@@ -26,7 +26,7 @@ function JoinGameDialogue({ open, setOpen }) {
       },
     })
 
-    if (result.data === null) return
+    if (result.data === null || result.data.joinGame === null) return
 
     navigate(`/playing/${result.data.joinGame.id}`)
   }
