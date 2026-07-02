@@ -175,14 +175,12 @@ const resolvers = {
       if (!context.user) {
         return null
       }
-      console.log('178')
       const game = await Game.findById(args.gameID).populate('players')
       if (!game) return null
 
       if (includesPlayer(game, context.user)) {
         return newReturnInfo(game, context)
       }
-      console.log('185')
       if (game.players.length == 2) {
         return null
       }
@@ -191,7 +189,20 @@ const resolvers = {
 
       await game.save()
 
-      return newReturnInfo(game, context)
+      const returnInfo = newReturnInfo(game, context)
+
+      const gameUpdate = {
+        gameID: game.id,
+        playerID: context.user.id,
+        type: 'New Player',
+        gameUser: returnInfo.players[1],
+      }
+
+      console.log(gameUpdate)
+
+      pubsub.publish('NEW_PLAYER_JOINED', { newPlayerJoined: gameUpdate })
+
+      return returnInfo
     },
     makeMove: async (root, args, context) => {
       console.log('try make move')
@@ -487,6 +498,9 @@ const resolvers = {
     },
     hintUpdate: {
       subscribe: () => pubsub.asyncIterableIterator('HINT_UPDATE'),
+    },
+    newPlayerJoined: {
+      subscribe: () => pubsub.asyncIterableIterator('NEW_PLAYER_JOINED'),
     },
   },
 }

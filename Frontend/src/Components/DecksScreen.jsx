@@ -1,6 +1,6 @@
 import DecksDropdown from './DeckDropdowns'
 import { useMutation, useQuery } from '@apollo/client/react'
-import { GET_ALL_DECKS, START_GAME } from '../queries'
+import { GET_ALL_DECKS, START_GAME, NEW_PLAYER_JOINED } from '../queries'
 import { Button, Card, CardContent } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'

@@ -18,7 +18,6 @@ function JoinGameDialogue({ open, setOpen }) {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
     const formJson = Object.fromEntries(formData.entries())
-    console.log(formJson)
 
     const result = await joinGame({
       variables: {

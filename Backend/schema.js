@@ -105,12 +105,14 @@ const typeDefs = /* GraphQL */ `
     gameStateChange: String
     turnsRemainingChange: Int
     hintChange: Hint
+    gameUser: GameUser
   }
 
   type Subscription {
     gameUpdate: GameUpdate!
     messageUpdate: ChatMessage!
     hintUpdate: GameUpdate!
+    newPlayerJoined: GameUpdate!
   }
 `
 

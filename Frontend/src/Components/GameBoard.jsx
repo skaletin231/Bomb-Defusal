@@ -2,7 +2,14 @@ import GameCard from './GameCard'
 import { useState } from 'react'
 import { Button, Card, CardContent } from '@mui/material'
 import { useParams } from 'react-router-dom'
-import { GAME_UPDATE, ME, GET_GAME, MAKE_MOVE, END_TURN } from '../queries'
+import {
+  GAME_UPDATE,
+  ME,
+  GET_GAME,
+  MAKE_MOVE,
+  END_TURN,
+  NEW_PLAYER_JOINED,
+} from '../queries'
 import {
   useApolloClient,
   useMutation,
@@ -126,6 +133,35 @@ const GameBoard = () => {
           },
         )
       }
+    },
+  })
+
+  useSubscription(NEW_PLAYER_JOINED, {
+    onData: ({ data }) => {
+      console.log('new player joined loop')
+      const update = data.data.newPlayerJoined
+
+      //TODO: Change this to make a new cache item for the new user and add that to the game as a reference instead
+
+      client.cache.updateQuery(
+        {
+          query: GET_GAME,
+          variables: { id: update.gameID },
+        },
+        (data) => {
+          if (!data) return data
+
+          console.log(data)
+
+          return {
+            ...data,
+            getGame: {
+              ...data.getGame,
+              players: [...data.getGame.players, update.gameUser],
+            },
+          }
+        },
+      )
     },
   })
 

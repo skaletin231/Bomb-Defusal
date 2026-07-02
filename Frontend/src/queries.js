@@ -249,6 +249,20 @@ export const HINT_UPDATE = gql`
     }
   }
 `
+//newPlayerJoined: GameUser!
+export const NEW_PLAYER_JOINED = gql`
+  subscription {
+    newPlayerJoined {
+      gameID
+      playerID
+      type
+      gameUser {
+        username
+        id
+      }
+    }
+  }
+`
 
 //#region Deck Related Stuff
 
@@ -266,7 +280,7 @@ export const GET_MY_DECKS = gql`
     }
   }
 `
-// mutation sendHint($gameID: ID!, $hint: String!, $count: Int!) {
+
 export const GET_MY_DECK = gql`
   query getMyDeck($deckID: ID!) {
     getMyDeck(deckID: $deckID) {
