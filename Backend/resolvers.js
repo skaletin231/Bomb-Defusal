@@ -16,6 +16,7 @@ const gameStates = {
 }
 
 const { GraphQLDateTime } = require('graphql-scalars')
+const { Error } = require('mongoose')
 
 const resolvers = {
   DateTime: GraphQLDateTime,
@@ -94,7 +95,7 @@ const resolvers = {
         'owner',
       )
 
-      return (await myDecks).map((deck) => ({
+      return myDecks.map((deck) => ({
         id: deck._id,
         owner: {
           username: deck.owner.username,
@@ -105,6 +106,29 @@ const resolvers = {
         cards: deck.cards,
       }))
     },
+    getMyDeck: async (root, args, context) => {
+      if (!context.user) {
+        return null
+      }
+
+      const myDeck = await Deck.findById(args.deckID).populate('owner')
+
+      if (!myDeck || !myDeck.owner._id.equals(context.user._id))
+        throw new Error(
+          'Either no deck was found with this id, or you do not have permission to access it',
+        )
+
+      return {
+        id: myDeck._id,
+        owner: {
+          username: myDeck.owner.username,
+          id: myDeck.owner._id,
+        },
+        name: myDeck.name,
+        public: myDeck.public,
+        cards: myDeck.cards,
+      }
+    },
     getAllDecks: async (root, __, context) => {
       if (!context.user) {
         return null
@@ -114,7 +138,8 @@ const resolvers = {
         $or: [{ public: true }, { owner: context.user._id }],
       }).populate('owner')
 
-      return (await decks).map((deck) => ({
+      return decks.map((deck) => ({
+        id: deck.id,
         owner: {
           username: deck.owner.username,
           id: deck.owner._id,
@@ -150,13 +175,14 @@ const resolvers = {
       if (!context.user) {
         return null
       }
+      console.log('178')
       const game = await Game.findById(args.gameID).populate('players')
       if (!game) return null
 
       if (includesPlayer(game, context.user)) {
         return newReturnInfo(game, context)
       }
-
+      console.log('185')
       if (game.players.length == 2) {
         return null
       }
@@ -354,7 +380,6 @@ const resolvers = {
         createdAt: message.createdAt,
       }
 
-      console.log('about to publish make message', returnMessage)
       pubsub.publish('MESSAGE_UPDATE', { messageUpdate: returnMessage })
 
       return returnMessage
@@ -381,9 +406,7 @@ const resolvers = {
       const turnChange = changeTurn(game)
       game.hints = game.hints.concat(hint)
 
-      console.log('about to save game sendHint')
       await game.save()
-      console.log('saved')
 
       const returnHint = {
         player: { username: context.user.username, id: context.user._id },
@@ -400,9 +423,7 @@ const resolvers = {
         gameStateChange: game.gameState,
       }
 
-      console.log('about to publish sendHint', gameUpdate)
       pubsub.publish('HINT_UPDATE', { hintUpdate: gameUpdate })
-      console.log('published')
 
       return returnHint
     },
@@ -421,6 +442,7 @@ const resolvers = {
       await newDeck.save()
 
       return {
+        id: newDeck._id,
         owner: {
           username: context.user.username,
           id: context.user._id,
@@ -437,10 +459,10 @@ const resolvers = {
 
       const deck = await Deck.findById(args.deckID)
       if (!deck || !deck.owner.equals(context.user._id)) return null
-
-      deck.name = args.name ? args.name : deck.name
-      deck.public = args.public ? args.public : deck.public
-      deck.cards = args.cards ? args.cards : deck.cards
+      console.log(args)
+      deck.name = args.name !== undefined ? args.name : deck.name
+      deck.public = args.public !== undefined ? args.public : deck.public
+      deck.cards = args.cards !== undefined ? args.cards : deck.cards
 
       await deck.save()
 
@@ -452,6 +474,7 @@ const resolvers = {
         name: deck.name,
         public: deck.public,
         cards: deck.cards,
+        id: deck.id,
       }
     },
   },

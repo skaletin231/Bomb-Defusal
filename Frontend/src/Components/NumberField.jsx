@@ -13,10 +13,10 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown'
 /**
  * This component is a placeholder for FormControl to correctly set the shrink label state on SSR.
  */
-function SSRInitialFilled(_) {
-  return null
-}
-SSRInitialFilled.muiName = 'Input'
+// function SSRInitialFilled(_) {
+//   return null
+// }
+// SSRInitialFilled.muiName = 'Input'
 
 function NumberField({ id: idProp, label, error, size = 'medium', ...other }) {
   let id = React.useId()
@@ -39,7 +39,7 @@ function NumberField({ id: idProp, label, error, size = 'medium', ...other }) {
         </FormControl>
       )}
     >
-      <SSRInitialFilled {...other} />
+      {/* <SSRInitialFilled {...other} /> */}
       <InputLabel htmlFor={id}>{label}</InputLabel>
       <BaseNumberField.Input
         id={id}

@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
 import './style.css'
 import { Auth0Provider } from '@auth0/auth0-react'
+import { BrowserRouter as Router } from 'react-router-dom'
 
 import ApolloProviderWithAuth from './Components/ApolloProviderWithAuth.jsx'
 
@@ -17,7 +18,9 @@ createRoot(document.getElementById('root')).render(
       }}
     >
       <ApolloProviderWithAuth>
-        <App />
+        <Router>
+          <App />
+        </Router>
       </ApolloProviderWithAuth>
     </Auth0Provider>
   </StrictMode>,

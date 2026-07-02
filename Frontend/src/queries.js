@@ -253,8 +253,23 @@ export const HINT_UPDATE = gql`
 //#region Deck Related Stuff
 
 export const GET_MY_DECKS = gql`
-  query {
+  query getMyDecks {
     getMyDecks {
+      id
+      owner {
+        username
+        id
+      }
+      name
+      public
+      cards
+    }
+  }
+`
+// mutation sendHint($gameID: ID!, $hint: String!, $count: Int!) {
+export const GET_MY_DECK = gql`
+  query getMyDeck($deckID: ID!) {
+    getMyDeck(deckID: $deckID) {
       id
       owner {
         username
@@ -270,6 +285,7 @@ export const GET_MY_DECKS = gql`
 export const GET_ALL_DECKS = gql`
   query {
     getAllDecks {
+      id
       owner {
         username
         id
@@ -284,6 +300,7 @@ export const GET_ALL_DECKS = gql`
 export const MAKE_DECK = gql`
   mutation makeDeck($name: String!, $public: Boolean!, $cards: [String!]!) {
     makeDeck(name: $name, public: $public, cards: $cards) {
+      id
       owner {
         username
         id
@@ -303,6 +320,7 @@ export const UPDATE_DECK = gql`
     $cards: [String!]!
   ) {
     updateDeck(deckID: $deckID, name: $name, public: $public, cards: $cards) {
+      id
       owner {
         username
         id

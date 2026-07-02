@@ -1,6 +1,12 @@
-import { useMutation } from '@apollo/client/react'
-import { MAKE_DECK, GET_MY_DECKS, UPDATE_DECK } from '../queries'
-import { useState } from 'react'
+import { useMutation, useQuery } from '@apollo/client/react'
+import {
+  MAKE_DECK,
+  GET_MY_DECKS,
+  UPDATE_DECK,
+  GET_MY_DECK,
+  GET_ALL_DECKS,
+} from '../queries'
+import { useEffect, useState } from 'react'
 import {
   Button,
   Box,
@@ -12,6 +18,8 @@ import {
   Card,
   IconButton,
 } from '@mui/material'
+import { Link, useParams } from 'react-router-dom'
+import { gql } from '@apollo/client'
 
 const formStyle = {
   justifyContent: 'flex-start',
@@ -26,43 +34,105 @@ const center = {
 
 const maxCardSize = 15
 
-//this can possible take an ID for reference.
-//it will use that id to update if it does
-const MakeDeckScreen = ({ setMakeNewDeck, startingDeck, setDeckToUpdate }) => {
-  //console.log(startingDeck)
+const MakeDeckScreen = () => {
+  const { id: deckID } = useParams()
+  const editMode = deckID !== undefined
   const [cardToAdd, setCardToAdd] = useState('')
-  const [deckName, setDeckName] = useState(
-    startingDeck ? startingDeck.name : '',
-  )
-  const [allCards, setAllCards] = useState(
-    startingDeck ? startingDeck.cards : [],
-  )
-  const [isPublicDeck, setIsPublickDeck] = useState(
-    startingDeck ? startingDeck.public : false,
-  )
+  const [deckName, setDeckName] = useState('')
+  const [allCards, setAllCards] = useState([])
+  const [isPublicDeck, setIsPublicDeck] = useState(false)
+
+  const deckResults = useQuery(GET_MY_DECK, {
+    variables: { deckID: deckID },
+    skip: !deckID,
+  })
 
   const [makeDeck] = useMutation(MAKE_DECK, {
     refetchQueries: [GET_MY_DECKS],
+    update(cache, { data }) {
+      console.log(data.makeDeck)
+      const newRef = cache.writeFragment({
+        data: data.makeDeck,
+        fragment: gql`
+          fragment Deck on Deck {
+            id
+            owner {
+              __typename
+              username
+              id
+            }
+            name
+            public
+            cards
+          }
+        `,
+      })
+
+      //if i ever add pagination, this may not be a good thing to do anymore
+      cache.modify({
+        fields: {
+          getMyDecks(existing = []) {
+            return [...existing, newRef]
+          },
+          getAllDecks(existing = []) {
+            return [...existing, newRef]
+          },
+        },
+      })
+    },
   })
 
   const [updateDeck] = useMutation(UPDATE_DECK, {
-    refetchQueries: [GET_MY_DECKS],
+    update(cache, { data }) {
+      cache.modify({
+        id: cache.identify({
+          __typename: 'Deck',
+          id: data.updateDeck.id,
+        }),
+        fields: {
+          name: () => data.updateDeck.name,
+          public: () => data.updateDeck.public,
+          cards: () => data.updateDeck.cards,
+        },
+      })
+    },
   })
+
+  useEffect(() => {
+    if (deckResults.data?.getMyDeck) {
+      const deck = deckResults.data.getMyDeck
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setDeckName(deck.name)
+      setAllCards(deck.cards)
+      setIsPublicDeck(deck.public)
+    }
+  }, [deckResults.data])
+
+  if (deckResults.loading) return <div>loading...</div>
+
+  if (editMode && !deckResults.data?.getMyDeck)
+    return <div>Issue Loading Deck</div>
 
   const tryVerifyDeckChanges = async (event) => {
     event.preventDefault()
 
-    if (startingDeck) {
+    if (editMode) {
+      console.log('updateDeck: ', {
+        deckID: deckResults.data?.getMyDeck.id,
+        name: deckName,
+        public: isPublicDeck,
+        cards: allCards,
+      })
       await updateDeck({
         variables: {
-          deckID: startingDeck.id,
+          deckID: deckResults.data?.getMyDeck.id,
           name: deckName,
           public: isPublicDeck,
           cards: allCards,
         },
       })
-      setDeckToUpdate(null)
     } else {
+      console.log('makeDeck')
       await makeDeck({
         variables: {
           name: deckName,
@@ -70,13 +140,7 @@ const MakeDeckScreen = ({ setMakeNewDeck, startingDeck, setDeckToUpdate }) => {
           cards: allCards,
         },
       })
-      setMakeNewDeck(false)
     }
-
-    // if (results.data !== null) {
-    //   console.log('deck was made')
-    //   console.log(results.data)
-    // }
   }
 
   function capitalizeWords(str) {
@@ -97,18 +161,11 @@ const MakeDeckScreen = ({ setMakeNewDeck, startingDeck, setDeckToUpdate }) => {
       setAllCards(allCards.concat(formattedWord))
     }
     setCardToAdd('')
-    //console.log(allCards)
     return
-  }
-
-  const goBack = () => {
-    setMakeNewDeck(false)
-    setDeckToUpdate(null)
   }
 
   const removeCard = (index) => {
     setAllCards(allCards.filter((card, i) => i !== index))
-    console.log(index)
   }
 
   return (
@@ -190,7 +247,7 @@ const MakeDeckScreen = ({ setMakeNewDeck, startingDeck, setDeckToUpdate }) => {
           <div style={{ textAlign: 'center' }}>
             <Button
               variant='outlined'
-              onClick={() => setIsPublickDeck(!isPublicDeck)}
+              onClick={() => setIsPublicDeck(!isPublicDeck)}
               sx={{ marginLeft: 'auto', margin: '.4rem' }}
             >
               {isPublicDeck && 'Public'}
@@ -222,16 +279,16 @@ const MakeDeckScreen = ({ setMakeNewDeck, startingDeck, setDeckToUpdate }) => {
             </div>
 
             <Button variant='contained' onClick={tryVerifyDeckChanges}>
-              {startingDeck && 'Update Deck'}
-              {!startingDeck && 'Create Deck'}
+              {editMode && 'Update Deck'}
+              {!editMode && 'Create Deck'}
             </Button>
           </div>
         </Box>
       </div>
 
       <div style={{ textAlign: 'center', marginTop: '5rem' }}>
-        <Button variant='contained' onClick={goBack}>
-          Go Back
+        <Button variant='contained' component={Link} to={'/mydecks'}>
+          Back To Decks
         </Button>
       </div>
     </div>

@@ -1,4 +1,8 @@
 import { Button, Box, Container } from '@mui/material'
+import { Link } from 'react-router-dom'
+import JoinGameDialogue from './JoinGameDialogue'
+import bomb from '../../images/bomb.svg'
+import { useState } from 'react'
 
 const containerStyle = {
   height: '100dvh',
@@ -32,7 +36,7 @@ const buttonStyle = {
     },
   },
   '&:after': {
-    content: `''`,
+    content: '""',
     position: 'absolute',
     top: '4px',
     left: '0px',
@@ -56,9 +60,9 @@ const backgroundStyle = {
   zIndex: '-2',
 }
 
-import bomb from '../../images/bomb.svg'
+const HomePage = () => {
+  const [open, setOpen] = useState(false)
 
-const HomePage = ({ startGame, logout }) => {
   return (
     <>
       <div style={backgroundStyle} className={'backgroundBottom'}></div>
@@ -67,14 +71,26 @@ const HomePage = ({ startGame, logout }) => {
           <img style={{ width: '20rem' }} src={bomb} alt='Logo' />{' '}
         </Box>
         <Box sx={boxStyle}>
-          <Button sx={buttonStyle} variant='contained' onClick={startGame}>
+          <Button
+            className='StartGameButton'
+            sx={buttonStyle}
+            variant='contained'
+            component={Link}
+            to='/startgame'
+          >
             Start Game
           </Button>
-          <Button sx={buttonStyle} variant='contained'>
+          <Button
+            className='JoinGameButton'
+            sx={buttonStyle}
+            variant='contained'
+            onClick={() => setOpen(true)}
+          >
             Join Game
           </Button>
         </Box>
       </Container>
+      <JoinGameDialogue open={open} setOpen={setOpen} />
     </>
   )
 }

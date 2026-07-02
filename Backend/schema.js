@@ -5,6 +5,7 @@ const typeDefs = /* GraphQL */ `
     getMessages(gameID: ID!): [ChatMessage!]
     getHints(gameID: ID!): [Hint!]
     getMyDecks: [Deck!]
+    getMyDeck(deckID: ID!): Deck
     getAllDecks: [Deck!]
     me: User
   }

@@ -1,7 +1,7 @@
 import GameCard from './GameCard'
 import { useState } from 'react'
 import { Button, Card, CardContent } from '@mui/material'
-
+import { useParams } from 'react-router-dom'
 import { GAME_UPDATE, ME, GET_GAME, MAKE_MOVE, END_TURN } from '../queries'
 import {
   useApolloClient,
@@ -35,7 +35,8 @@ const gameStates = {
   playing: 'Playing',
 }
 
-const GameBoard = ({ gameID }) => {
+const GameBoard = () => {
+  const { id: gameID } = useParams()
   const client = useApolloClient()
 
   const { data: meData } = useQuery(ME, {})
