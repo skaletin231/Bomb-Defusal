@@ -17,15 +17,16 @@ const DecksScreen = () => {
 
   const tryCreateGame = async (deck) => {
     event.preventDefault()
-
+    console.log('tryCreateGame', deck)
     const result = await startGame({
       variables: {
-        words: deck.cards,
+        deckID: deck.id,
       },
     })
 
     if (result.data === null) return
-    navigate(`/playing/${result.data.startGame.id}`)
+    console.log(result.data)
+    if (result.data.startGame) navigate(`/playing/${result.data.startGame}`)
   }
 
   return (
@@ -34,11 +35,7 @@ const DecksScreen = () => {
       {decks.map((deck, i) => (
         <Card key={i}>
           <CardContent>
-            <DecksDropdown
-              deck={deck}
-              key={deck.name}
-              tryCreateGame={tryCreateGame}
-            />
+            <DecksDropdown deck={deck} key={deck.name} />
             <Button variant='contained' onClick={() => tryCreateGame(deck)}>
               {' '}
               Use Deck

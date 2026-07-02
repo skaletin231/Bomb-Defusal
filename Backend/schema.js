@@ -58,7 +58,7 @@ const typeDefs = /* GraphQL */ `
   }
 
   type Mutation { #player should be obtainable from context now if player is me
-    startGame(words: [String!]!): Game
+    startGame(deckID: ID!): ID
     joinGame(gameID: ID!): Game
     makeMove(gameID: ID!, index: Int!): Game
     endTurn(gameID: ID!): Game

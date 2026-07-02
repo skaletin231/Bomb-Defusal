@@ -152,11 +152,20 @@ const resolvers = {
   },
   Mutation: {
     startGame: async (root, args, context) => {
+      console.log('try start game', args)
       if (!context.user) {
         return null
       }
 
-      const board = MakeBoard(args.words)
+      const deck = await Deck.findById(args.deckID)
+
+      if (!deck) return null
+
+      const canUse = deck.public || deck.owner.equals(context.user._id)
+
+      if (!canUse) return null
+
+      const board = MakeBoard(deck.cards)
 
       const game = new Game({
         players: [context.user],
@@ -169,7 +178,7 @@ const resolvers = {
 
       await game.save()
 
-      return newReturnInfo(game, context)
+      return game._id
     },
     joinGame: async (root, args, context) => {
       if (!context.user) {
