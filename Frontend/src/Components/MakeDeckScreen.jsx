@@ -18,7 +18,7 @@ import {
   Card,
   IconButton,
 } from '@mui/material'
-import { useParams } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
 import { gql } from '@apollo/client'
 
 const formStyle = {
@@ -164,8 +164,6 @@ const MakeDeckScreen = () => {
     return
   }
 
-  const goBack = () => {}
-
   const removeCard = (index) => {
     setAllCards(allCards.filter((card, i) => i !== index))
   }
@@ -289,8 +287,8 @@ const MakeDeckScreen = () => {
       </div>
 
       <div style={{ textAlign: 'center', marginTop: '5rem' }}>
-        <Button variant='contained' onClick={goBack}>
-          Go Back
+        <Button variant='contained' component={Link} to={'/mydecks'}>
+          Back To Decks
         </Button>
       </div>
     </div>
