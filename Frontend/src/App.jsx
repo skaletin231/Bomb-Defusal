@@ -9,6 +9,12 @@ import DecksScreen from './Components/DecksScreen'
 import JoinGame from './Components/JoinGameDialogue'
 import MyDecks from './Components/MyDecks'
 import MakeDeckScreen from './Components/MakeDeckScreen'
+import { Box } from '@mui/material'
+
+const boxStyle = {
+  padding: '3rem',
+}
+
 function App() {
   const result = useQuery(ME, {})
 
@@ -29,7 +35,7 @@ function App() {
   }
 
   return (
-    <div>
+    <Box sx={boxStyle}>
       <BasicMenu loggedIn={result.data?.me !== null} />
       <Routes>
         <Route path='/' element={<HomePage />} />
@@ -40,7 +46,7 @@ function App() {
         <Route path='/mydecks/:id' element={<MakeDeckScreen />} />
         <Route path='*' element={noPageError()} />
       </Routes>
-    </div>
+    </Box>
   )
 }
 
