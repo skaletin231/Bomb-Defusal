@@ -254,6 +254,8 @@ const GameBoard = () => {
       )}
       <p>current player: {game.currentPlayer.username}</p>
       <p>you: {me.username}</p>
+      <p>Turns Reamining: {game.turnsRemaining}</p>
+
       {me.id === game.currentPlayer.id &&
         game.gameState === gameStates.playing && (
           <Button onClick={tryEndTurn} variant='contained'>
@@ -261,7 +263,6 @@ const GameBoard = () => {
           </Button>
         )}
       {makeCard()}
-      <p>Turns Reamining: {game.turnsRemaining}</p>
       <ChatHintContainer
         gameID={gameID}
         show={
