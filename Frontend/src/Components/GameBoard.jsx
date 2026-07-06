@@ -59,80 +59,64 @@ const GameBoard = () => {
       console.log('update loop')
       const update = data.data.gameUpdate
 
-      if (update.gameStateChange !== null) {
-        client.cache.updateQuery(
-          {
-            query: GET_GAME,
-            variables: { id: update.gameID },
-          },
-          (data) => {
-            if (!data) return data
+      client.cache.updateQuery(
+        {
+          query: GET_GAME,
+          variables: { id: update.gameID },
+        },
+        (data) => {
+          if (!data) return data
 
-            return {
-              ...data,
-              getGame: {
-                ...data.getGame,
-                gameState: update.gameStateChange,
-              },
-            }
-          },
-        )
-      }
-      if (update.turnChange !== null) {
-        client.cache.updateQuery(
-          {
-            query: GET_GAME,
-            variables: { id: update.gameID },
-          },
-          (data) => {
-            if (!data) return data
+          const gameStateChange =
+            update.gameStateChange !== null
+              ? update.gameStateChange
+              : data.getGame.gameState
 
-            return {
-              ...data,
-              getGame: {
-                ...data.getGame,
-                currentPlayer: {
+          const currentPlayer =
+            update.turnChange !== null
+              ? {
                   username: update.turnChange.turnUpdate.username,
                   id: update.turnChange.turnUpdate.id,
-                },
-                turnsRemaining: update.turnsRemainingChange,
+                }
+              : data.getGame.currentPlayer
+
+          const turnsRemaining =
+            update.turnsRemainingChange !== null
+              ? update.turnsRemainingChange
+              : data.getGame.turnsRemaining
+
+          const spots =
+            update.changedSpots !== null
+              ? data.getGame.board.spots.map((spot) =>
+                  spot.word !== update.changedSpots[0].word
+                    ? spot
+                    : {
+                        ...spot,
+                        typeRevealed: {
+                          myType: update.changedSpots[0].typeRevealed.theirType,
+                          theirType: update.changedSpots[0].typeRevealed.myType,
+                        },
+                      },
+                )
+              : data.getGame.board.spots
+
+          console.log(gameStateChange, currentPlayer, turnsRemaining, spots)
+
+          return {
+            ...data,
+            getGame: {
+              ...data.getGame,
+              gameState: gameStateChange,
+              board: {
+                ...data.getGame.board,
+                spots: spots,
               },
-            }
-          },
-        )
-      }
-
-      if (update.changedSpots !== null) {
-        client.cache.updateQuery(
-          {
-            query: GET_GAME,
-            variables: { id: update.gameID },
-          },
-          (data) => {
-            if (!data) return data
-
-            const newTypeRevealed = {
-              myType: update.changedSpots[0].typeRevealed.theirType,
-              theirType: update.changedSpots[0].typeRevealed.myType,
-            }
-
-            return {
-              ...data,
-              getGame: {
-                ...data.getGame,
-                board: {
-                  ...data.getGame.board,
-                  spots: data.getGame.board.spots.map((spot) =>
-                    spot.word !== update.changedSpots[0].word
-                      ? spot
-                      : { ...spot, typeRevealed: newTypeRevealed },
-                  ),
-                },
-              },
-            }
-          },
-        )
-      }
+              currentPlayer: currentPlayer,
+              turnsRemaining: turnsRemaining,
+            },
+          }
+        },
+      )
     },
   })
 
