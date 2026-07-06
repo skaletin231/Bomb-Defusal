@@ -34,6 +34,10 @@ function App() {
     return <h1>Error 404: Page Not Found</h1>
   }
 
+  if (result.loading) {
+    return <p>loading...</p>
+  }
+
   return (
     <Box sx={boxStyle}>
       <BasicMenu loggedIn={result.data?.me !== null} />

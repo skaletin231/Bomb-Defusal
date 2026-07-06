@@ -1,5 +1,5 @@
 import GameCard from './GameCard'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Button, Card, CardContent } from '@mui/material'
 import { useParams } from 'react-router-dom'
 import {
@@ -18,6 +18,7 @@ import {
 } from '@apollo/client/react'
 import ChatWindow from './ChatWindow'
 import ChatHintContainer from './ChatHintContainer'
+import GameOverScreen from './GameOverScreen'
 
 const style = {
   display: 'grid',
@@ -43,12 +44,13 @@ const gameStates = {
 }
 
 const GameBoard = () => {
+  const [open, setOpen] = useState(false)
+  const [selectedCard, setSelectedCard] = useState(null)
+
   const { id: gameID } = useParams()
   const client = useApolloClient()
-
   const { data: meData } = useQuery(ME, {})
   const me = meData.me
-  const [selectedCard, setSelectedCard] = useState(null)
 
   const gameResult = useQuery(GET_GAME, {
     variables: { id: gameID },
@@ -100,8 +102,6 @@ const GameBoard = () => {
                 )
               : data.getGame.board.spots
 
-          console.log(gameStateChange, currentPlayer, turnsRemaining, spots)
-
           return {
             ...data,
             getGame: {
@@ -117,6 +117,9 @@ const GameBoard = () => {
           }
         },
       )
+
+      if (update.gameState === 'Win' || update.gameState === 'Lose')
+        setOpen(true)
     },
   })
 
@@ -191,11 +194,18 @@ const GameBoard = () => {
     })
   }
 
+  const game = gameResult.data?.getGame
+
+  useEffect(() => {
+    if (gameResult.loading) return
+
+    if (game.gameState === 'Win' || game.gameState === 'Lose') setOpen(true)
+  }, [gameResult.loading])
+
   if (gameResult.loading) {
     return <div>loading...</div>
   }
 
-  const game = gameResult.data.getGame
   const boardSpots = game.board.spots
 
   const trySetSelected = (selected) => {
@@ -256,7 +266,7 @@ const GameBoard = () => {
     )
   }
   return (
-    <div>
+    <div style={{ paddingBottom: '20px' }}>
       <div style={style}>
         {boardSpots.map((spot) => (
           <GameCard
@@ -288,6 +298,11 @@ const GameBoard = () => {
         show={
           game.gameState === gameStates.hint && game.currentPlayer.id === me.id
         }
+      />
+      <GameOverScreen
+        open={open}
+        setOpen={setOpen}
+        gameState={game.gameState}
       />
     </div>
   )
