@@ -39,6 +39,8 @@ const typeDefs = /* GraphQL */ `
     gameState: String!
     turnsRemaining: Int!
     hints: [Hint!]!
+    mistakes: Int!
+    mistakeLimit: Int!
   }
 
   scalar DateTime
@@ -58,7 +60,7 @@ const typeDefs = /* GraphQL */ `
   }
 
   type Mutation { #player should be obtainable from context now if player is me
-    startGame(deckID: ID!): ID
+    startGame(deckID: ID!, mistakeLimit: Int, turnLimit: Int): ID
     joinGame(gameID: ID!): Game
     makeMove(gameID: ID!, index: Int!): Game
     endTurn(gameID: ID!): Game
@@ -104,6 +106,7 @@ const typeDefs = /* GraphQL */ `
     turnChange: GamePatch
     gameStateChange: String
     turnsRemainingChange: Int
+    mistakes: Int
     hintChange: Hint
     gameUser: GameUser
   }

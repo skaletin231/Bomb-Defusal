@@ -113,6 +113,7 @@ const GameBoard = () => {
               },
               currentPlayer: currentPlayer,
               turnsRemaining: turnsRemaining,
+              mistakes: update.mistakes ?? data.getGame.mistakes,
             },
           }
         },
@@ -166,6 +167,9 @@ const GameBoard = () => {
         },
       )
       setSelectedCard(null)
+    },
+    onError: (error) => {
+      console.log(error.message)
     },
   })
 
@@ -285,6 +289,9 @@ const GameBoard = () => {
       <p>current player: {game.currentPlayer.username}</p>
       <p>you: {me.username}</p>
       <p>Turns Reamining: {game.turnsRemaining}</p>
+      {game.mistakeLimit > -1 && (
+        <p>Mistakes Left: {game.mistakeLimit - game.mistakes}</p>
+      )}
 
       {me.id === game.currentPlayer.id &&
         game.gameState === gameStates.playing && (

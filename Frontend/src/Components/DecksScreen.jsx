@@ -4,8 +4,11 @@ import { GET_ALL_DECKS, START_GAME, NEW_PLAYER_JOINED } from '../queries'
 import { Button, Card, CardContent } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
 import { Link } from 'react-router-dom'
+import { useState } from 'react'
+import CreateGameDialogue from './CreateGameDialogue'
 
 const DecksScreen = () => {
+  const [id, setID] = useState(null)
   const deckResults = useQuery(GET_ALL_DECKS)
   const navigate = useNavigate()
 
@@ -36,7 +39,11 @@ const DecksScreen = () => {
         <Card key={i}>
           <CardContent>
             <DecksDropdown deck={deck} key={deck.name} />
-            <Button variant='contained' onClick={() => tryCreateGame(deck)}>
+            {/* <Button variant='contained' onClick={() => tryCreateGame(deck)}>
+              {' '}
+              Use Deck
+            </Button> */}
+            <Button variant='contained' onClick={() => setID(deck.id)}>
               {' '}
               Use Deck
             </Button>
@@ -46,6 +53,7 @@ const DecksScreen = () => {
       <Button component={Link} to='/'>
         Go Back
       </Button>
+      <CreateGameDialogue id={id} setID={setID} />
     </>
   )
 }

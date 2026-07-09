@@ -67,6 +67,14 @@ const gameSchema = new mongoose.Schema({
     default: 9,
   },
   hints: [hintSchema],
+  mistakes: {
+    type: Number,
+    default: 0,
+  },
+  mistakeLimit: {
+    type: Number,
+    default: -1,
+  },
 })
 
 module.exports = mongoose.model('Game', gameSchema)

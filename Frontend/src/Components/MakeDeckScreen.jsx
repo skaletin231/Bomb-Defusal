@@ -110,6 +110,10 @@ const MakeDeckScreen = () => {
 
   if (deckResults.loading) return <div>loading...</div>
 
+  if (deckResults.error) {
+    return <div>{deckResults.error.message}</div>
+  }
+
   if (editMode && !deckResults.data?.getMyDeck)
     return <div>Issue Loading Deck</div>
 

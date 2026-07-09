@@ -2,7 +2,17 @@ const Game = require('./models/game')
 const User = require('./models/user')
 const Deck = require('./models/decks')
 const Message = require('./models/message')
-
+const {
+  deckNotFoundError,
+  notLoggedInError,
+  notAPlayerError,
+  gameNotFoundError,
+  gameFullError,
+  notYourTurnError,
+  invalidMoveError,
+  wrongGamestateError,
+  cantAccessDeckError,
+} = require('./graphQLErrors')
 const { MakeBoard } = require('./utils/GameboardUtils')
 
 const { PubSub } = require('graphql-subscriptions')
@@ -15,23 +25,18 @@ const gameStates = {
   playing: 'Playing',
 }
 
+const { GraphQLError } = require('graphql')
 const { GraphQLDateTime } = require('graphql-scalars')
-const { Error } = require('mongoose')
+// const { Error } = require('mongoose')
 
 const resolvers = {
   DateTime: GraphQLDateTime,
   Query: {
     getGame: async (root, args, context) => {
-      if (!context.user) {
-        return null
-      }
+      checkIsLoggedIn(context)
 
       const game = await Game.findById(args.id).populate('players')
-
-      const isAPlayer = game.players.some((player) =>
-        player._id.equals(context.user._id),
-      )
-      if (!isAPlayer) return null
+      if (!game || !includesPlayer(game, context.user)) notAPlayerError()
 
       return newReturnInfo(game, context)
     },
@@ -46,11 +51,11 @@ const resolvers = {
       return context.user
     },
     getMessages: async (root, args, context) => {
+      checkIsLoggedIn(context)
+
       const game = await Game.findById(args.gameID).populate('players')
 
-      if (!game || !context.user || !includesPlayer(game, context.user)) {
-        return null
-      }
+      if (!game || !includesPlayer(game, context.user)) notAPlayerError()
 
       const messages = await Message.find({ gameID: args.gameID }).populate(
         'user',
@@ -65,11 +70,11 @@ const resolvers = {
       }))
     },
     getHints: async (root, args, context) => {
+      checkIsLoggedIn(context)
+
       const game = await Game.findById(args.gameID).populate('players')
 
-      if (!game || !context.user || !includesPlayer(game, context.user)) {
-        return null
-      }
+      if (!game || !includesPlayer(game, context.user)) notAPlayerError()
 
       const players = game.players
 
@@ -87,9 +92,7 @@ const resolvers = {
       }))
     },
     getMyDecks: async (root, __, context) => {
-      if (!context.user) {
-        return null
-      }
+      checkIsLoggedIn(context)
 
       const myDecks = await Deck.find({ owner: context.user._id }).populate(
         'owner',
@@ -107,16 +110,12 @@ const resolvers = {
       }))
     },
     getMyDeck: async (root, args, context) => {
-      if (!context.user) {
-        return null
-      }
+      checkIsLoggedIn(context)
 
       const myDeck = await Deck.findById(args.deckID).populate('owner')
 
       if (!myDeck || !myDeck.owner._id.equals(context.user._id))
-        throw new Error(
-          'Either no deck was found with this id, or you do not have permission to access it',
-        )
+        deckNotFoundError()
 
       return {
         id: myDeck._id,
@@ -130,9 +129,7 @@ const resolvers = {
       }
     },
     getAllDecks: async (root, __, context) => {
-      if (!context.user) {
-        return null
-      }
+      checkIsLoggedIn(context)
 
       const decks = await Deck.find({
         $or: [{ public: true }, { owner: context.user._id }],
@@ -152,18 +149,14 @@ const resolvers = {
   },
   Mutation: {
     startGame: async (root, args, context) => {
-      console.log('try start game', args)
-      if (!context.user) {
-        return null
-      }
+      checkIsLoggedIn(context)
 
       const deck = await Deck.findById(args.deckID)
-
-      if (!deck) return null
+      if (!deck) deckNotFoundError()
 
       const canUse = deck.public || deck.owner.equals(context.user._id)
 
-      if (!canUse) return null
+      if (!canUse) deckNotFoundError()
 
       const board = MakeBoard(deck.cards)
 
@@ -174,6 +167,8 @@ const resolvers = {
           spots: board,
         },
         gameState: gameStates.hint,
+        turnsRemaining: args.turnLimit, //if not given, these are udnefined so goes to default
+        mistakeLimit: args.mistakeLimit,
       })
 
       await game.save()
@@ -181,17 +176,16 @@ const resolvers = {
       return game._id
     },
     joinGame: async (root, args, context) => {
-      if (!context.user) {
-        return null
-      }
+      checkIsLoggedIn(context)
+
       const game = await Game.findById(args.gameID).populate('players')
-      if (!game) return null
+      if (!game) gameNotFoundError()
 
       if (includesPlayer(game, context.user)) {
         return newReturnInfo(game, context)
       }
       if (game.players.length == 2) {
-        return null
+        gameFullError()
       }
 
       game.players = game.players.concat(context.user)
@@ -214,28 +208,23 @@ const resolvers = {
       return returnInfo
     },
     makeMove: async (root, args, context) => {
-      console.log('try make move')
-      if (!context.user) {
-        return null
-      }
+      checkIsLoggedIn(context)
+
       const game = await Game.findById(args.gameID).populate('players')
 
-      if (!includesPlayer(game, context.user)) return null
+      if (!game || !includesPlayer(game, context.user)) notAPlayerError()
 
       const myTypeRevealed = isPlayer1(game, context.user._id)
         ? game.board.spots[args.index].typeRevealed.player1
         : game.board.spots[args.index].typeRevealed.player2
 
-      if (
-        myTypeRevealed !== null ||
-        !game.currentPlayer.equals(context.user._id)
-      ) //already made this move or can't make a move
-      {
-        console.log('cant make move')
-        return newReturnInfo(game, context)
+      if (myTypeRevealed !== null) {
+        invalidMoveError()
       }
 
-      console.log('192')
+      if (!game.currentPlayer.equals(context.user._id)) {
+        notYourTurnError()
+      }
 
       if (isPlayer1(game, context.user._id)) {
         game.board.spots[args.index].typeRevealed.player1 =
@@ -254,7 +243,6 @@ const resolvers = {
               isPlayer1(game, context.user._id),
             )
             await game.save()
-            console.log('about to publish make move bomb', returnVal)
             pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
             return newReturnInfo(game, context)
           }
@@ -266,7 +254,6 @@ const resolvers = {
             isPlayer1(game, context.user._id),
           )
           await game.save()
-          console.log('about to publish make move wire', returnVal)
           pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
           return newReturnInfo(game, context)
         }
@@ -326,12 +313,13 @@ const resolvers = {
       return newReturnInfo(game, context)
     },
     endTurn: async (root, args, context) => {
+      checkIsLoggedIn(context)
+
       const game = await Game.findById(args.gameID).populate('players')
 
-      if (!includesPlayer(game, context.user)) return null
+      if (!game || !includesPlayer(game, context.user)) notAPlayerError()
 
-      if (!game.currentPlayer.equals(context.user._id))
-        return newReturnInfo(game, context)
+      if (!game.currentPlayer.equals(context.user._id)) notYourTurnError()
 
       let turnChangeMade = changeTurn(game)
 
@@ -368,10 +356,9 @@ const resolvers = {
       return newUser
     },
     updateUserInfo: async (root, args, context) => {
+      checkIsLoggedIn(context)
+
       const user = context.user
-
-      if (!user) return null
-
       user.username = args.username
 
       await user.save()
@@ -379,12 +366,10 @@ const resolvers = {
       return user
     },
     sendMessage: async (root, args, context) => {
-      const game = await Game.findById(args.gameID)
-      if (!game) return null
+      checkIsLoggedIn(context)
 
-      if (!context.user || !includesPlayer(game, context.user)) {
-        return null
-      }
+      const game = await Game.findById(args.gameID)
+      if (!game || !includesPlayer(game, context.user)) notAPlayerError()
 
       const message = new Message({
         gameID: args.gameID,
@@ -405,17 +390,14 @@ const resolvers = {
       return returnMessage
     },
     sendHint: async (root, args, context) => {
-      const game = await Game.findById(args.gameID).populate('players')
-      if (!game) return null
+      checkIsLoggedIn(context)
 
-      if (
-        !context.user ||
-        !includesPlayer(game, context.user) ||
-        !context.user._id.equals(game.currentPlayer._id) ||
-        game.gameState !== gameStates.hint
-      ) {
-        return null
-      }
+      const game = await Game.findById(args.gameID).populate('players')
+      if (!game || !includesPlayer(game, context.user)) notAPlayerError()
+
+      if (!context.user._id.equals(game.currentPlayer._id)) notYourTurnError()
+
+      if (game.gameState !== gameStates.hint) wrongGamestateError()
 
       const hint = {
         player: context.user._id,
@@ -437,7 +419,7 @@ const resolvers = {
       const gameUpdate = {
         gameID: game.id,
         playerID: context.user.id,
-        type: 'Hint',
+        type: gameStates.hint,
         hintChange: returnHint,
         turnChange: turnChange,
         gameStateChange: game.gameState,
@@ -448,9 +430,7 @@ const resolvers = {
       return returnHint
     },
     makeDeck: async (root, args, context) => {
-      if (!context.user) {
-        return null
-      }
+      checkIsLoggedIn(context)
 
       const newDeck = new Deck({
         owner: context.user._id,
@@ -473,13 +453,11 @@ const resolvers = {
       }
     },
     updateDeck: async (root, args, context) => {
-      if (!context.user) {
-        return null
-      }
+      checkIsLoggedIn(context)
 
       const deck = await Deck.findById(args.deckID)
-      if (!deck || !deck.owner.equals(context.user._id)) return null
-      console.log(args)
+      if (!deck || !deck.owner.equals(context.user._id)) cantAccessDeckError()
+
       deck.name = args.name !== undefined ? args.name : deck.name
       deck.public = args.public !== undefined ? args.public : deck.public
       deck.cards = args.cards !== undefined ? args.cards : deck.cards
@@ -551,6 +529,8 @@ const newReturnInfo = (game, context) => {
     },
     gameState: game.gameState,
     turnsRemaining: game.turnsRemaining,
+    mistakes: game.mistakes,
+    mistakeLimit: game.mistakeLimit,
   }
 }
 
@@ -563,7 +543,6 @@ const includesPlayer = (game, user) => {
   return false
 }
 
-//currently removing turn limit to get it working first
 const changeToHint = (game) => {
   //when going to hint mode, the player who just moved is the hinter now
   //unless only they have wires left
@@ -588,7 +567,6 @@ const changeToHint = (game) => {
 }
 
 const changeToPlaying = (game) => {
-  console.log('try change to playing')
   if (isPlayer1(game, game.currentPlayer._id)) {
     game.currentPlayer = game.players[1]
   } else {
@@ -608,14 +586,11 @@ const changeToPlaying = (game) => {
 }
 
 const changeTurn = (game) => {
-  console.log('changeTurn fired')
   if (game.turnsRemaining > 0) //may be hint or playing
   {
     if (game.gameState === gameStates.playing) {
-      console.log('about to try change to hint')
       return changeToHint(game)
     } else {
-      console.log('about to try change to playing')
       return changeToPlaying(game)
     }
   } else //Go to next playing turn
@@ -687,17 +662,17 @@ const updateSpotWire = (context, game, spot, isPlayer1) => {
 }
 
 const updateSpotDud = (context, game, spot, isPlayer1) => {
-  console.log('is dud fired')
   let turnChangeMade = null
 
-  if (game.turnsRemaining === 0) {
+  game.mistakes++
+
+  if (game.turnsRemaining === 0 || game.mistakes == game.mistakeLimit) {
     endGame(game, gameStates.lose)
   } else {
     turnChangeMade = changeTurn(game)
     game.gameState = gameStates.hint
     game.turnsRemaining -= 1
   }
-  console.log('635')
 
   const typeRevealed = isPlayer1
     ? {
@@ -708,7 +683,6 @@ const updateSpotDud = (context, game, spot, isPlayer1) => {
         myType: spot.typeRevealed.player2,
         theirType: spot.typeRevealed.player1,
       }
-  console.log('646')
 
   const gameUpdate = {
     gameID: game.id,
@@ -723,8 +697,8 @@ const updateSpotDud = (context, game, spot, isPlayer1) => {
     turnChange: turnChangeMade,
     gameStateChange: game.gameState,
     turnsRemainingChange: game.turnsRemaining,
+    mistakes: game.mistakes,
   }
-  console.log('662')
 
   return gameUpdate
 }
@@ -751,16 +725,8 @@ const updateSpotBomb = (context, game, spot, isPlayer1) => {
   return gameUpdate
 }
 
-module.exports = resolvers
+const checkIsLoggedIn = (context) => {
+  if (!context.user) notLoggedInError()
+}
 
-/*
-    ok when a player makes a move i need to check: 
-      1. are they out of moves
-          - end their turn
-      2. are both players out of moves
-          - end game in a win
-      3. was it a bomb
-          - end game in a loss
-      4. was it a dud
-          - end their turn
-*/
+module.exports = resolvers

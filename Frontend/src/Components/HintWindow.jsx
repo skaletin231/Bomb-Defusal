@@ -214,7 +214,10 @@ const HintWindow = ({ gameID, show }) => {
                 onChange={({ target }) => formatHint(target.value)}
               ></TextField>
               <NumberField
-                style={{ width: '30%', margin: '.4rem .1rem' }}
+                style={{
+                  width: '30%',
+                  margin: '.4rem .1rem',
+                }}
                 label='Count'
                 value={countToSend}
                 min={0}

@@ -34,6 +34,7 @@ function NumberField({ id: idProp, label, error, size = 'medium', ...other }) {
           required={state.required}
           error={error}
           variant='outlined'
+          sx={other.sx}
         >
           {props.children}
         </FormControl>

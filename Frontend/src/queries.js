@@ -1,30 +1,40 @@
 import { gql } from '@apollo/client'
 
+const GAME_DETAILS = gql`
+  fragment GameFields on Game {
+    board {
+      spots {
+        word
+        myType
+        typeRevealed {
+          myType
+          theirType
+        }
+      }
+    }
+    players {
+      username
+      id
+    }
+    currentPlayer {
+      username
+      id
+    }
+    gameState
+    turnsRemaining
+    mistakes
+    mistakeLimit
+  }
+`
+
 export const GET_GAME = gql`
   query getGame($id: ID!) {
     getGame(id: $id) {
-      board {
-        spots {
-          word
-          myType
-          typeRevealed {
-            myType
-            theirType
-          }
-        }
-      }
-      players {
-        username
-        id
-      }
-      currentPlayer {
-        username
-        id
-      }
-      gameState
-      turnsRemaining
+      ...GameFields
     }
   }
+
+  ${GAME_DETAILS}
 `
 
 export const GET_MESSAGES = gql`
@@ -77,59 +87,29 @@ export const JOIN_GAME = gql`
 export const MAKE_MOVE = gql`
   mutation makeMove($gameID: ID!, $index: Int!) {
     makeMove(gameID: $gameID, index: $index) {
-      board {
-        spots {
-          word
-          myType
-          typeRevealed {
-            myType
-            theirType
-          }
-        }
-      }
-      players {
-        username
-        id
-      }
-      currentPlayer {
-        username
-        id
-      }
-      gameState
-      turnsRemaining
+      ...GameFields
     }
   }
+
+  ${GAME_DETAILS}
 `
 export const END_TURN = gql`
   mutation endTurn($gameID: ID!) {
     endTurn(gameID: $gameID) {
-      board {
-        spots {
-          word
-          myType
-          typeRevealed {
-            myType
-            theirType
-          }
-        }
-      }
-      players {
-        username
-        id
-      }
-      currentPlayer {
-        username
-        id
-      }
-      gameState
-      turnsRemaining
+      ...GameFields
     }
   }
+
+  ${GAME_DETAILS}
 `
 
 export const START_GAME = gql`
-  mutation startGame($deckID: ID!) {
-    startGame(deckID: $deckID)
+  mutation startGame($deckID: ID!, $mistakeLimit: Int, $turnLimit: Int) {
+    startGame(
+      deckID: $deckID
+      mistakeLimit: $mistakeLimit
+      turnLimit: $turnLimit
+    )
   }
 `
 
@@ -206,6 +186,7 @@ export const GAME_UPDATE = gql`
       }
       gameStateChange
       turnsRemainingChange
+      mistakes
     }
   }
 `
