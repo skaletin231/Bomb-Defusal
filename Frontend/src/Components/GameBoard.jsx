@@ -58,7 +58,7 @@ const GameBoard = () => {
 
   useSubscription(GAME_UPDATE, {
     onData: ({ data }) => {
-      console.log('update loop')
+      console.log('update loop', data)
       const update = data.data.gameUpdate
 
       client.cache.updateQuery(

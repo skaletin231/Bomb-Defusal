@@ -37,7 +37,7 @@ const myMessages = {
   backgroundColor: '#8bff3e',
 }
 
-const ChatWindow = ({ gameID }) => {
+const ChatWindow = ({ gameID, chatView }) => {
   const client = useApolloClient()
   const [messageToSend, setMessageToSend] = useState('')
   const bottomRef = useRef(null)
@@ -113,7 +113,7 @@ const ChatWindow = ({ gameID }) => {
   }
 
   return (
-    <>
+    <Box sx={chatView === 'Hint' ? { display: 'None' } : null}>
       <Stack sx={stackSX} spacing={1}>
         {chatHistory.map((message, id) => (
           <Typography
@@ -150,7 +150,7 @@ const ChatWindow = ({ gameID }) => {
           </Button>
         </form>
       </Box>
-    </>
+    </Box>
   )
 }
 

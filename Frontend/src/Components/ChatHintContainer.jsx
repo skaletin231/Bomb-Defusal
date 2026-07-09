@@ -38,13 +38,12 @@ const ChatHintContainer = ({ gameID, show }) => {
   }
 
   const chatContainer = () => {
-    return <ChatWindow gameID={gameID} />
+    return <ChatWindow gameID={gameID} chatView={chatView} />
   }
 
   const hintContainer = () => {
-    return <HintWindow gameID={gameID} show={show} />
+    return <HintWindow gameID={gameID} show={show} chatView={chatView} />
   }
-
   const toggleChat = () => {
     setOpen(!open)
   }
@@ -78,8 +77,8 @@ const ChatHintContainer = ({ gameID, show }) => {
         </Box>
       </Paper>
       <Collapse in={open} timeout={300}>
-        {chatView === 'Chat' && chatContainer()}
-        {chatView === 'Hint' && hintContainer()}
+        {chatContainer()}
+        {hintContainer()}
       </Collapse>
     </Box>
   )

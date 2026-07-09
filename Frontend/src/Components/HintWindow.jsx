@@ -50,7 +50,7 @@ const myHints = {
   backgroundColor: '#8bff3e',
 }
 
-const HintWindow = ({ gameID, show }) => {
+const HintWindow = ({ gameID, show, chatView }) => {
   const client = useApolloClient()
   const [hintToSend, setHintToSend] = useState('')
   const [error, setError] = useState(false)
@@ -186,7 +186,7 @@ const HintWindow = ({ gameID, show }) => {
   }
 
   return (
-    <>
+    <Box sx={chatView === 'Chat' ? { display: 'None' } : null}>
       <Stack sx={stackSX} spacing={1}>
         {hintHistory.map((hint, id) => (
           <Typography
@@ -236,7 +236,7 @@ const HintWindow = ({ gameID, show }) => {
           </form>
         </Box>
       )}
-    </>
+    </Box>
   )
 }
 
