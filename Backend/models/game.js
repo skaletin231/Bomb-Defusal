@@ -66,6 +66,10 @@ const gameSchema = new mongoose.Schema({
     type: Number,
     default: 9,
   },
+  maxTurns: {
+    type: Number,
+    default: 9,
+  },
   hints: [hintSchema],
   mistakes: {
     type: Number,

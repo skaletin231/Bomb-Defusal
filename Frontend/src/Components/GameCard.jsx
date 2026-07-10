@@ -25,7 +25,7 @@ const colorPickerPicked = {
 
 const GameCard = ({ spot, selectedCard, setSelectedCard }) => {
   const parentStyle = {
-    aspectRatio: '1/1',
+    aspectRatio: '2/1.4',
     backgroundColor:
       spot.typeRevealed.myType === null
         ? 'white'
@@ -34,6 +34,7 @@ const GameCard = ({ spot, selectedCard, setSelectedCard }) => {
     justifyContent: 'center',
     borderWidth: 2,
     borderColor: selectedCard?.word === spot.word ? 'green' : 'black',
+    borderRadius: '40px',
   }
 
   const buttonStyle = {
@@ -41,7 +42,7 @@ const GameCard = ({ spot, selectedCard, setSelectedCard }) => {
     width: '100%',
     height: '100%',
     borderWidth: spot.typeRevealed.theirType === null ? '0' : '.4em',
-    borderRadius: '2px',
+    borderRadius: '38px',
     borderStyle: 'solid',
     borderColor:
       spot.typeRevealed.theirType === null

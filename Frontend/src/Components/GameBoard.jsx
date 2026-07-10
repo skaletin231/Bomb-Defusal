@@ -24,6 +24,28 @@ const style = {
   display: 'grid',
   gridTemplateColumns: 'repeat(5, 1fr)',
   gap: '12px',
+  maxHeight: '80vh',
+}
+
+const gameBoardHeader = {
+  color: '#737373',
+  fontSize: '1.2rem',
+}
+
+const backgroundStyle = {
+  top: '0',
+  left: '0',
+  bottom: '0',
+  right: '0',
+  position: 'absolute',
+  backgroundColor: '#FFF8E9',
+  zIndex: '-2',
+}
+
+const turnText = {
+  color: '#3A1605',
+  fontSize: '3rem',
+  margin: '20px 0',
 }
 
 const cardStyle = {
@@ -234,10 +256,11 @@ const GameBoard = () => {
   }
 
   const parentStyle = {
-    aspectRatio: '1/1',
+    aspectRatio: '2/1.4',
     display: 'flex',
     justifyContent: 'center',
     borderWidth: 2,
+    borderRadius: '40px',
   }
 
   const makeCard = () => {
@@ -253,7 +276,7 @@ const GameBoard = () => {
       },
     }
     return (
-      <div style={cardStyle}>
+      <div style={cardStyle} className='MyKeyCard'>
         {boardSpots.map((spot) => (
           <Card sx={parentStyle} key={spot.word} variant='outlined'>
             <CardContent
@@ -269,9 +292,30 @@ const GameBoard = () => {
       </div>
     )
   }
+
+  const header = () => {
+    if (game.currentPlayer.id === me.id) {
+      return <h2 style={turnText}>I'ts your turn!</h2>
+    } else {
+      return <h2 style={turnText}>It is the other player's</h2>
+    }
+  }
+
   return (
     <div style={{ paddingBottom: '20px' }}>
-      <div style={style}>
+      <div style={backgroundStyle} className={'backgroundBottom'}></div>
+
+      <p style={gameBoardHeader}>
+        Round {game.maxTurns - game.turnsRemaining}/{game.maxTurns} •{' '}
+        {game.remainingWires}/{15} guessed{' '}
+        {game.mistakeLimit !== -1 && (
+          <>
+            • {game.mistakes}/{game.mistakeLimit} mistakes made
+          </>
+        )}
+      </p>
+      {header()}
+      <div style={style} className='MyBoard'>
         {boardSpots.map((spot) => (
           <GameCard
             key={spot.word}

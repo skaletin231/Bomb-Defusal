@@ -22,8 +22,10 @@ const GAME_DETAILS = gql`
     }
     gameState
     turnsRemaining
+    maxTurns
     mistakes
     mistakeLimit
+    remainingWires
   }
 `
 
