@@ -39,7 +39,7 @@ function App() {
   }
 
   return (
-    <Box sx={boxStyle}>
+    <Box sx={boxStyle} className='mainContainer'>
       <BasicMenu loggedIn={result.data?.me !== null} />
       <Routes>
         <Route path='/' element={<HomePage />} />
