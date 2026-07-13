@@ -30,8 +30,6 @@ const GameCard = ({ spot, selectedCard, setSelectedCard }) => {
       spot.typeRevealed.myType === null
         ? 'white'
         : colorPicker[spot.typeRevealed.myType],
-    display: 'flex',
-    justifyContent: 'center',
     borderWidth: 2,
     borderColor: selectedCard?.word === spot.word ? 'green' : 'black',
     borderRadius: '40px',

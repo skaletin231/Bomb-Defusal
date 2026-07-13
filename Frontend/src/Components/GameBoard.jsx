@@ -21,11 +21,13 @@ import ChatHintContainer from './ChatHintContainer'
 import GameOverScreen from './GameOverScreen'
 import '@fontsource/suwannaphum'
 
-const style = {
+const boardStyle = {
   display: 'grid',
   gridTemplateColumns: 'repeat(5, 1fr)',
-  gap: '12px',
-  maxHeight: '80vh',
+  gap: '16px',
+  aspectRatio: '2/1.4',
+  marginInline: 'auto',
+  maxHeight: '70vh',
 }
 
 const gameBoardHeader = {
@@ -306,7 +308,7 @@ const GameBoard = () => {
     } else {
       return (
         <Typography variant='h2' style={turnText}>
-          It is the other player's
+          It is the other player's turn!
         </Typography>
       )
     }
@@ -326,7 +328,7 @@ const GameBoard = () => {
         )}
       </Typography>
       {header()}
-      <div style={style} className='MyBoard'>
+      <div style={boardStyle} className='MyBoard'>
         {boardSpots.map((spot) => (
           <GameCard
             key={spot.word}
