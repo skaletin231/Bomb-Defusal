@@ -1,6 +1,6 @@
 import GameCard from './GameCard'
 import { useState, useEffect } from 'react'
-import { Button, Card, CardContent } from '@mui/material'
+import { Button, Card, CardContent, Typography } from '@mui/material'
 import { useParams } from 'react-router-dom'
 import {
   GAME_UPDATE,
@@ -19,6 +19,7 @@ import {
 import ChatWindow from './ChatWindow'
 import ChatHintContainer from './ChatHintContainer'
 import GameOverScreen from './GameOverScreen'
+import '@fontsource/suwannaphum'
 
 const style = {
   display: 'grid',
@@ -46,6 +47,8 @@ const turnText = {
   color: '#3A1605',
   fontSize: '3rem',
   margin: '20px 0',
+  fontFamily: '"Suwannaphum", serif',
+  fontWeight: 'bold',
 }
 
 const cardStyle = {
@@ -295,9 +298,17 @@ const GameBoard = () => {
 
   const header = () => {
     if (game.currentPlayer.id === me.id) {
-      return <h2 style={turnText}>I'ts your turn!</h2>
+      return (
+        <Typography variant='h2' style={turnText}>
+          I'ts your turn!
+        </Typography>
+      )
     } else {
-      return <h2 style={turnText}>It is the other player's</h2>
+      return (
+        <Typography variant='h2' style={turnText}>
+          It is the other player's
+        </Typography>
+      )
     }
   }
 
@@ -305,7 +316,7 @@ const GameBoard = () => {
     <div style={{ paddingBottom: '20px' }}>
       <div style={backgroundStyle} className={'backgroundBottom'}></div>
 
-      <p style={gameBoardHeader}>
+      <Typography sx={gameBoardHeader}>
         Round {game.maxTurns - game.turnsRemaining}/{game.maxTurns} •{' '}
         {game.remainingWires}/{15} guessed{' '}
         {game.mistakeLimit !== -1 && (
@@ -313,7 +324,7 @@ const GameBoard = () => {
             • {game.mistakes}/{game.mistakeLimit} mistakes made
           </>
         )}
-      </p>
+      </Typography>
       {header()}
       <div style={style} className='MyBoard'>
         {boardSpots.map((spot) => (
@@ -329,12 +340,6 @@ const GameBoard = () => {
         <Button onClick={submitMove} sx={buttonStyle} variant='contained'>
           Submit
         </Button>
-      )}
-      <p>current player: {game.currentPlayer.username}</p>
-      <p>you: {me.username}</p>
-      <p>Turns Reamining: {game.turnsRemaining}</p>
-      {game.mistakeLimit > -1 && (
-        <p>Mistakes Left: {game.mistakeLimit - game.mistakes}</p>
       )}
 
       {me.id === game.currentPlayer.id &&

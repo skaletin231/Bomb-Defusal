@@ -5,7 +5,7 @@ import bomb from '../../images/bomb.svg'
 import { useState } from 'react'
 
 const containerStyle = {
-  height: '100dvh',
+  height: 'auto',
 }
 
 const boxStyle = {
