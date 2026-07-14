@@ -32,7 +32,7 @@ const GameCard = ({ spot, selectedCard, setSelectedCard }) => {
         : colorPicker[spot.typeRevealed.myType],
     borderWidth: 2,
     borderColor: selectedCard?.word === spot.word ? 'green' : 'black',
-    borderRadius: '40px',
+    borderRadius: '10%',
   }
 
   const buttonStyle = {
@@ -40,7 +40,7 @@ const GameCard = ({ spot, selectedCard, setSelectedCard }) => {
     width: '100%',
     height: '100%',
     borderWidth: spot.typeRevealed.theirType === null ? '0' : '.4em',
-    borderRadius: '38px',
+    borderRadius: '10%',
     borderStyle: 'solid',
     borderColor:
       spot.typeRevealed.theirType === null

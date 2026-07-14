@@ -1,6 +1,13 @@
 import GameCard from './GameCard'
 import { useState, useEffect } from 'react'
-import { Button, Card, CardContent, Typography } from '@mui/material'
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { useParams } from 'react-router-dom'
 import {
   GAME_UPDATE,
@@ -9,6 +16,8 @@ import {
   MAKE_MOVE,
   END_TURN,
   NEW_PLAYER_JOINED,
+  SEND_HINT,
+  GET_HINTS,
 } from '../queries'
 import {
   useApolloClient,
@@ -20,6 +29,8 @@ import ChatWindow from './ChatWindow'
 import ChatHintContainer from './ChatHintContainer'
 import GameOverScreen from './GameOverScreen'
 import '@fontsource/suwannaphum'
+import AddIcon from '@mui/icons-material/Add'
+import RemoveIcon from '@mui/icons-material/Remove'
 
 const boardStyle = {
   display: 'grid',
@@ -28,6 +39,7 @@ const boardStyle = {
   aspectRatio: '2/1.4',
   marginInline: 'auto',
   maxHeight: '70vh',
+  marginTop: '10px',
 }
 
 const gameBoardHeader = {
@@ -43,6 +55,115 @@ const backgroundStyle = {
   position: 'absolute',
   backgroundColor: '#FFF8E9',
   zIndex: '-2',
+}
+
+const parentStyle = {
+  aspectRatio: '2/1.4',
+  display: 'flex',
+  justifyContent: 'center',
+  borderWidth: 2,
+  borderRadius: '10%',
+}
+
+const hintCountButtonStyling = {
+  minWidth: '0px',
+  height: '2em',
+  width: '2em',
+}
+
+const sendHintButtonStyle = {
+  backgroundColor: '#588A29',
+  border: '.15rem solid #286B1F',
+  width: '100px',
+  height: '44px',
+  borderRadius: '10px',
+  padding: '6px 10px',
+  fontSize: '17px',
+  '&:hover': {
+    backgroundColor: '#588A29',
+    borderRadius: '10px',
+  },
+  '&:active': {
+    top: '6px',
+    left: '0px',
+    backgroundColor: '#1E5C15',
+
+    '&:after': {
+      right: '-2px',
+      bottom: '-2px',
+      left: '-2px',
+      top: '-2px',
+    },
+  },
+  '&:after': {
+    content: '""',
+    position: 'absolute',
+    top: '4px',
+    left: '-2px',
+    right: '-2px',
+    bottom: '-8px',
+    display: 'block',
+    border: '.15rem solid #286B1F',
+    backgroundColor: '#1E5C15',
+    borderRadius: '10px',
+    zIndex: '-1',
+  },
+}
+
+const hintTextBox = {
+  '& .MuiOutlinedInput-root': {
+    '&::before': {
+      content: '""',
+      position: 'absolute',
+      inset: 0,
+      transform: 'translateY(6px)',
+      backgroundColor: '#E1E1E1',
+      border: '.15rem solid #84582E',
+      borderRadius: '10px',
+      zIndex: -1,
+    },
+    '& fieldset': {
+      border: '.15rem solid #84582E',
+      background: 'white',
+      borderRadius: '10px',
+      zIndex: '-1',
+    },
+    '&:hover fieldset': {
+      border: '.15rem solid #84582E',
+      borderRadius: '10px',
+    },
+    '&.Mui-focused fieldset': {
+      border: '.15rem solid #84582E',
+      borderRadius: '10px',
+    },
+  },
+}
+
+const hintCountBox = {
+  position: 'relative',
+  width: '50px',
+  height: '40px',
+  background: 'white',
+  border: '.15rem solid #84582E',
+  borderRadius: '10px',
+  alignContent: 'center',
+  '&:after': {
+    content: '""',
+    position: 'absolute',
+    top: '4px',
+    left: '-2px',
+    right: '-2px',
+    bottom: '-8px',
+    display: 'block',
+    border: '.15rem solid #84582E',
+    backgroundColor: '#E1E1E1',
+    borderRadius: '10px',
+    zIndex: '-1',
+  },
+}
+
+const hintCountText = {
+  textAlign: 'center',
 }
 
 const turnText = {
@@ -72,6 +193,10 @@ const gameStates = {
 
 const GameBoard = () => {
   const [open, setOpen] = useState(false)
+  const [hintCount, setHintCount] = useState(0)
+  const [hintText, setHintText] = useState('')
+  const [error, setError] = useState(false)
+
   const [selectedCard, setSelectedCard] = useState(null)
 
   const { id: gameID } = useParams()
@@ -83,9 +208,55 @@ const GameBoard = () => {
     variables: { id: gameID },
   })
 
+  const [sendHint] = useMutation(SEND_HINT, {
+    update: (cache, response) => {
+      cache.updateQuery(
+        {
+          query: GET_HINTS,
+          variables: { gameID: gameID },
+        },
+        (data) => {
+          if (!data || !response.data?.sendHint) return data
+
+          return {
+            ...data,
+            getHints: [...data.getHints, response.data.sendHint],
+          }
+        },
+      )
+
+      cache.updateQuery(
+        {
+          query: GET_GAME,
+          variables: { id: gameID },
+        },
+        (cacheData) => {
+          if (!cacheData) return cacheData
+          const newPlayer =
+            me.id === cacheData.getGame.players[0].id
+              ? cacheData.getGame.players[1]
+              : cacheData.getGame.players[0]
+          return {
+            ...cacheData,
+            getGame: {
+              ...cacheData.getGame,
+              currentPlayer: newPlayer,
+              gameState: 'Playing',
+            },
+          }
+        },
+      )
+
+      setHintCount(0)
+      setHintText('')
+    },
+    onError: (error) => {
+      console.log('error:', error)
+    },
+  })
+
   useSubscription(GAME_UPDATE, {
     onData: ({ data }) => {
-      console.log('update loop', data)
       const update = data.data.gameUpdate
 
       client.cache.updateQuery(
@@ -153,7 +324,6 @@ const GameBoard = () => {
 
   useSubscription(NEW_PLAYER_JOINED, {
     onData: ({ data }) => {
-      console.log('new player joined loop')
       const update = data.data.newPlayerJoined
 
       //TODO: Change this to make a new cache item for the new user and add that to the game as a reference instead
@@ -217,6 +387,19 @@ const GameBoard = () => {
     },
   })
 
+  const trySendHint = async (event) => {
+    event.preventDefault()
+
+    if (error) return
+    sendHint({
+      variables: {
+        gameID: gameID,
+        hint: hintText,
+        count: hintCount,
+      },
+    })
+  }
+
   const tryEndTurn = () => {
     endTurn({
       variables: {
@@ -258,14 +441,6 @@ const GameBoard = () => {
         index: index,
       },
     })
-  }
-
-  const parentStyle = {
-    aspectRatio: '2/1.4',
-    display: 'flex',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderRadius: '40px',
   }
 
   const makeCard = () => {
@@ -314,6 +489,78 @@ const GameBoard = () => {
     }
   }
 
+  const show =
+    game.gameState === gameStates.hint && game.currentPlayer.id === me.id
+
+  const updateHintCount = (change) => {
+    setHintCount(Math.max(hintCount + change, 0))
+  }
+
+  const formatHint = (hint) => {
+    setHintText(hint)
+    setError(hint.includes(' '))
+  }
+
+  const hintSection = () => {
+    return (
+      <Box
+        className='GiveHintSection'
+        sx={{ display: 'flex', flexDirection: 'row', gap: '40px' }}
+      >
+        <Box className='HintInput'>
+          <TextField
+            label='Hint'
+            sx={hintTextBox}
+            error={error}
+            slotProps={{ htmlInput: { style: { borderRadius: '20%' } } }}
+            size='small'
+            onChange={({ target }) => formatHint(target.value)}
+          ></TextField>
+        </Box>
+        <Box
+          className='HintCount'
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            gap: '10px',
+            alignItems: 'center',
+          }}
+        >
+          <Button
+            sx={hintCountButtonStyling}
+            className='DownButton'
+            onClick={() => updateHintCount(-1)}
+          >
+            <RemoveIcon sx={{ color: '#84582E' }} />
+          </Button>
+          <Box className='HintCountBox' sx={hintCountBox}>
+            <Typography className='HintCountLabel' sx={hintCountText}>
+              {hintCount}
+            </Typography>
+          </Box>
+
+          <Button
+            sx={hintCountButtonStyling}
+            className='UpButton'
+            onClick={() => updateHintCount(1)}
+          >
+            <AddIcon sx={{ color: '#84582E' }} />
+          </Button>
+        </Box>
+        <Box className='HintSubmit'>
+          <Button
+            className='HintSubmitButton'
+            variant='contained'
+            sx={sendHintButtonStyle}
+            onClick={trySendHint}
+          >
+            Send Hint
+          </Button>
+        </Box>
+      </Box>
+    )
+  }
+
   return (
     <div style={{ paddingBottom: '20px' }}>
       <div style={backgroundStyle} className={'backgroundBottom'}></div>
@@ -328,6 +575,7 @@ const GameBoard = () => {
         )}
       </Typography>
       {header()}
+      {show && hintSection()}
       <div style={boardStyle} className='MyBoard'>
         {boardSpots.map((spot) => (
           <GameCard
@@ -351,12 +599,7 @@ const GameBoard = () => {
           </Button>
         )}
       {makeCard()}
-      <ChatHintContainer
-        gameID={gameID}
-        show={
-          game.gameState === gameStates.hint && game.currentPlayer.id === me.id
-        }
-      />
+      <ChatHintContainer gameID={gameID} />
       <GameOverScreen
         open={open}
         setOpen={setOpen}
