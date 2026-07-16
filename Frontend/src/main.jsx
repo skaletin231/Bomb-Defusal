@@ -12,6 +12,9 @@ const theme = createTheme({
   typography: {
     fontFamily: '"Reddit Sans", sans-serif',
   },
+  card: {
+    fontFamily: '"Reddit Sans", sans-serif',
+  },
   components: {
     MuiButton: {
       styleOverrides: {

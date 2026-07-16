@@ -1,3 +1,40 @@
 body {
   margin: 0px;
 }
+
+div.notRevealedColor {
+  color: #84582e;
+  border-color: #84582e;
+}
+
+div.wireColor {
+  background-color: #bbe890;
+  color: #1e5c15;
+}
+
+div.bombColor {
+  background-color: #000000;
+  color: #d82828;
+}
+
+div.dudColor {
+  background-color: #faf2af;
+  color: #847812;
+}
+
+div.wireRevealedColor {
+  border-color: #1e5c15;
+}
+
+div.bombRevealedColor {
+  border-color: #d82828;
+}
+
+div.dudRevealedColor {
+  border-color: #847812;
+}
+
+div.cardSelected {
+  border-color: #588a29;
+  color: #588a29;
+}

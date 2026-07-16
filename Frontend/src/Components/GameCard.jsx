@@ -1,4 +1,4 @@
-import { Button, Card, CardContent } from '@mui/material'
+import { Button, Card, CardContent, Typography } from '@mui/material'
 
 const style = {
   height: '100%',
@@ -9,6 +9,18 @@ const style = {
   '&:last-child': {
     pb: 0,
   },
+}
+
+const classesForColors = {
+  wire: 'wireColor',
+  bomb: 'bombColor',
+  dud: 'dudColor',
+  null: 'notRevealedColor',
+}
+const classesForReveals = {
+  wire: 'wireRevealedColor',
+  bomb: 'bombRevealedColor',
+  dud: 'dudRevealedColor',
 }
 
 const colorPicker = {
@@ -26,30 +38,22 @@ const colorPickerPicked = {
 const GameCard = ({ spot, selectedCard, setSelectedCard }) => {
   const parentStyle = {
     aspectRatio: '2/1.4',
-    backgroundColor:
-      spot.typeRevealed.myType === null
-        ? 'white'
-        : colorPicker[spot.typeRevealed.myType],
-    borderWidth: 2,
-    borderColor: selectedCard?.word === spot.word ? 'green' : 'black',
+    display: 'flex',
+    justifyContent: 'center',
     borderRadius: '10%',
+    borderWidth: '4px',
   }
 
   const buttonStyle = {
-    color: 'black',
     width: '100%',
     height: '100%',
-    borderWidth: spot.typeRevealed.theirType === null ? '0' : '.4em',
     borderRadius: '10%',
-    borderStyle: 'solid',
-    borderColor:
-      spot.typeRevealed.theirType === null
-        ? 'transparent'
-        : colorPickerPicked[spot.typeRevealed.theirType],
     p: '0px',
+    color: 'inherit',
   }
 
   const makeMove = () => {
+    console.log('click')
     if (spot.typeRevealed.myType !== null) return
 
     if (selectedCard?.word === spot.word) {
@@ -60,10 +64,19 @@ const GameCard = ({ spot, selectedCard, setSelectedCard }) => {
     setSelectedCard(spot)
   }
 
+  const classToUse =
+    selectedCard?.word === spot.word
+      ? `cardSelected ${classesForColors[spot.typeRevealed.myType]}`
+      : classesForColors[spot.typeRevealed.myType]
+
+  console.log(classToUse)
+
   return (
-    <Card sx={parentStyle} variant='outlined'>
+    <Card className={classToUse} sx={parentStyle} variant='outlined'>
       <Button sx={buttonStyle} onClick={() => makeMove()}>
-        <CardContent sx={style}>{spot.word}</CardContent>
+        <CardContent sx={style}>
+          <Typography>{spot.word}</Typography>
+        </CardContent>
       </Button>
     </Card>
   )

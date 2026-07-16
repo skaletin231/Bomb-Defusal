@@ -27,7 +27,6 @@ const gameStates = {
 
 const { GraphQLError } = require('graphql')
 const { GraphQLDateTime } = require('graphql-scalars')
-// const { Error } = require('mongoose')
 
 const resolvers = {
   DateTime: GraphQLDateTime,

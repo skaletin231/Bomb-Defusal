@@ -31,6 +31,7 @@ import GameOverScreen from './GameOverScreen'
 import '@fontsource/suwannaphum'
 import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 
 const boardStyle = {
   display: 'grid',
@@ -57,12 +58,19 @@ const backgroundStyle = {
   zIndex: '-2',
 }
 
+const changeBoardStyle = {
+  position: 'absolute',
+  right: 0,
+  top: 0,
+  color: '#3A1605',
+}
+
 const parentStyle = {
   aspectRatio: '2/1.4',
   display: 'flex',
   justifyContent: 'center',
-  borderWidth: 2,
   borderRadius: '10%',
+  borderWidth: '4px',
 }
 
 const hintCountButtonStyling = {
@@ -71,7 +79,9 @@ const hintCountButtonStyling = {
   width: '2em',
 }
 
-const sendHintButtonStyle = {
+const confirmationButtonStyle = {
+  display: 'block',
+  margin: '10px',
   backgroundColor: '#588A29',
   border: '.15rem solid #286B1F',
   width: '100px',
@@ -107,6 +117,18 @@ const sendHintButtonStyle = {
     backgroundColor: '#1E5C15',
     borderRadius: '10px',
     zIndex: '-1',
+  },
+  '&.Mui-disabled': {
+    top: '6px',
+    left: '0px',
+    backgroundColor: '#1E5C15',
+
+    '&:after': {
+      right: '-2px',
+      bottom: '-2px',
+      left: '-2px',
+      top: '-2px',
+    },
   },
 }
 
@@ -180,10 +202,6 @@ const cardStyle = {
   gap: '8px',
 }
 
-const buttonStyle = {
-  marginTop: '10px',
-}
-
 const gameStates = {
   hint: 'Hint',
   win: 'Win',
@@ -192,6 +210,7 @@ const gameStates = {
 }
 
 const GameBoard = () => {
+  const [yourBoard, setYourBord] = useState(false)
   const [open, setOpen] = useState(false)
   const [hintCount, setHintCount] = useState(0)
   const [hintText, setHintText] = useState('')
@@ -203,6 +222,10 @@ const GameBoard = () => {
   const client = useApolloClient()
   const { data: meData } = useQuery(ME, {})
   const me = meData.me
+
+  const hintResults = useQuery(GET_HINTS, {
+    variables: { gameID: gameID },
+  })
 
   const gameResult = useQuery(GET_GAME, {
     variables: { id: gameID },
@@ -443,42 +466,39 @@ const GameBoard = () => {
     })
   }
 
-  const makeCard = () => {
-    const colorPicker = {
-      bomb: 'rgb(128, 128, 128)',
-      dud: 'rgb(255, 255, 0)',
-      wire: 'rgb(0, 128, 0)',
-    }
-    const child = {
-      p: 0,
-      '&:last-child': {
-        pb: 0,
-      },
-    }
-    return (
-      <div style={cardStyle} className='MyKeyCard'>
-        {boardSpots.map((spot) => (
-          <Card sx={parentStyle} key={spot.word} variant='outlined'>
-            <CardContent
-              sx={child}
-              style={{
-                width: '100%',
-                height: '100%',
-                backgroundColor: colorPicker[spot.myType],
-              }}
-            ></CardContent>
-          </Card>
-        ))}
-      </div>
-    )
-  }
-
   const header = () => {
     if (game.currentPlayer.id === me.id) {
       return (
-        <Typography variant='h2' style={turnText}>
-          I'ts your turn!
-        </Typography>
+        <>
+          <Typography variant='h2' style={turnText}>
+            I'ts your turn!
+          </Typography>
+          {hintResults.data && (
+            <Typography>
+              Hint: {hintResults.data?.getHints.at(-1).hint}{' '}
+              {hintResults.data?.getHints.at(-1).count}
+            </Typography>
+          )}
+
+          <Button
+            onClick={submitMove}
+            disabled={selectedCard === null}
+            sx={confirmationButtonStyle}
+            variant='contained'
+          >
+            Submit
+          </Button>
+          {me.id === game.currentPlayer.id &&
+            game.gameState === gameStates.playing && (
+              <Button
+                onClick={tryEndTurn}
+                sx={confirmationButtonStyle}
+                variant='contained'
+              >
+                End Turn
+              </Button>
+            )}
+        </>
       )
     } else {
       return (
@@ -551,13 +571,96 @@ const GameBoard = () => {
           <Button
             className='HintSubmitButton'
             variant='contained'
-            sx={sendHintButtonStyle}
+            sx={confirmationButtonStyle}
             onClick={trySendHint}
           >
             Send Hint
           </Button>
         </Box>
       </Box>
+    )
+  }
+
+  const classesForColors = {
+    wire: 'wireColor',
+    bomb: 'bombColor',
+    dud: 'dudColor',
+  }
+  const classesForReveals = {
+    wire: 'wireRevealedColor',
+    bomb: 'bombRevealedColor',
+    dud: 'dudRevealedColor',
+  }
+
+  const playBoard = () => {
+    return (
+      <>
+        <Box sx={{ position: 'relative' }}>
+          <Typography
+            variant='h4'
+            sx={{ textAlign: 'center', fontWeight: 'bold', color: '#3A1605' }}
+          >
+            Their Board
+          </Typography>
+          <Button sx={changeBoardStyle} onClick={() => setYourBord(!yourBoard)}>
+            <SwapHorizIcon />
+          </Button>
+        </Box>
+
+        <div style={boardStyle} className='MyBoard'>
+          {boardSpots.map((spot) => (
+            <GameCard
+              key={spot.word}
+              spot={spot}
+              selectedCard={selectedCard}
+              setSelectedCard={trySetSelected}
+            />
+          ))}
+        </div>
+      </>
+    )
+  }
+
+  const hintBoard = () => {
+    const theirCardStyle = {
+      height: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      p: 0,
+      '&:last-child': {
+        pb: 0,
+      },
+    }
+    return (
+      <>
+        <Box sx={{ position: 'relative' }}>
+          <Typography
+            variant='h4'
+            sx={{ textAlign: 'center', fontWeight: 'bold', color: '#3A1605' }}
+          >
+            Your Board
+          </Typography>
+          <Button sx={changeBoardStyle} onClick={() => setYourBord(!yourBoard)}>
+            <SwapHorizIcon />
+          </Button>
+        </Box>
+
+        <div style={boardStyle} className='MyKeyCard'>
+          {boardSpots.map((spot) => (
+            <Card
+              className={`${classesForColors[spot.myType]} ${classesForReveals[spot.typeRevealed.theirType]}`}
+              sx={parentStyle}
+              key={spot.word}
+              variant='outlined'
+            >
+              <CardContent sx={theirCardStyle}>
+                <Typography>{spot.word}</Typography>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </>
     )
   }
 
@@ -576,29 +679,9 @@ const GameBoard = () => {
       </Typography>
       {header()}
       {show && hintSection()}
-      <div style={boardStyle} className='MyBoard'>
-        {boardSpots.map((spot) => (
-          <GameCard
-            key={spot.word}
-            spot={spot}
-            selectedCard={selectedCard}
-            setSelectedCard={trySetSelected}
-          />
-        ))}
-      </div>
-      {selectedCard && (
-        <Button onClick={submitMove} sx={buttonStyle} variant='contained'>
-          Submit
-        </Button>
-      )}
+      {yourBoard && playBoard()}
+      {!yourBoard && hintBoard()}
 
-      {me.id === game.currentPlayer.id &&
-        game.gameState === gameStates.playing && (
-          <Button onClick={tryEndTurn} variant='contained'>
-            End Turn
-          </Button>
-        )}
-      {makeCard()}
       <ChatHintContainer gameID={gameID} />
       <GameOverScreen
         open={open}
