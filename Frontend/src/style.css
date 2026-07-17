@@ -135,3 +135,11 @@ a.buttonStyle3D:active::after {
   border: 0.15rem solid #ce8f07;
   background-color: #3b82ce;
 }
+
+div.parentStyle {
+  aspect-ratio: 2/1.4;
+  display: flex;
+  justify-content: center;
+  border-radius: 10%;
+  border-width: 4px;
+}

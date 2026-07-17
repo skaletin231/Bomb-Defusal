@@ -25,7 +25,6 @@ import {
   useQuery,
   useSubscription,
 } from '@apollo/client/react'
-import ChatWindow from './ChatWindow'
 import ChatHintContainer from './ChatHintContainer'
 import GameOverScreen from './GameOverScreen'
 import '@fontsource/suwannaphum'
@@ -53,14 +52,6 @@ const changeBoardStyle = {
   right: 0,
   top: 0,
   color: '#3A1605',
-}
-
-const parentStyle = {
-  aspectRatio: '2/1.4',
-  display: 'flex',
-  justifyContent: 'center',
-  borderRadius: '10%',
-  borderWidth: '4px',
 }
 
 const hintCountButtonStyling = {
@@ -580,8 +571,7 @@ const GameBoard = () => {
         <div style={boardStyle} className='MyKeyCard'>
           {boardSpots.map((spot) => (
             <Card
-              className={`${classesForColors[spot.myType]} ${classesForReveals[spot.typeRevealed.theirType]}`}
-              sx={parentStyle}
+              className={`parentStyle ${classesForColors[spot.myType]} ${classesForReveals[spot.typeRevealed.theirType]}`}
               key={spot.word}
               variant='outlined'
             >
