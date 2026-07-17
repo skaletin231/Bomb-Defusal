@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { Button, Box, Stack, Paper, Typography, TextField } from '@mui/material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { Box, Button, Paper } from '@mui/material'
 import Collapse from '@mui/material/Collapse'
+import { useState } from 'react'
 import ChatWindow from './ChatWindow'
 import HintWindow from './HintWindow'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 const containerSX = {
   display: 'flex',

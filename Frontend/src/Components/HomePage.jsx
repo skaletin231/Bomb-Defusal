@@ -1,8 +1,8 @@
-import { Button, Box, Container } from '@mui/material'
-import { Link } from 'react-router-dom'
-import JoinGameDialogue from './JoinGameDialogue'
-import bomb from '../../images/bomb.svg'
+import { Box, Button, Container } from '@mui/material'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
+import bomb from '../../images/bomb.svg'
+import JoinGameDialogue from './JoinGameDialogue'
 
 const boxStyle = {
   justifyContent: 'space-evenly',

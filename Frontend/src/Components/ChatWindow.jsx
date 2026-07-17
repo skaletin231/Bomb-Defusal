@@ -1,12 +1,12 @@
-import { Button, Box, Stack, Paper, Typography, TextField } from '@mui/material'
-import { GET_MESSAGES, ME, SEND_MESSAGE, MESSAGE_UPDATE } from '../queries'
 import {
   useApolloClient,
   useMutation,
   useQuery,
   useSubscription,
 } from '@apollo/client/react'
-import { useState, useEffect, useRef } from 'react'
+import { Box, Button, Stack, TextField, Typography } from '@mui/material'
+import { useEffect, useRef, useState } from 'react'
+import { GET_MESSAGES, ME, MESSAGE_UPDATE, SEND_MESSAGE } from '../queries'
 
 const textSX = {
   width: 'auto',

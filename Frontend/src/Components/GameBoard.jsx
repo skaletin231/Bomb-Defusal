@@ -1,5 +1,13 @@
-import GameCard from './GameCard'
-import { useState, useEffect } from 'react'
+import {
+  useApolloClient,
+  useMutation,
+  useQuery,
+  useSubscription,
+} from '@apollo/client/react'
+import '@fontsource/suwannaphum'
+import AddIcon from '@mui/icons-material/Add'
+import RemoveIcon from '@mui/icons-material/Remove'
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import {
   Box,
   Button,
@@ -8,29 +16,21 @@ import {
   TextField,
   Typography,
 } from '@mui/material'
+import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
-  GAME_UPDATE,
-  ME,
-  GET_GAME,
-  MAKE_MOVE,
   END_TURN,
+  GAME_UPDATE,
+  GET_GAME,
+  GET_HINTS,
+  MAKE_MOVE,
+  ME,
   NEW_PLAYER_JOINED,
   SEND_HINT,
-  GET_HINTS,
 } from '../queries'
-import {
-  useApolloClient,
-  useMutation,
-  useQuery,
-  useSubscription,
-} from '@apollo/client/react'
 import ChatHintContainer from './ChatHintContainer'
+import GameCard from './GameCard'
 import GameOverScreen from './GameOverScreen'
-import '@fontsource/suwannaphum'
-import AddIcon from '@mui/icons-material/Add'
-import RemoveIcon from '@mui/icons-material/Remove'
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 
 const boardStyle = {
   display: 'grid',
@@ -443,6 +443,7 @@ const GameBoard = () => {
     setError(hint.includes(' '))
   }
 
+  //TODO: this can be it's own jsx maybe
   const hintSection = () => {
     return (
       <Box
@@ -514,6 +515,7 @@ const GameBoard = () => {
     dud: 'dudRevealedColor',
   }
 
+  //TODO: this entire thing should maybe be it's own jsx
   const playBoard = () => {
     return (
       <>
@@ -543,6 +545,7 @@ const GameBoard = () => {
     )
   }
 
+  //TODO: this can be moved to it's own jsx
   const hintBoard = () => {
     const theirCardStyle = {
       height: '100%',

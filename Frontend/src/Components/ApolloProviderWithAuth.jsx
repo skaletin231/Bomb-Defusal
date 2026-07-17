@@ -6,8 +6,8 @@ import {
   HttpLink,
   InMemoryCache,
 } from '@apollo/client'
+import { setContext } from '@apollo/client/link/context'
 import { ApolloProvider } from '@apollo/client/react'
-import { setContext, SetContextLink } from '@apollo/client/link/context'
 
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { getMainDefinition } from '@apollo/client/utilities'

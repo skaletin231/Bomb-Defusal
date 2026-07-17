@@ -1,24 +1,12 @@
-import {
-  Button,
-  Box,
-  Stack,
-  Paper,
-  Typography,
-  TextField,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-} from '@mui/material'
-import NumberField from './NumberField'
+import { Box, Stack, Typography } from '@mui/material'
 
-import { GET_HINTS, ME, SEND_HINT, HINT_UPDATE, GET_GAME } from '../queries'
 import {
   useApolloClient,
   useQuery,
   useSubscription,
 } from '@apollo/client/react'
 import { useEffect, useRef } from 'react'
+import { GET_GAME, GET_HINTS, HINT_UPDATE, ME } from '../queries'
 
 const textSX = {
   width: 'auto',

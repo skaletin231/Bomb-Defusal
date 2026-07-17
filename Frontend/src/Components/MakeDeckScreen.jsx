@@ -1,25 +1,17 @@
+import { gql } from '@apollo/client'
 import { useMutation, useQuery } from '@apollo/client/react'
 import {
-  MAKE_DECK,
-  GET_MY_DECKS,
-  UPDATE_DECK,
-  GET_MY_DECK,
-  GET_ALL_DECKS,
-} from '../queries'
-import { useEffect, useState } from 'react'
-import {
-  Button,
   Box,
-  Stack,
-  Paper,
-  Typography,
-  TextField,
-  CardContent,
+  Button,
   Card,
+  CardContent,
   IconButton,
+  TextField,
+  Typography,
 } from '@mui/material'
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { gql } from '@apollo/client'
+import { GET_MY_DECK, GET_MY_DECKS, MAKE_DECK, UPDATE_DECK } from '../queries'
 
 const formStyle = {
   justifyContent: 'flex-start',

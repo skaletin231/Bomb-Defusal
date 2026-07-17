@@ -1,13 +1,12 @@
-import * as React from 'react'
-import Button from '@mui/material/Button'
+import { useQuery } from '@apollo/client/react'
+import { useAuth0 } from '@auth0/auth0-react'
+import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline'
+import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
-import { useAuth0 } from '@auth0/auth0-react'
-import IconButton from '@mui/material/IconButton'
-import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline'
+import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ME } from '../queries'
-import { useQuery } from '@apollo/client/react'
 
 const divStyle = {
   position: 'fixed',

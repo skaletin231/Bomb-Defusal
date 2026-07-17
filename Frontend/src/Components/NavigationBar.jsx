@@ -1,6 +1,6 @@
-import { Button, Box } from '@mui/material'
-import BasicMenu from './BasicMenu'
+import { Box, Button } from '@mui/material'
 import { Link } from 'react-router-dom'
+import BasicMenu from './BasicMenu'
 
 const navBarStyle = {
   position: 'sticky',
