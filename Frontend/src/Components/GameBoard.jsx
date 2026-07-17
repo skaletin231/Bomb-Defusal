@@ -48,16 +48,6 @@ const gameBoardHeader = {
   fontSize: '1.2rem',
 }
 
-const backgroundStyle = {
-  top: '0',
-  left: '0',
-  bottom: '0',
-  right: '0',
-  position: 'absolute',
-  backgroundColor: '#FFF8E9',
-  zIndex: '-2',
-}
-
 const changeBoardStyle = {
   position: 'absolute',
   right: 0,
@@ -77,59 +67,6 @@ const hintCountButtonStyling = {
   minWidth: '0px',
   height: '2em',
   width: '2em',
-}
-
-const confirmationButtonStyle = {
-  display: 'block',
-  margin: '10px',
-  backgroundColor: '#588A29',
-  border: '.15rem solid #286B1F',
-  width: '100px',
-  height: '44px',
-  borderRadius: '10px',
-  padding: '6px 10px',
-  fontSize: '17px',
-  '&:hover': {
-    backgroundColor: '#588A29',
-    borderRadius: '10px',
-  },
-  '&:active': {
-    top: '6px',
-    left: '0px',
-    backgroundColor: '#1E5C15',
-
-    '&:after': {
-      right: '-2px',
-      bottom: '-2px',
-      left: '-2px',
-      top: '-2px',
-    },
-  },
-  '&:after': {
-    content: '""',
-    position: 'absolute',
-    top: '4px',
-    left: '-2px',
-    right: '-2px',
-    bottom: '-8px',
-    display: 'block',
-    border: '.15rem solid #286B1F',
-    backgroundColor: '#1E5C15',
-    borderRadius: '10px',
-    zIndex: '-1',
-  },
-  '&.Mui-disabled': {
-    top: '6px',
-    left: '0px',
-    backgroundColor: '#1E5C15',
-
-    '&:after': {
-      right: '-2px',
-      bottom: '-2px',
-      left: '-2px',
-      top: '-2px',
-    },
-  },
 }
 
 const hintTextBox = {
@@ -194,12 +131,6 @@ const turnText = {
   margin: '20px 0',
   fontFamily: '"Suwannaphum", serif',
   fontWeight: 'bold',
-}
-
-const cardStyle = {
-  display: 'grid',
-  gridTemplateColumns: 'repeat(5, 1fr)',
-  gap: '8px',
 }
 
 const gameStates = {
@@ -483,7 +414,7 @@ const GameBoard = () => {
           <Button
             onClick={submitMove}
             disabled={selectedCard === null}
-            sx={confirmationButtonStyle}
+            className='buttonStyle3D'
             variant='contained'
           >
             Submit
@@ -492,7 +423,7 @@ const GameBoard = () => {
             game.gameState === gameStates.playing && (
               <Button
                 onClick={tryEndTurn}
-                sx={confirmationButtonStyle}
+                className='buttonStyle3D'
                 variant='contained'
               >
                 End Turn
@@ -571,7 +502,7 @@ const GameBoard = () => {
           <Button
             className='HintSubmitButton'
             variant='contained'
-            sx={confirmationButtonStyle}
+            className='buttonStyle3D'
             onClick={trySendHint}
           >
             Send Hint
@@ -666,7 +597,7 @@ const GameBoard = () => {
 
   return (
     <div style={{ paddingBottom: '20px' }}>
-      <div style={backgroundStyle} className={'backgroundBottom'}></div>
+      <div className={'background'}></div>
 
       <Typography sx={gameBoardHeader}>
         Round {game.maxTurns - game.turnsRemaining}/{game.maxTurns} •{' '}
