@@ -5,17 +5,8 @@ import {
   useSubscription,
 } from '@apollo/client/react'
 import '@fontsource/suwannaphum'
-import AddIcon from '@mui/icons-material/Add'
-import RemoveIcon from '@mui/icons-material/Remove'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  TextField,
-  Typography,
-} from '@mui/material'
+import { Box, Button, Card, CardContent, Typography } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
@@ -28,9 +19,9 @@ import {
   NEW_PLAYER_JOINED,
 } from '../queries'
 import ChatHintContainer from './ChatHintContainer'
+import GameBoardHintHeader from './GameBoardHintHeader'
 import GameCard from './GameCard'
 import GameOverScreen from './GameOverScreen'
-import GameBoardHintHeader from './GameBoardHintHeader'
 
 const boardStyle = {
   display: 'grid',
