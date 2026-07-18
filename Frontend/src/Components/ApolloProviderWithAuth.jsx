@@ -27,8 +27,6 @@ function ApolloProviderWithAuth({ children }) {
         console.log('no token available yet', error)
       }
 
-      //console.log('token fetched: ', token)
-
       return {
         headers: {
           ...headers,
@@ -59,7 +57,6 @@ function ApolloProviderWithAuth({ children }) {
 
     return new ApolloClient({
       link: splitLink,
-      // link: authLink.concat(httpLink),
       cache: new InMemoryCache(),
     })
   }, [getAccessTokenSilently])

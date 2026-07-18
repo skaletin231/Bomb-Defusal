@@ -28,7 +28,6 @@ const GameCard = ({ spot, selectedCard, setSelectedCard }) => {
   }
 
   const makeMove = () => {
-    console.log('click')
     if (spot.typeRevealed.myType !== null) return
 
     if (selectedCard?.word === spot.word) {
@@ -43,8 +42,6 @@ const GameCard = ({ spot, selectedCard, setSelectedCard }) => {
     selectedCard?.word === spot.word
       ? `cardSelected ${classesForColors[spot.typeRevealed.myType]}`
       : classesForColors[spot.typeRevealed.myType]
-
-  console.log(classToUse)
 
   return (
     <Card className={`parentStyle ${classToUse}`} variant='outlined'>
