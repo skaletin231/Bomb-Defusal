@@ -144,7 +144,10 @@ div.parentStyle {
 }
 
 .gameBoard {
-  width: min(calc(70vh * (2 / 1.43)), 90vw);
-  max-height: 92vh;
+  width: min(calc(70vh * (2 / 1.43)), calc(100% - 20px));
   margin-inline: auto;
+}
+
+.headerContainer {
+  width: auto;
 }

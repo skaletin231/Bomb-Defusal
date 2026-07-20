@@ -30,6 +30,7 @@ const boardStyle = {
   marginInline: 'auto',
   marginTop: '10px',
   position: 'relative',
+  aspectRatio: '2/1.4',
 }
 
 const gameBoardHeader = {
@@ -396,18 +397,21 @@ const GameBoard = () => {
 
   return (
     <div className='gameBoard'>
-      <div className={'background'}></div>
-      <Typography sx={gameBoardHeader}>
-        Round {game.maxTurns - game.turnsRemaining}/{game.maxTurns} •{' '}
-        {game.remainingWires}/{15} guessed{' '}
-        {game.mistakeLimit !== -1 && (
-          <>
-            • {game.mistakes}/{game.mistakeLimit} mistakes made
-          </>
-        )}
-      </Typography>
-      {header()}
-      {show && <GameBoardHintHeader />}
+      <div className='background'></div>
+      <Box className='headerContainer'>
+        <Typography sx={gameBoardHeader}>
+          Round {game.maxTurns - game.turnsRemaining}/{game.maxTurns} •{' '}
+          {game.remainingWires}/{15} guessed{' '}
+          {game.mistakeLimit !== -1 && (
+            <>
+              • {game.mistakes}/{game.mistakeLimit} mistakes made
+            </>
+          )}
+        </Typography>
+        {header()}
+        {show && <GameBoardHintHeader />}
+      </Box>
+
       {yourBoard && playBoard()}
       {!yourBoard && hintBoard()}
 
