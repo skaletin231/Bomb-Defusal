@@ -8,6 +8,7 @@ const navBarStyle = {
   width: '100vw',
   zIndex: '100',
   backgroundColor: '#FFF8E9',
+  height: '5vh',
 }
 
 const NavigationBar = () => {

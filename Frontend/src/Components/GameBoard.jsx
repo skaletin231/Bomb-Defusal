@@ -27,10 +27,9 @@ const boardStyle = {
   display: 'grid',
   gridTemplateColumns: 'repeat(5, 1fr)',
   gap: '16px',
-  aspectRatio: '2/1.4',
   marginInline: 'auto',
-  maxHeight: '70vh',
   marginTop: '10px',
+  position: 'relative',
 }
 
 const gameBoardHeader = {
@@ -41,7 +40,8 @@ const gameBoardHeader = {
 const changeBoardStyle = {
   position: 'absolute',
   right: 0,
-  top: 0,
+  bottom: '100%',
+  marginBottom: '10px',
   color: '#3A1605',
 }
 
@@ -61,7 +61,7 @@ const gameStates = {
 }
 
 const GameBoard = () => {
-  const [yourBoard, setYourBord] = useState(false)
+  const [yourBoard, setYourBord] = useState(true)
   const [open, setOpen] = useState(false)
 
   const [selectedCard, setSelectedCard] = useState(null)
@@ -270,21 +270,30 @@ const GameBoard = () => {
                   {hintResults.data?.getHints.at(-1).count}
                 </Typography>
               )}
-              <Button
-                onClick={submitMove}
-                disabled={selectedCard === null}
-                className='buttonStyle3D'
-                variant='contained'
+              <Box
+                sx={{
+                  flexDirection: 'row',
+                  display: 'flex',
+                  gap: '20px',
+                  margin: '10px 0px',
+                }}
               >
-                Submit
-              </Button>
-              <Button
-                onClick={tryEndTurn}
-                className='buttonStyle3D'
-                variant='contained'
-              >
-                End Turn
-              </Button>
+                <Button
+                  onClick={submitMove}
+                  disabled={selectedCard === null}
+                  className='buttonStyle3D'
+                  variant='contained'
+                >
+                  Submit
+                </Button>
+                <Button
+                  onClick={tryEndTurn}
+                  className='buttonStyle3D'
+                  variant='contained'
+                >
+                  End Turn
+                </Button>
+              </Box>
             </>
           )}
         </>
@@ -323,12 +332,12 @@ const GameBoard = () => {
           >
             Their Board
           </Typography>
-          <Button sx={changeBoardStyle} onClick={() => setYourBord(!yourBoard)}>
-            <SwapHorizIcon />
-          </Button>
         </Box>
 
         <div style={boardStyle} className='MyBoard'>
+          <Button sx={changeBoardStyle} onClick={() => setYourBord(!yourBoard)}>
+            <SwapHorizIcon />
+          </Button>
           {boardSpots.map((spot) => (
             <GameCard
               key={spot.word}
@@ -361,14 +370,14 @@ const GameBoard = () => {
             variant='h4'
             sx={{ textAlign: 'center', fontWeight: 'bold', color: '#3A1605' }}
           >
-            Your Board
+            Key Card
           </Typography>
-          <Button sx={changeBoardStyle} onClick={() => setYourBord(!yourBoard)}>
-            <SwapHorizIcon />
-          </Button>
         </Box>
 
         <div style={boardStyle} className='MyKeyCard'>
+          <Button sx={changeBoardStyle} onClick={() => setYourBord(!yourBoard)}>
+            <SwapHorizIcon />
+          </Button>
           {boardSpots.map((spot) => (
             <Card
               className={`parentStyle ${classesForColors[spot.myType]} ${classesForReveals[spot.typeRevealed.theirType]}`}
@@ -386,9 +395,8 @@ const GameBoard = () => {
   }
 
   return (
-    <div style={{ paddingBottom: '20px' }}>
+    <div className='gameBoard'>
       <div className={'background'}></div>
-
       <Typography sx={gameBoardHeader}>
         Round {game.maxTurns - game.turnsRemaining}/{game.maxTurns} •{' '}
         {game.remainingWires}/{15} guessed{' '}

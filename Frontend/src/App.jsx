@@ -11,7 +11,7 @@ import { Box } from '@mui/material'
 import NavigationBar from './Components/NavigationBar'
 
 const boxStyle = {
-  padding: '3rem',
+  padding: '0rem 3rem 3vh 3rem',
 }
 
 function App() {

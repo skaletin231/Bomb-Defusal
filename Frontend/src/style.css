@@ -44,7 +44,7 @@ div.cardSelected {
   left: 0;
   bottom: 0;
   right: 0;
-  position: absolute;
+  position: fixed;
   background-color: #fff8e9;
   z-index: -2;
 }
@@ -52,7 +52,6 @@ div.cardSelected {
 Button.buttonStyle3D,
 a.buttonStyle3D {
   display: block;
-  margin: 10px;
   background-color: #588a29;
   border: 0.15rem solid #286b1f;
   width: 100px;
@@ -142,4 +141,10 @@ div.parentStyle {
   justify-content: center;
   border-radius: 10%;
   border-width: 4px;
+}
+
+.gameBoard {
+  width: min(calc(70vh * (2 / 1.43)), 90vw);
+  max-height: 92vh;
+  margin-inline: auto;
 }
