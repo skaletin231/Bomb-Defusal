@@ -1,12 +1,10 @@
-import { Box, TextField, Button, Typography } from '@mui/material'
-import RemoveIcon from '@mui/icons-material/Remove'
+import { useMutation, useQuery } from '@apollo/client/react'
 import AddIcon from '@mui/icons-material/Add'
+import RemoveIcon from '@mui/icons-material/Remove'
+import { Box, Button, TextField } from '@mui/material'
 import { useState } from 'react'
-import { SEND_HINT, GET_HINTS, GET_GAME, ME } from '../queries'
 import { useParams } from 'react-router-dom'
-import { useQuery, useMutation } from '@apollo/client/react'
-import NumberField from './NumberField'
-import { NumberField as BaseNumberField } from '@base-ui/react/number-field'
+import { GET_GAME, GET_HINTS, ME, SEND_HINT } from '../queries'
 
 const hintTextBox = {
   '& .MuiOutlinedInput-root': {
