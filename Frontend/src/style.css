@@ -151,3 +151,16 @@ div.parentStyle {
 .headerContainer {
   width: auto;
 }
+
+p.hintText {
+  font-size: 2rem;
+  color: #3a1605;
+}
+
+p.waitingForHint {
+  font-style: italic;
+}
+
+.hintCountBox input {
+  text-align: center;
+}

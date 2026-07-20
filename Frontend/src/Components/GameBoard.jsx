@@ -266,7 +266,7 @@ const GameBoard = () => {
           {isPlaying && (
             <>
               {hintResults.data && (
-                <Typography>
+                <Typography className='hintText'>
                   Hint: {hintResults.data?.getHints.at(-1).hint}{' '}
                   {hintResults.data?.getHints.at(-1).count}
                 </Typography>
@@ -300,11 +300,25 @@ const GameBoard = () => {
         </>
       )
     } else {
-      return (
-        <Typography variant='h2' style={turnText}>
-          It is the other player's turn!
-        </Typography>
-      )
+      if (isPlaying) {
+        return (
+          <Typography variant='h2' style={turnText}>
+            It is the other player's turn!
+          </Typography>
+        )
+      } else {
+        return (
+          <>
+            <Typography variant='h2' style={turnText}>
+              It is the other player's turn!
+            </Typography>
+
+            <Typography className='hintText waitingForHint'>
+              Waiting for hint...
+            </Typography>
+          </>
+        )
+      }
     }
   }
 

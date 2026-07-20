@@ -5,6 +5,8 @@ import { useState } from 'react'
 import { SEND_HINT, GET_HINTS, GET_GAME, ME } from '../queries'
 import { useParams } from 'react-router-dom'
 import { useQuery, useMutation } from '@apollo/client/react'
+import NumberField from './NumberField'
+import { NumberField as BaseNumberField } from '@base-ui/react/number-field'
 
 const hintTextBox = {
   '& .MuiOutlinedInput-root': {
@@ -129,7 +131,7 @@ const GameBoardHintHeader = () => {
   }
 
   const updateHintCount = (change) => {
-    setHintCount(Math.max(hintCount + change, 0))
+    setHintCount(Math.max(Number(hintCount) + change, 0))
   }
 
   const trySendHint = async (event) => {
@@ -140,9 +142,15 @@ const GameBoardHintHeader = () => {
       variables: {
         gameID: gameID,
         hint: hintText,
-        count: hintCount,
+        count: Number(hintCount),
       },
     })
+  }
+
+  const handleChange = (event) => {
+    const rawValue = event.target.value
+    const cleanValue = rawValue.replace(/[^0-9]/g, '')
+    setHintCount(cleanValue)
   }
 
   return (
@@ -176,10 +184,25 @@ const GameBoardHintHeader = () => {
         >
           <RemoveIcon sx={{ color: '#84582E' }} />
         </Button>
-        <Box className='HintCountBox' sx={hintCountBox}>
-          <Typography className='HintCountLabel' sx={hintCountText}>
-            {hintCount}
-          </Typography>
+        <Box className='hintCountBox' sx={hintCountBox}>
+          <TextField
+            value={hintCount}
+            onChange={handleChange}
+            sx={{
+              height: '100%',
+              width: '100%',
+              '& .MuiOutlinedInput-root': {
+                height: '100%',
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                border: 'none',
+              },
+              '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline':
+                {
+                  border: 'none',
+                },
+            }}
+          />
         </Box>
 
         <Button

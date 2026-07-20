@@ -57,42 +57,6 @@ function NumberField({ id: idProp, label, error, size = 'medium', ...other }) {
             slotProps={{
               input: props,
             }}
-            endAdornment={
-              <InputAdornment
-                position='end'
-                sx={{
-                  flexDirection: 'column',
-                  maxHeight: 'unset',
-                  alignSelf: 'stretch',
-                  borderLeft: '1px solid',
-                  borderColor: 'divider',
-                  ml: 0,
-                  '& button': {
-                    py: 0,
-                    flex: 1,
-                    borderRadius: 0.5,
-                  },
-                }}
-              >
-                <BaseNumberField.Increment
-                  render={<IconButton size={size} aria-label='Increase' />}
-                >
-                  <KeyboardArrowUpIcon
-                    fontSize={size}
-                    sx={{ transform: 'translateY(2px)' }}
-                  />
-                </BaseNumberField.Increment>
-
-                <BaseNumberField.Decrement
-                  render={<IconButton size={size} aria-label='Decrease' />}
-                >
-                  <KeyboardArrowDownIcon
-                    fontSize={size}
-                    sx={{ transform: 'translateY(-2px)' }}
-                  />
-                </BaseNumberField.Decrement>
-              </InputAdornment>
-            }
             sx={{ pr: 0 }}
           />
         )}
