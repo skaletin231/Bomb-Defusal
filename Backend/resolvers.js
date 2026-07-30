@@ -37,7 +37,7 @@ const resolvers = {
       const game = await Game.findById(args.id).populate('players')
       if (!game || !includesPlayer(game, context.user)) notAPlayerError()
 
-      return newReturnInfo(game, context)
+      return returnInfo(game, context)
     },
     getUser: async (root, args) => {
       const user = await User.findOne({ auth_ID: args.auth_ID })
@@ -182,7 +182,7 @@ const resolvers = {
       if (!game) gameNotFoundError()
 
       if (includesPlayer(game, context.user)) {
-        return newReturnInfo(game, context)
+        return returnInfo(game, context)
       }
       if (game.players.length == 2) {
         gameFullError()
@@ -192,20 +192,18 @@ const resolvers = {
 
       await game.save()
 
-      const returnInfo = newReturnInfo(game, context)
+      const gameInfo = returnInfo(game, context)
 
       const gameUpdate = {
         gameID: game.id,
         playerID: context.user.id,
         type: 'New Player',
-        gameUser: returnInfo.players[1],
+        gameUser: gameInfo.players[1],
       }
-
-      console.log(gameUpdate)
 
       pubsub.publish('NEW_PLAYER_JOINED', { newPlayerJoined: gameUpdate })
 
-      return returnInfo
+      return gameInfo
     },
     makeMove: async (root, args, context) => {
       checkIsLoggedIn(context)
@@ -244,7 +242,7 @@ const resolvers = {
             )
             await game.save()
             pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
-            return newReturnInfo(game, context)
+            return returnInfo(game, context)
           }
 
           let returnVal = updateSpotWire(
@@ -255,7 +253,7 @@ const resolvers = {
           )
           await game.save()
           pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
-          return newReturnInfo(game, context)
+          return returnInfo(game, context)
         }
       } else //player 2 move
       {
@@ -275,10 +273,9 @@ const resolvers = {
               isPlayer1(game, context.user._id),
             )
             await game.save()
-            console.log('about to publish make move bomb', returnVal)
             pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
 
-            return newReturnInfo(game, context)
+            return returnInfo(game, context)
           }
 
           let returnVal = updateSpotWire(
@@ -288,13 +285,10 @@ const resolvers = {
             isPlayer1(game, context.user._id),
           )
           await game.save()
-          console.log('about to publish make move wire', returnVal)
           pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
-          return newReturnInfo(game, context)
+          return returnInfo(game, context)
         }
       }
-
-      console.log(context.user)
 
       let returnValDud = updateSpotDud(
         context,
@@ -303,14 +297,11 @@ const resolvers = {
         isPlayer1(game, context.user._id),
       )
 
-      console.log('269')
-
       await game.save()
-      console.log('about to publish make move dud', returnValDud)
 
       pubsub.publish('GAME_UPDATE', { gameUpdate: returnValDud })
 
-      return newReturnInfo(game, context)
+      return returnInfo(game, context)
     },
     endTurn: async (root, args, context) => {
       checkIsLoggedIn(context)
@@ -338,7 +329,7 @@ const resolvers = {
 
       pubsub.publish('GAME_UPDATE', { gameUpdate })
 
-      return newReturnInfo(game, context)
+      return returnInfo(game, context)
     },
     addUser: async (root, args) => {
       const user = await User.findOne({ auth_ID: args.auth_ID })
@@ -492,7 +483,7 @@ const resolvers = {
   },
 }
 
-const newReturnInfo = (game, context) => {
+const returnInfo = (game, context) => {
   return {
     id: game.id,
 
@@ -548,22 +539,7 @@ const includesPlayer = (game, user) => {
 }
 
 const changeToHint = (game) => {
-  //when going to hint mode, the player who just moved is the hinter now
-  //unless only they have wires left
-  if (isPlayer1(game, game.currentPlayer._id)) {
-    if (player2IsDone(game)) game.currentPlayer = game.players[1]
-    else game.currentPlayer = game.players[0]
-  } else {
-    if (player1IsDone(game)) game.currentPlayer = game.players[0]
-    else game.currentPlayer = game.players[1]
-  }
-
-  turnChangeMade = {
-    turnUpdate: {
-      username: game.currentPlayer.username,
-      id: game.currentPlayer.id,
-    },
-  }
+  turnChangeMade = changeTurnStateHelper(game, 'hint')
 
   game.gameState = gameStates.hint
 
@@ -571,10 +547,28 @@ const changeToHint = (game) => {
 }
 
 const changeToPlaying = (game) => {
-  if (isPlayer1(game, game.currentPlayer._id)) {
-    game.currentPlayer = game.players[1]
+  turnChangeMade = changeTurnStateHelper(game, 'playing')
+
+  game.gameState = gameStates.playing
+
+  return turnChangeMade
+}
+
+const changeTurnStateHelper = (game, newState) => {
+  if (player2IsDone(game)) {
+    game.currentPlayer =
+      newState === 'playing' ? game.players[0] : game.players[1]
+  } else if (player1IsDone(game)) {
+    game.currentPlayer =
+      newState === 'playing' ? game.players[1] : game.players[0]
   } else {
-    game.currentPlayer = game.players[0]
+    if (isPlayer1(game, game.currentPlayer._id)) {
+      game.currentPlayer =
+        newState === 'playing' ? game.players[1] : game.players[0]
+    } else {
+      game.currentPlayer =
+        newState === 'playing' ? game.players[0] : game.players[1]
+    }
   }
 
   turnChangeMade = {
@@ -583,8 +577,6 @@ const changeToPlaying = (game) => {
       id: game.currentPlayer.id,
     },
   }
-
-  game.gameState = gameStates.playing
 
   return turnChangeMade
 }
@@ -644,19 +636,25 @@ const updateSpotWire = (context, game, spot, isPlayer1) => {
     endGame(game, gameStates.win)
   }
 
+  let gameUpdate = getGeneralGameUpdate(game, context, turnChangeMade)
+  gameUpdate.changedSpots = [
+    {
+      word: spot.word,
+      typeRevealed: {
+        myType: 'wire',
+        theirType: 'wire',
+      },
+    },
+  ]
+
+  return gameUpdate
+}
+
+const getGeneralGameUpdate = (game, context, turnChangeMade) => {
   const gameUpdate = {
     gameID: game.id,
     playerID: context.user.id,
     type: 'Move Made',
-    changedSpots: [
-      {
-        word: spot.word,
-        typeRevealed: {
-          myType: 'wire',
-          theirType: 'wire',
-        },
-      },
-    ],
     turnChange: turnChangeMade,
     gameStateChange: game.gameState,
     turnsRemainingChange: game.turnsRemaining,
@@ -688,21 +686,14 @@ const updateSpotDud = (context, game, spot, isPlayer1) => {
         theirType: spot.typeRevealed.player1,
       }
 
-  const gameUpdate = {
-    gameID: game.id,
-    playerID: context.user.id,
-    type: 'Move Made',
-    changedSpots: [
-      {
-        word: spot.word,
-        typeRevealed: typeRevealed,
-      },
-    ],
-    turnChange: turnChangeMade,
-    gameStateChange: game.gameState,
-    turnsRemainingChange: game.turnsRemaining,
-    mistakes: game.mistakes,
-  }
+  let gameUpdate = getGeneralGameUpdate(game, context, turnChangeMade)
+  gameUpdate.changedSpots = [
+    {
+      word: spot.word,
+      typeRevealed: typeRevealed,
+    },
+  ]
+  gameUpdate.mistakes = game.mistakes
 
   return gameUpdate
 }
@@ -710,21 +701,16 @@ const updateSpotDud = (context, game, spot, isPlayer1) => {
 const updateSpotBomb = (context, game, spot, isPlayer1) => {
   endGame(game, gameStates.lose)
 
-  const gameUpdate = {
-    gameID: game.id,
-    playerID: context.user.id,
-    type: 'Move Made',
-    changedSpots: [
-      {
-        word: spot.word,
-        typeRevealed: {
-          myType: 'bomb',
-          theirType: 'bomb',
-        },
+  let gameUpdate = getGeneralGameUpdate(game, context, turnChangeMade)
+  gameUpdate.changedSpots = [
+    {
+      word: spot.word,
+      typeRevealed: {
+        myType: 'bomb',
+        theirType: 'bomb',
       },
-    ],
-    gameStateChange: gameStates.lose,
-  }
+    },
+  ]
 
   return gameUpdate
 }
