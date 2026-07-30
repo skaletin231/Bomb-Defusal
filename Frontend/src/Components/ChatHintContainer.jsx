@@ -1,9 +1,9 @@
-import { useState } from 'react'
-import { Button, Box, Stack, Paper, Typography, TextField } from '@mui/material'
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
+import { Box, Button, Paper } from '@mui/material'
 import Collapse from '@mui/material/Collapse'
+import { useState } from 'react'
 import ChatWindow from './ChatWindow'
 import HintWindow from './HintWindow'
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 
 const containerSX = {
   display: 'flex',
@@ -29,7 +29,7 @@ const selectedButton = {
   backgroundColor: '#f3f0f0d5',
 }
 
-const ChatHintContainer = ({ gameID, show }) => {
+const ChatHintContainer = ({ gameID }) => {
   const [chatView, setChatView] = useState('Chat')
   const [open, setOpen] = useState(true)
 
@@ -42,7 +42,7 @@ const ChatHintContainer = ({ gameID, show }) => {
   }
 
   const hintContainer = () => {
-    return <HintWindow gameID={gameID} show={show} chatView={chatView} />
+    return <HintWindow gameID={gameID} chatView={chatView} />
   }
   const toggleChat = () => {
     setOpen(!open)

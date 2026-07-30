@@ -1,0 +1,16 @@
+{
+  "name": "bomb-difusal",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "client": "npm run dev --prefix Frontend",
+    "server": "npm run dev --prefix Backend",
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "build": "npm run build:ui --prefix Backend",
+    "deploy": "npm run deploy:full --prefix Backend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.4"
+  }
+}

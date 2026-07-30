@@ -1,4 +1,4 @@
-import { Button, Card, CardContent } from '@mui/material'
+import { Button, Card, CardContent, Typography } from '@mui/material'
 
 const style = {
   height: '100%',
@@ -11,43 +11,20 @@ const style = {
   },
 }
 
-const colorPicker = {
-  bomb: 'gray',
-  dud: 'yellow',
-  wire: 'green',
-}
-
-const colorPickerPicked = {
-  bomb: 'rgb(180, 180, 180)',
-  dud: 'rgb(255,210,0)',
-  wire: 'rgb(0, 190, 0)',
+const classesForColors = {
+  wire: 'wireColor',
+  bomb: 'bombColor',
+  dud: 'dudColor',
+  null: 'notRevealedColor',
 }
 
 const GameCard = ({ spot, selectedCard, setSelectedCard }) => {
-  const parentStyle = {
-    aspectRatio: '1/1',
-    backgroundColor:
-      spot.typeRevealed.myType === null
-        ? 'white'
-        : colorPicker[spot.typeRevealed.myType],
-    display: 'flex',
-    justifyContent: 'center',
-    borderWidth: 2,
-    borderColor: selectedCard?.word === spot.word ? 'green' : 'black',
-  }
-
   const buttonStyle = {
-    color: 'black',
     width: '100%',
     height: '100%',
-    borderWidth: spot.typeRevealed.theirType === null ? '0' : '.4em',
-    borderRadius: '2px',
-    borderStyle: 'solid',
-    borderColor:
-      spot.typeRevealed.theirType === null
-        ? 'transparent'
-        : colorPickerPicked[spot.typeRevealed.theirType],
+    borderRadius: '10%',
     p: '0px',
+    color: 'inherit',
   }
 
   const makeMove = () => {
@@ -61,10 +38,17 @@ const GameCard = ({ spot, selectedCard, setSelectedCard }) => {
     setSelectedCard(spot)
   }
 
+  const classToUse =
+    selectedCard?.word === spot.word
+      ? `cardSelected ${classesForColors[spot.typeRevealed.myType]}`
+      : classesForColors[spot.typeRevealed.myType]
+
   return (
-    <Card sx={parentStyle} variant='outlined'>
+    <Card className={`parentStyle ${classToUse}`} variant='outlined'>
       <Button sx={buttonStyle} onClick={() => makeMove()}>
-        <CardContent sx={style}>{spot.word}</CardContent>
+        <CardContent sx={style}>
+          <Typography className='cardText'>{spot.word}</Typography>
+        </CardContent>
       </Button>
     </Card>
   )

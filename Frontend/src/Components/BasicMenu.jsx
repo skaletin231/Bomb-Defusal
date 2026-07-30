@@ -1,19 +1,23 @@
-import * as React from 'react'
-import Button from '@mui/material/Button'
+import { useQuery } from '@apollo/client/react'
+import { useAuth0 } from '@auth0/auth0-react'
+import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline'
+import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
-import { useAuth0 } from '@auth0/auth0-react'
-import IconButton from '@mui/material/IconButton'
-import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline'
+import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ME } from '../queries'
 
 const divStyle = {
-  position: 'absolute',
-  top: '5px',
-  right: '5px',
+  position: 'fixed',
+  top: 'calc(3.5vh - 16px)',
+  right: '3rem',
 }
 
-export default function BasicMenu({ loggedIn }) {
+export default function BasicMenu() {
+  const result = useQuery(ME, {})
+  const loggedIn = result.data?.me !== null
+
   const { loginWithRedirect, logout } = useAuth0()
   const navigate = useNavigate()
 
@@ -29,15 +33,10 @@ export default function BasicMenu({ loggedIn }) {
     setAnchorEl(null)
   }
 
-  const handleProfileTransition = () => {
-    console.log('not implamented yet')
-    handleClose()
-  }
-
-  const handleAccountTransition = () => {
-    console.log('not implamented yet')
-    handleClose()
-  }
+  // const handleProfileTransition = () => {
+  //   console.log('not implamented yet')
+  //   handleClose()
+  // }
 
   const handleLogout = () => {
     logout()
@@ -67,7 +66,6 @@ export default function BasicMenu({ loggedIn }) {
     return (
       <>
         {/* <MenuItem onClick={handleProfileTransition}>Profile</MenuItem> */}
-        {/* <MenuItem onClick={handleAccountTransition}>My account</MenuItem> */}
         <MenuItem onClick={handleBackToHome}>Home</MenuItem>
         <MenuItem onClick={handleMyDeckTransition}>My deck</MenuItem>
         <MenuItem onClick={handleLogout}>Logout</MenuItem>

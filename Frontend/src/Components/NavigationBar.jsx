@@ -1,0 +1,36 @@
+import { Box, Button } from '@mui/material'
+import { Link } from 'react-router-dom'
+import BasicMenu from './BasicMenu'
+
+const navBarStyle = {
+  position: 'sticky',
+  top: '0px',
+  width: 'calc(100vw - 6rem)',
+  zIndex: '100',
+  backgroundColor: '#FFF8E9',
+  height: '7vh',
+}
+
+const NavigationBar = () => {
+  return (
+    <Box sx={navBarStyle} className='navigationBar'>
+      <Button
+        sx={{ color: 'black', padding: '5px 0px' }}
+        component={Link}
+        to='/'
+        startIcon={
+          <img
+            src='../../images/bomb.svg'
+            alt='Logo'
+            style={{ width: '7vh', height: '7vh' }}
+          />
+        }
+      >
+        Defuser
+      </Button>
+      <BasicMenu />
+    </Box>
+  )
+}
+
+export default NavigationBar

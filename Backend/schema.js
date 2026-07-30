@@ -38,9 +38,11 @@ const typeDefs = /* GraphQL */ `
     board: Board!
     gameState: String!
     turnsRemaining: Int!
+    maxTurns: Int!
     hints: [Hint!]!
     mistakes: Int!
     mistakeLimit: Int!
+    remainingWires: Int!
   }
 
   scalar DateTime

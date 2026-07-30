@@ -1,18 +1,8 @@
-import DecksDropdown from './DeckDropdowns'
 import { useQuery } from '@apollo/client/react'
-import { GET_MY_DECKS } from '../queries'
-import {
-  Button,
-  Box,
-  Stack,
-  Paper,
-  Typography,
-  TextField,
-  Card,
-  CardContent,
-} from '@mui/material'
-import MakeDeckScreen from './MakeDeckScreen'
+import { Button, Card, CardContent } from '@mui/material'
 import { Link } from 'react-router-dom'
+import { GET_MY_DECKS } from '../queries'
+import DecksDropdown from './DeckDropdowns'
 
 const MyDecks = () => {
   const deckResults = useQuery(GET_MY_DECKS)

@@ -1,5 +1,5 @@
+import { Box, Button } from '@mui/material'
 import { useState } from 'react'
-import { Button, Card, CardContent, Box } from '@mui/material'
 
 const DecksDropdown = ({ deck }) => {
   const [isDropedDown, setIsDropedDown] = useState(false)

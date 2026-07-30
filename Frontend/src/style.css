@@ -1,3 +1,190 @@
 body {
   margin: 0px;
 }
+
+.mainContainer,
+.navigationBar {
+  padding: 0rem 3rem 0rem 3rem;
+}
+
+div.notRevealedColor {
+  color: #84582e;
+  border-color: #84582e;
+  background-color: #f5f5f5;
+}
+
+div.wireColor {
+  background-color: #bbe890;
+  color: #1e5c15;
+  border-color: #286b1f;
+}
+
+div.bombColor {
+  background-color: #000000;
+  color: #d82828;
+}
+
+div.dudColor {
+  background-color: #faf2af;
+  color: #847812;
+  border-color: #847812;
+}
+
+div.wireRevealedColor {
+  /* border-color: #1e5c15; */
+  box-shadow: 0px 0px 3px 3px #1e5c15;
+}
+
+div.bombRevealedColor {
+  /* border-color: #d82828; */
+  box-shadow: 0px 0px 3px 3px #d82828;
+}
+
+div.dudRevealedColor {
+  /* border-color: #84582e; */
+  box-shadow: 0px 0px 3px 3px #84582e;
+}
+
+div.cardSelected {
+  border-color: #588a29;
+  color: #588a29;
+}
+
+.background {
+  top: 0;
+  left: 0;
+  bottom: 0;
+  right: 0;
+  position: fixed;
+  background-color: #fff8e9;
+  z-index: -2;
+}
+
+Button.buttonStyle3D,
+a.buttonStyle3D {
+  display: block;
+  background-color: #588a29;
+  border: 0.15rem solid #286b1f;
+  width: 100px;
+  height: 44px;
+  border-radius: 10px;
+  padding: 6px 10px;
+  font-size: 17px;
+}
+
+a.buttonStyle3D {
+  display: inline-flex;
+}
+
+Button.buttonStyle3D.Mui-disabled,
+a.buttonStyle3D.Mui-disabled {
+  top: 6px;
+  left: 0px;
+  background-color: #808080;
+  border-color: #5d5d5d;
+}
+
+Button.buttonStyle3D.Mui-disabled::after,
+a.buttonStyle3D.Mui-disabled::after {
+  right: -2px;
+  bottom: -2px;
+  left: -2px;
+  top: -2px;
+}
+
+Button.buttonStyle3D::after,
+a.buttonStyle3D::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: -2px;
+  right: -2px;
+  bottom: -8px;
+  display: block;
+  border: 0.15rem solid #286b1f;
+  background-color: #1e5c15;
+  border-radius: 10px;
+  z-index: -1;
+}
+
+Button.buttonStyle3D:hover,
+a.buttonStyle3D:hover {
+  background-color: #588a29;
+  border-radius: 10px;
+}
+
+Button.buttonStyle3D:active,
+a.buttonStyle3D:active {
+  top: 6px;
+  left: 0px;
+  background-color: #1e5c15;
+}
+
+Button.buttonStyle3D:active::after,
+a.buttonStyle3D:active::after {
+  right: -2px;
+  bottom: -2px;
+  left: -2px;
+  top: -2px;
+}
+
+.homePage Button.buttonStyle3D,
+.homePage a.buttonStyle3D {
+  background-color: #0063cc;
+  border: none;
+  width: 10rem;
+  height: 4rem;
+}
+
+.homePage Button.buttonStyle3D:hover,
+.homePage a.buttonStyle3D :hover {
+  background-color: #0063cc;
+}
+
+.homePage Button.buttonStyle3D::after,
+.homePage a.buttonStyle3D::after {
+  border: 0.15rem solid #ce8f07;
+  background-color: #3b82ce;
+}
+
+div.parentStyle {
+  aspect-ratio: 2/1.4;
+  display: flex;
+  justify-content: center;
+  border-radius: 10%;
+  border-width: 4px;
+}
+
+.gameBoard {
+  width: min(calc(70vh * (2 / 1.43)), calc(100% - 20px));
+  margin-inline: auto;
+}
+
+.headerContainer {
+  width: auto;
+}
+
+p.hintTitle {
+  font-size: 1.5rem;
+  color: #3a1605;
+  font-weight: bold;
+}
+
+p.hintContent {
+  font-size: 2rem;
+  color: #84582e;
+  font-weight: bold;
+}
+
+p.waitingForHint {
+  font-style: italic;
+}
+
+.hintCountBox input {
+  text-align: center;
+}
+
+p.cardText {
+  font-size: 1.5rem;
+  font-weight: bold;
+}

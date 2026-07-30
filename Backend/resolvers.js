@@ -27,7 +27,6 @@ const gameStates = {
 
 const { GraphQLError } = require('graphql')
 const { GraphQLDateTime } = require('graphql-scalars')
-// const { Error } = require('mongoose')
 
 const resolvers = {
   DateTime: GraphQLDateTime,
@@ -168,6 +167,7 @@ const resolvers = {
         },
         gameState: gameStates.hint,
         turnsRemaining: args.turnLimit, //if not given, these are udnefined so goes to default
+        maxTurns: args.turnLimit,
         mistakeLimit: args.mistakeLimit,
       })
 
@@ -529,6 +529,10 @@ const newReturnInfo = (game, context) => {
     },
     gameState: game.gameState,
     turnsRemaining: game.turnsRemaining,
+    remainingWires: game.board.spots.filter(
+      (spot) => spot.typeRevealed.player1 === 'wire',
+    ).length,
+    maxTurns: game.maxTurns,
     mistakes: game.mistakes,
     mistakeLimit: game.mistakeLimit,
   }

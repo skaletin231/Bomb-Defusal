@@ -1,7 +1,7 @@
-import { TextField, Button } from '@mui/material'
+import { useMutation } from '@apollo/client/react'
+import { Button, TextField } from '@mui/material'
 import { useState } from 'react'
 import { UPDATE_USER_INFO } from '../queries'
-import { useMutation } from '@apollo/client/react'
 
 const AccountSetup = () => {
   const [username, setUsername] = useState('')

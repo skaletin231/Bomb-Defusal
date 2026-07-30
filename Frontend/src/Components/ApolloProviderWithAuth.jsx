@@ -6,8 +6,8 @@ import {
   HttpLink,
   InMemoryCache,
 } from '@apollo/client'
+import { setContext } from '@apollo/client/link/context'
 import { ApolloProvider } from '@apollo/client/react'
-import { setContext, SetContextLink } from '@apollo/client/link/context'
 
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { getMainDefinition } from '@apollo/client/utilities'
@@ -26,8 +26,6 @@ function ApolloProviderWithAuth({ children }) {
       } catch (error) {
         console.log('no token available yet', error)
       }
-
-      //console.log('token fetched: ', token)
 
       return {
         headers: {
@@ -59,7 +57,6 @@ function ApolloProviderWithAuth({ children }) {
 
     return new ApolloClient({
       link: splitLink,
-      // link: authLink.concat(httpLink),
       cache: new InMemoryCache(),
     })
   }, [getAccessTokenSilently])
