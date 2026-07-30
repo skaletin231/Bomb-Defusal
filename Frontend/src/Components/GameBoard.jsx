@@ -260,7 +260,7 @@ const GameBoard = () => {
       return (
         <>
           <Typography variant='h2' style={turnText}>
-            I'ts your turn!
+            It's your turn!
           </Typography>
 
           {isPlaying && (
@@ -400,7 +400,7 @@ const GameBoard = () => {
               variant='outlined'
             >
               <CardContent sx={theirCardStyle}>
-                <Typography>{spot.word}</Typography>
+                <Typography className='cardText'>{spot.word}</Typography>
               </CardContent>
             </Card>
           ))}

@@ -87,6 +87,8 @@ const startServer = async (port) => {
 
   await server.start()
 
+  app.use(express.static('dist'))
+
   app.use(
     '/',
     cors(),

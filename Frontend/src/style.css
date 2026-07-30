@@ -164,3 +164,7 @@ p.waitingForHint {
 .hintCountBox input {
   text-align: center;
 }
+
+p.cardText {
+  font-size: 1.5rem;
+}

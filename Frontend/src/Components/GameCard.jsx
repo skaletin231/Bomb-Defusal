@@ -47,7 +47,7 @@ const GameCard = ({ spot, selectedCard, setSelectedCard }) => {
     <Card className={`parentStyle ${classToUse}`} variant='outlined'>
       <Button sx={buttonStyle} onClick={() => makeMove()}>
         <CardContent sx={style}>
-          <Typography>{spot.word}</Typography>
+          <Typography className='cardText'>{spot.word}</Typography>
         </CardContent>
       </Button>
     </Card>
