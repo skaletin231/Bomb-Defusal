@@ -10,10 +10,6 @@ import MakeDeckScreen from './Components/MakeDeckScreen'
 import { Box } from '@mui/material'
 import NavigationBar from './Components/NavigationBar'
 
-const boxStyle = {
-  padding: '0rem 3rem 3vh 3rem',
-}
-
 function App() {
   const result = useQuery(ME, {})
 
@@ -40,7 +36,7 @@ function App() {
   return (
     <Box className='EntirePage'>
       <NavigationBar />
-      <Box sx={boxStyle} className='mainContainer'>
+      <Box className='mainContainer'>
         <Routes>
           <Route path='/' element={<HomePage />} />
           <Route path='/startgame' element={<DecksScreen />} />

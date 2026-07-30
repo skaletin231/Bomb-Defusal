@@ -5,24 +5,24 @@ import BasicMenu from './BasicMenu'
 const navBarStyle = {
   position: 'sticky',
   top: '0px',
-  width: '100vw',
+  width: 'calc(100vw - 6rem)',
   zIndex: '100',
   backgroundColor: '#FFF8E9',
-  height: '5vh',
+  height: '7vh',
 }
 
 const NavigationBar = () => {
   return (
-    <Box sx={navBarStyle}>
+    <Box sx={navBarStyle} className='navigationBar'>
       <Button
-        sx={{ color: 'black' }}
+        sx={{ color: 'black', padding: '5px 0px' }}
         component={Link}
         to='/'
         startIcon={
           <img
             src='../../images/bomb.svg'
             alt='Logo'
-            style={{ width: 60, height: 60 }}
+            style={{ width: '7vh', height: '7vh' }}
           />
         }
       >

@@ -266,10 +266,15 @@ const GameBoard = () => {
           {isPlaying && (
             <>
               {hintResults.data && (
-                <Typography className='hintText'>
-                  Hint: {hintResults.data?.getHints.at(-1).hint}{' '}
-                  {hintResults.data?.getHints.at(-1).count}
-                </Typography>
+                <Box
+                  sx={{ display: 'flex', gap: '20px', alignItems: 'baseline' }}
+                >
+                  <Typography className='hintTitle'>Hint:</Typography>
+                  <Typography className='hintContent'>
+                    {hintResults.data?.getHints.at(-1).hint}{' '}
+                    {hintResults.data?.getHints.at(-1).count}
+                  </Typography>
+                </Box>
               )}
               <Box
                 sx={{

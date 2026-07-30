@@ -10,8 +10,8 @@ import { ME } from '../queries'
 
 const divStyle = {
   position: 'fixed',
-  top: '5px',
-  right: '5px',
+  top: 'calc(3.5vh - 16px)',
+  right: '3rem',
 }
 
 export default function BasicMenu() {
