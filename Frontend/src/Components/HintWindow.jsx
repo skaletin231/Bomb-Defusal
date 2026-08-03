@@ -17,18 +17,19 @@ const textSX = {
 
 const stackSX = {
   padding: '0 .2rem',
-  height: '150px',
+  height: '211px',
   overflowY: 'auto',
 }
 
 const theirHints = {
   alignSelf: 'flex-start',
-  backgroundColor: '#a3a3a3',
+  backgroundColor: '#FFFFFF',
 }
 
 const myHints = {
   alignSelf: 'flex-end',
-  backgroundColor: '#8bff3e',
+  color: '#FFFFFF',
+  backgroundColor: '#588A29',
 }
 
 const HintWindow = ({ gameID, chatView }) => {

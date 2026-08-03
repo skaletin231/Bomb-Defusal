@@ -4,6 +4,8 @@ import Collapse from '@mui/material/Collapse'
 import { useState } from 'react'
 import ChatWindow from './ChatWindow'
 import HintWindow from './HintWindow'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
+import ToggleButton from '@mui/material/ToggleButton'
 
 const containerSX = {
   display: 'flex',
@@ -11,18 +13,27 @@ const containerSX = {
   position: 'fixed',
   right: '0px',
   bottom: '0px',
-  backgroundColor: '#e3e3e3d5',
-  border: 'solid',
-  borderWidth: '.1rem',
   width: '21rem',
 }
 
 const paperSX = {
-  backgroundColor: '#d4d4d4d5',
-  margin: '.1rem',
+  margin: '0',
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
+  borderRadius: '15% 15% 0px 0px',
+  overflow: 'hidden',
+  borderStyle: 'solid',
+  borderWidth: '1px',
+  backgroundColor: '#84582E',
+  borderColor: '#84582E',
+}
+
+const collapseContainerSX = {
+  borderStyle: 'solid',
+  borderWidth: '0px 3px',
+  borderColor: '#84582E',
+  backgroundColor: '#ececec',
 }
 
 const selectedButton = {
@@ -33,7 +44,8 @@ const ChatHintContainer = ({ gameID }) => {
   const [chatView, setChatView] = useState('Chat')
   const [open, setOpen] = useState(true)
 
-  const changeView = (newView) => {
+  const changeView = (event, newView) => {
+    if (newView === null) return
     setChatView(newView)
   }
 
@@ -52,31 +64,70 @@ const ChatHintContainer = ({ gameID }) => {
     <Box sx={containerSX} className='chatbox'>
       <Paper sx={paperSX} elevation={1}>
         <Box>
-          <Button
-            sx={chatView === 'Chat' ? selectedButton : null}
-            onClick={() => changeView('Chat')}
-          >
-            Chat
-          </Button>
-          <Button
-            sx={chatView === 'Hint' ? selectedButton : null}
-            onClick={() => changeView('Hint')}
-          >
-            Hint
-          </Button>
+          <ToggleButtonGroup value={chatView} exclusive onChange={changeView}>
+            <ToggleButton
+              value='Chat'
+              sx={{
+                color: '#adadad',
+                '&.Mui-selected': {
+                  color: '#ffffff',
+                  backgroundColor: '#724c28',
+                },
+                '&.Mui-selected:hover': {
+                  backgroundColor: '#724c28',
+                },
+              }}
+            >
+              Chat
+            </ToggleButton>
+            <ToggleButton
+              value='Hint'
+              sx={{
+                color: '#adadad',
+                '&.Mui-selected': {
+                  color: '#ffffff',
+                  backgroundColor: '#724c28',
+                },
+                '&.Mui-selected:hover': {
+                  backgroundColor: '#724c28',
+                },
+              }}
+            >
+              Hint
+            </ToggleButton>
+          </ToggleButtonGroup>
         </Box>
-        <Box>
-          <Button onClick={toggleChat}>
+        <Box sx={{ alignSelf: 'stretch' }}>
+          <Button
+            onClick={toggleChat}
+            sx={{
+              color: '#d8d8d8',
+              backgroundColor: 'transparent',
+              padding: '0px',
+              height: '100%',
+
+              '&:hover': {
+                backgroundColor: 'transparent',
+                color: '#ffffff',
+              },
+              '&:active': {
+                backgroundColor: 'transparent',
+                color: '#ffffff',
+              },
+            }}
+          >
             <ExpandMoreIcon
               sx={{
                 transform: open ? 'rotate(0deg)' : 'rotate(180deg)',
                 transition: 'transform 300ms ease',
+                width: '36px',
+                height: '36px',
               }}
             />
           </Button>
         </Box>
       </Paper>
-      <Collapse in={open} timeout={300}>
+      <Collapse sx={collapseContainerSX} in={open} timeout={300}>
         {chatContainer()}
         {hintContainer()}
       </Collapse>

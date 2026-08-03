@@ -7,6 +7,9 @@ import {
 import { Box, Button, Stack, TextField, Typography } from '@mui/material'
 import { useEffect, useRef, useState } from 'react'
 import { GET_MESSAGES, ME, MESSAGE_UPDATE, SEND_MESSAGE } from '../queries'
+import InputAdornment from '@mui/material/InputAdornment'
+import SendOutlinedIcon from '@mui/icons-material/SendOutlined'
+import IconButton from '@mui/material/IconButton'
 
 const textSX = {
   width: 'auto',
@@ -16,9 +19,7 @@ const textSX = {
 }
 
 const formStyle = {
-  justifyContent: 'flex-start',
-  flexDirection: 'row',
-  display: 'flex',
+  flex: 1,
 }
 
 const stackSX = {
@@ -129,25 +130,52 @@ const ChatWindow = ({ gameID, chatView }) => {
         <div ref={bottomRef} />
       </Stack>
       <Box
-        sx={{ display: 'flex', border: 'solid', borderWidth: '.1rem 0 0 0' }}
+        sx={{
+          display: 'flex',
+          height: '60px',
+        }}
       >
         <form onSubmit={trySendMessage} style={formStyle}>
-          <div style={{ width: '70%' }}>
-            <TextField
-              sx={{ margin: '.4rem .1rem' }}
-              variant='outlined'
-              label='Message'
-              onChange={({ target }) => setMessageToSend(target.value)}
-            ></TextField>
-          </div>
-
-          <Button
-            type='submit'
-            sx={{ marginLeft: 'auto', margin: '.4rem' }}
-            variant='contained'
-          >
-            Send
-          </Button>
+          <TextField
+            fullWidth
+            multiline
+            sx={{
+              margin: '0',
+              height: '100%',
+              '& .MuiInputLabel-root': {
+                transform: 'translate(14px, 20px) scale(1)',
+              },
+              '& .MuiInputLabel-shrink': {
+                transform: 'translate(14px, -9px) scale(0.75)',
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#84582E',
+                borderWidth: '3px 0',
+              },
+              '&:hover .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#84582E',
+                borderWidth: '3px 0',
+              },
+              '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#84582E',
+                borderWidth: '3px 0',
+              },
+            }}
+            variant='outlined'
+            label='Message'
+            onChange={({ target }) => setMessageToSend(target.value)}
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <IconButton type='submit'>
+                      <SendOutlinedIcon sx={{ color: '#84582E' }} />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              },
+            }}
+          ></TextField>
         </form>
       </Box>
     </Box>
