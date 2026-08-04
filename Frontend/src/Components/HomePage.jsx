@@ -10,16 +10,21 @@ const boxStyle = {
   alignItems: 'center',
 }
 
+const containerSX = {
+  height: '60vh',
+  alignContent: 'center',
+}
+
 const HomePage = () => {
   const [open, setOpen] = useState(false)
 
   return (
-    <>
+    <Box sx={{ height: '93vh' }}>
       <div
         className={'background'}
-        style={{ backgroundColor: '#27bfda' }}
+        style={{ backgroundColor: '#FFF8E9' }}
       ></div>
-      <Container className='homePage'>
+      <Container className='homePage' sx={containerSX}>
         <Box sx={{ justifyContent: 'center', display: 'flex' }}>
           <img style={{ width: '20rem' }} src={bomb} alt='Logo' />{' '}
         </Box>
@@ -42,7 +47,7 @@ const HomePage = () => {
         </Box>
       </Container>
       <JoinGameDialogue open={open} setOpen={setOpen} />
-    </>
+    </Box>
   )
 }
 

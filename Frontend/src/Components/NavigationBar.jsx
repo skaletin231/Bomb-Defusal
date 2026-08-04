@@ -15,7 +15,12 @@ const NavigationBar = () => {
   return (
     <Box sx={navBarStyle} className='navigationBar'>
       <Button
-        sx={{ color: 'black', padding: '5px 0px' }}
+        sx={{
+          color: 'black',
+          padding: '5px 0px',
+          fontSize: '1.5rem',
+          fontWeight: 'bold',
+        }}
         component={Link}
         to='/'
         startIcon={
