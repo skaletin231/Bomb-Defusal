@@ -8,11 +8,13 @@ const boxStyle = {
   justifyContent: 'space-evenly',
   display: 'flex',
   alignItems: 'center',
+  marginTop: '5rem',
 }
 
 const containerSX = {
   height: '60vh',
   alignContent: 'center',
+  spacing: '20px',
 }
 
 const HomePage = () => {
