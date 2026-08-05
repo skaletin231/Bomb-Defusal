@@ -36,6 +36,7 @@ function App() {
   return (
     <Box className='EntirePage'>
       <NavigationBar />
+      <div className='background'></div>
       <Box className='mainContainer'>
         <Routes>
           <Route path='/' element={<HomePage />} />

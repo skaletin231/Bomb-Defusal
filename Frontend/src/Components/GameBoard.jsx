@@ -416,7 +416,6 @@ const GameBoard = () => {
 
   return (
     <div className='gameBoard'>
-      <div className='background'></div>
       <Box className='headerContainer'>
         <Typography sx={gameBoardHeader}>
           Round {game.maxTurns - game.turnsRemaining}/{game.maxTurns} •{' '}
