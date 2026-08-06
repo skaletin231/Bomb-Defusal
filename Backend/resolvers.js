@@ -212,16 +212,16 @@ const resolvers = {
 
       if (!game || !includesPlayer(game, context.user)) notAPlayerError()
 
+      if (!context.user._id.equals(game.currentPlayer._id)) notYourTurnError()
+
+      if (game.gameState !== gameStates.playing) wrongGamestateError()
+
       const myTypeRevealed = isPlayer1(game, context.user._id)
         ? game.board.spots[args.index].typeRevealed.player1
         : game.board.spots[args.index].typeRevealed.player2
 
       if (myTypeRevealed !== null) {
         invalidMoveError()
-      }
-
-      if (!game.currentPlayer.equals(context.user._id)) {
-        notYourTurnError()
       }
 
       if (isPlayer1(game, context.user._id)) {
@@ -464,6 +464,47 @@ const resolvers = {
         public: deck.public,
         cards: deck.cards,
         id: deck.id,
+      }
+    },
+    removeDeck: async (root, args, context) => {
+      console.log(args)
+      checkIsLoggedIn(context)
+
+      const deck = await Deck.findById(args.deckID)
+      if (!deck || !deck.owner.equals(context.user._id)) cantAccessDeckError()
+      console.log(deck)
+
+      const deleted = await Deck.findByIdAndDelete(args.deckID)
+      console.log(deleted)
+
+      return deleted._id
+    },
+    copyDeck: async (root, args, context) => {
+      checkIsLoggedIn(context)
+
+      const deck = await Deck.findById(args.deckID)
+      if (!deck || !deck.owner.equals(context.user._id)) cantAccessDeckError()
+      console.log(deck)
+
+      const newDeck = new Deck({
+        owner: context.user._id,
+        name: deck.name,
+        public: false,
+        cards: deck.cards,
+      })
+      console.log(newDeck)
+
+      await newDeck.save()
+
+      return {
+        id: newDeck._id,
+        owner: {
+          username: context.user.username,
+          id: context.user._id,
+        },
+        name: newDeck.name,
+        public: newDeck.public,
+        cards: newDeck.cards,
       }
     },
   },

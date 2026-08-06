@@ -8,7 +8,7 @@ const deckSchema = new mongoose.Schema({
   name: String,
   public: {
     type: Boolean,
-    default: true,
+    default: false,
   },
   cards: [String],
 })

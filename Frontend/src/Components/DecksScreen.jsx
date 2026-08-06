@@ -14,6 +14,8 @@ const DecksScreen = () => {
 
   const decks = deckResults.data.getAllDecks
 
+  console.log(decks[0])
+
   return (
     <>
       <h1>Start Game</h1>

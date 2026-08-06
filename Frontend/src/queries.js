@@ -307,6 +307,27 @@ export const MAKE_DECK = gql`
   }
 `
 
+export const COPY_DECK = gql`
+  mutation copyDeck($deckID: ID!) {
+    copyDeck(deckID: $deckID) {
+      id
+      owner {
+        username
+        id
+      }
+      name
+      public
+      cards
+    }
+  }
+`
+
+export const REMOVE_DECK = gql`
+  mutation removeDeck($deckID: ID!) {
+    removeDeck(deckID: $deckID)
+  }
+`
+
 export const UPDATE_DECK = gql`
   mutation updateDeck(
     $deckID: ID!

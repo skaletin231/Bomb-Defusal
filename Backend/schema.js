@@ -77,6 +77,8 @@ const typeDefs = /* GraphQL */ `
       public: Boolean
       cards: [String!]
     ): Deck
+    removeDeck(deckID: ID!): ID
+    copyDeck(deckID: ID!): Deck
   }
 
   type User {
