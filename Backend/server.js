@@ -53,7 +53,7 @@ const startServer = async (port) => {
 
   const wsServer = new WebSocketServer({
     server: httpServer,
-    path: '/',
+    path: '/graphql',
   })
 
   const schema = makeExecutableSchema({ typeDefs, resolvers })
@@ -90,7 +90,7 @@ const startServer = async (port) => {
   app.use(express.static('dist'))
 
   app.use(
-    '/',
+    '/graphql',
     cors(),
     express.json(),
     checkJwtOptional,
@@ -142,9 +142,7 @@ const startServer = async (port) => {
     }),
   )
 
-  httpServer.listen(port, () =>
-    console.log(`Server is now running on http://localhost:${port}`),
-  )
+  httpServer.listen(port, () => console.log(`Server is now running on ${port}`))
 }
 
 module.exports = startServer

@@ -35,11 +35,22 @@ function ApolloProviderWithAuth({ children }) {
       }
     })
 
-    const httpLink = new HttpLink({ uri: 'http://localhost:4000' })
+    //const httpLink = new HttpLink({ uri: 'http://localhost:4000' })
+    const httpLink = new HttpLink({
+      uri: '/graphql',
+    })
+
+    // const wsLink = new GraphQLWsLink(
+    //   createClient({
+    //     url: 'ws://localhost:4000',
+    //   }),
+    // )
+
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
 
     const wsLink = new GraphQLWsLink(
       createClient({
-        url: 'ws://localhost:4000',
+        url: `${wsProtocol}//${window.location.host}/graphql`,
       }),
     )
 
