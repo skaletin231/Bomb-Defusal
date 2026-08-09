@@ -51,6 +51,7 @@ const MyDecks = () => {
   const boxSX = {
     display: 'flex',
     gap: '10px',
+    flexFlow: 'wrap',
   }
 
   const innerboxSX = {
