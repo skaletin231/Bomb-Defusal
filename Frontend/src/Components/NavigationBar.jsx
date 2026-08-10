@@ -1,6 +1,7 @@
 import { Box, Button } from '@mui/material'
 import { Link } from 'react-router-dom'
 import BasicMenu from './BasicMenu'
+import bomb from '../../images/bomb.svg'
 
 const navBarStyle = {
   position: 'sticky',
@@ -24,11 +25,7 @@ const NavigationBar = () => {
         component={Link}
         to='/'
         startIcon={
-          <img
-            src='../../images/bomb.svg'
-            alt='Logo'
-            style={{ width: '7vh', height: '7vh' }}
-          />
+          <img src={bomb} alt='Logo' style={{ width: '7vh', height: '7vh' }} />
         }
       >
         Defuser
