@@ -1,12 +1,19 @@
 const { GraphQLError } = require('graphql')
 
+const graphQLErrorCodes = {
+  notFound: 'NOT_FOUND',
+  unauthenticated: 'UNAUTHENTICATED',
+  badInput: 'BAD_USER_INPUT',
+  limitReached: 'LIMIT_MAXED',
+}
+
 //used for not finding a deck, but also for finding one you don't own
 function deckNotFoundError() {
   throw new GraphQLError(
     'Either no deck was found with this id, or you do not have permission to access it.',
     {
       extensions: {
-        code: 'NOT_FOUND',
+        code: graphQLErrorCodes.notFound,
       },
     },
   )
@@ -15,7 +22,7 @@ function deckNotFoundError() {
 function notLoggedInError() {
   throw new GraphQLError('Not logged in.', {
     extensions: {
-      code: 'UNAUTHENTICATED',
+      code: graphQLErrorCodes.unauthenticated,
     },
   })
 }
@@ -23,7 +30,7 @@ function notLoggedInError() {
 function notAPlayerError() {
   throw new GraphQLError('Game not found or not in the game', {
     extensions: {
-      code: 'NOT_FOUND',
+      code: graphQLErrorCodes.notFound,
     },
   })
 }
@@ -31,7 +38,7 @@ function notAPlayerError() {
 function gameNotFoundError() {
   throw new GraphQLError('No game with this ID found', {
     extensions: {
-      code: 'BAD_USER_INPUT',
+      code: graphQLErrorCodes.badInput,
     },
   })
 }
@@ -39,7 +46,7 @@ function gameNotFoundError() {
 function gameFullError() {
   throw new GraphQLError('This game is full already', {
     extensions: {
-      code: 'LIMIT_MAXED',
+      code: graphQLErrorCodes.limitReached,
     },
   })
 }
@@ -47,7 +54,7 @@ function gameFullError() {
 function notYourTurnError() {
   throw new GraphQLError('It is not your turn', {
     extensions: {
-      code: 'BAD_USER_INPUT',
+      code: graphQLErrorCodes.badInput,
     },
   })
 }
@@ -55,7 +62,7 @@ function notYourTurnError() {
 function invalidMoveError() {
   throw new GraphQLError('invalid move', {
     extensions: {
-      code: 'BAD_USER_INPUT',
+      code: graphQLErrorCodes.badInput,
     },
   })
 }
@@ -63,7 +70,7 @@ function invalidMoveError() {
 function wrongGamestateError() {
   throw new GraphQLError('Invalid Action', {
     extensions: {
-      code: 'BAD_USER_INPUT',
+      code: graphQLErrorCodes.badInput,
     },
   })
 }
@@ -71,7 +78,7 @@ function wrongGamestateError() {
 function cantAccessDeckError() {
   throw new GraphQLError('Deck not found or you do not own it', {
     extensions: {
-      code: 'NOT_FOUND',
+      code: graphQLErrorCodes.notFound,
     },
   })
 }

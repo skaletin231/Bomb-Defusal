@@ -6,13 +6,18 @@ const typeDefs = /* GraphQL */ `
     getHints(gameID: ID!): [Hint!]
     getMyDecks: [Deck!]
     getMyDeck(deckID: ID!): Deck
-    getAllDecks: [Deck!]
+    getAllDecks: AllDecks!
     me: User
   }
 
   type Revealed {
     myType: String
     theirType: String
+  }
+
+  type AllDecks {
+    myDecks: [Deck!]
+    publicDecks: [Deck!]
   }
 
   type Spot {

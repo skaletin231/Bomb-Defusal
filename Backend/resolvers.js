@@ -130,11 +130,16 @@ const resolvers = {
     getAllDecks: async (root, __, context) => {
       checkIsLoggedIn(context)
 
-      const decks = await Deck.find({
-        $or: [{ public: true }, { owner: context.user._id }],
+      const myDecks = await Deck.find({
+        owner: context.user._id,
       }).populate('owner')
 
-      return decks.map((deck) => ({
+      const publicDecks = await Deck.find({
+        public: true,
+        owner: { $ne: context.user._id },
+      }).populate('owner')
+
+      const myDecksObject = myDecks.map((deck) => ({
         id: deck.id,
         owner: {
           username: deck.owner.username,
@@ -144,6 +149,22 @@ const resolvers = {
         public: deck.public,
         cards: deck.cards,
       }))
+
+      const publicDecksObject = publicDecks.map((deck) => ({
+        id: deck.id,
+        owner: {
+          username: deck.owner.username,
+          id: deck.owner._id,
+        },
+        name: deck.name,
+        public: deck.public,
+        cards: deck.cards,
+      }))
+
+      return {
+        myDecks: myDecksObject,
+        publicDecks: publicDecksObject,
+      }
     },
   },
   Mutation: {
@@ -177,7 +198,6 @@ const resolvers = {
     },
     joinGame: async (root, args, context) => {
       checkIsLoggedIn(context)
-
       const game = await Game.findById(args.gameID).populate('players')
       if (!game) gameNotFoundError()
 
