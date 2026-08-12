@@ -58,14 +58,12 @@ const deckNameSX = {
   color: '#84582e',
 }
 
-const DeckObject = ({ deck, type, tryMakeDeck }) => {
+const DeckObject = ({ deck, type, tryMakeDeck, setID, setSelectedDeck }) => {
   const [removeDeck] = useMutation(REMOVE_DECK, {
     update: (cache, response) => {
-      console.log('responce:', response)
       cache.modify({
         fields: {
           getMyDecks(existingDeckRefs = [], { readField }) {
-            console.log(existingDeckRefs)
             return existingDeckRefs.filter(
               (deckRef) =>
                 readField('id', deckRef) !== response.data.removeDeck,
@@ -98,6 +96,21 @@ const DeckObject = ({ deck, type, tryMakeDeck }) => {
     })
   }
 
+  const playGameButton = () => {
+    return (
+      <Box sx={buttonHolderSX}>
+        <Button
+          sx={copyButton}
+          className='copyButton'
+          variant='contained'
+          onClick={() => setID(deck.id)}
+        >
+          Use Deck
+        </Button>
+      </Box>
+    )
+  }
+
   const myDeckButtons = () => {
     return (
       <Box sx={buttonHolderSX}>
@@ -126,7 +139,7 @@ const DeckObject = ({ deck, type, tryMakeDeck }) => {
           sx={deleteButton}
           className='deleteButton'
           variant='contained'
-          onClick={tryRemoveDeck}
+          onClick={() => setSelectedDeck(deck.id)}
         >
           <DeleteForeverOutlinedIcon
             sx={{ color: '#9b2a2a', '&:hover': { color: '#B43131' } }}
@@ -144,7 +157,8 @@ const DeckObject = ({ deck, type, tryMakeDeck }) => {
         <Typography className='deckName' sx={deckNameSX}>
           {deck.name}
         </Typography>
-        {type === 'mine' && myDeckButtons()}
+        {type === 'edit' && myDeckButtons()}
+        {type === 'play' && playGameButton()}
       </CardContent>
     </Card>
   )

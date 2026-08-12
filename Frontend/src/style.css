@@ -111,6 +111,26 @@ a.buttonStyle3D::after {
   z-index: -1;
 }
 
+.confirmDelete Button.buttonStyle3D.cancel {
+  background-color: #808080;
+  border-color: #414141;
+}
+
+.confirmDelete Button.buttonStyle3D.warning {
+  background-color: #b43131;
+  border-color: #690f0f;
+}
+
+.confirmDelete Button.buttonStyle3D.cancel:after {
+  background-color: #5d5d5d;
+  border-color: #414141;
+}
+
+.confirmDelete Button.buttonStyle3D.warning:after {
+  background-color: #881c1c;
+  border-color: #690f0f;
+}
+
 Button.buttonStyle3D:hover,
 a.buttonStyle3D:hover {
   background-color: #588a29;

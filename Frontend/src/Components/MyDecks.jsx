@@ -1,13 +1,17 @@
 import { useMutation, useQuery } from '@apollo/client/react'
 import { Button, Card, CardContent, Box, Typography } from '@mui/material'
 import { Link } from 'react-router-dom'
-import { GET_ALL_DECKS, GET_MY_DECKS, COPY_DECK } from '../queries'
+import { GET_ALL_DECKS, GET_MY_DECKS, COPY_DECK, REMOVE_DECK } from '../queries'
 import DeckObject from './DeckObject'
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined'
 import IconButton from '@mui/material/IconButton'
 import { gql } from '@apollo/client'
+import { useState } from 'react'
+import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
+import '@fontsource/suwannaphum'
 
 const MyDecks = () => {
+  const [selectedDeck, setSelectedDeck] = useState(null)
   const deckResults = useQuery(GET_MY_DECKS)
 
   const [copyDeck] = useMutation(COPY_DECK, {
@@ -41,6 +45,30 @@ const MyDecks = () => {
           },
         },
       })
+    },
+  })
+
+  const [removeDeck] = useMutation(REMOVE_DECK, {
+    update: (cache, response) => {
+      cache.modify({
+        fields: {
+          getMyDecks(existingDeckRefs = [], { readField }) {
+            return existingDeckRefs.filter(
+              (deckRef) =>
+                readField('id', deckRef) !== response.data.removeDeck,
+            )
+          },
+          getAllDecks(existingDeckRefs = [], { readField }) {
+            return existingDeckRefs.filter(
+              (deckRef) =>
+                readField('id', deckRef) !== response.data.removeDeck,
+            )
+          },
+        },
+      })
+    },
+    onError: (error) => {
+      console.log(error.message)
     },
   })
 
@@ -92,9 +120,23 @@ const MyDecks = () => {
     })
   }
 
+  const tryRemoveDeck = async () => {
+    await removeDeck({
+      variables: {
+        deckID: selectedDeck,
+      },
+    })
+    setSelectedDeck(null)
+    console.log('removed deck')
+  }
+
   return (
     <Box>
-      <h1>My Decks</h1>
+      <Typography
+        sx={{ fontSize: '2rem', margin: '10px 0px', fontWeight: 'bold' }}
+      >
+        My Decks
+      </Typography>
 
       <Box sx={boxSX}>
         <Button sx={buttonSX} component={Link} to={'/mydecks/new'}>
@@ -108,11 +150,17 @@ const MyDecks = () => {
           <DeckObject
             key={i}
             deck={deck}
-            type={'mine'}
+            type={'edit'}
             tryMakeDeck={tryMakeDeck}
+            setSelectedDeck={setSelectedDeck}
           />
         ))}
       </Box>
+      <ConfirmDeleteDialogue
+        open={selectedDeck !== null}
+        onConfirm={tryRemoveDeck}
+        setSelectedDeck={setSelectedDeck}
+      />
     </Box>
   )
 }

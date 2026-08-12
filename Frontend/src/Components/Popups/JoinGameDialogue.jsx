@@ -6,7 +6,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import TextField from '@mui/material/TextField'
 import { useNavigate } from 'react-router-dom'
-import { JOIN_GAME } from '../queries'
+import { JOIN_GAME } from '../../queries'
 
 function JoinGameDialogue({ open, setOpen }) {
   const [joinGame] = useMutation(JOIN_GAME)
@@ -17,15 +17,23 @@ function JoinGameDialogue({ open, setOpen }) {
     const formData = new FormData(event.currentTarget)
     const formJson = Object.fromEntries(formData.entries())
 
-    const result = await joinGame({
-      variables: {
-        gameID: formJson.gameID,
-      },
-    })
+    try {
+      const result = await joinGame({
+        variables: {
+          gameID: formJson.gameID.trim(),
+        },
+      })
 
-    if (result.data === null || result.data.joinGame === null) return
+      if (result.data === null || result.data.joinGame === null) return
 
-    navigate(`/playing/${result.data.joinGame.id}`)
+      navigate(`/playing/${result.data.joinGame.id}`)
+    } catch (error) {
+      if (error?.errors?.[0]?.extensions?.code === 'INTERNAL_SERVER_ERROR') {
+        console.error(`Invalid ID recieved: ${formJson.gameID}`)
+      } else {
+        console.error(error)
+      }
+    }
   }
 
   const handleClose = () => {

@@ -39,7 +39,11 @@ export default function BasicMenu() {
   // }
 
   const handleLogout = () => {
-    logout()
+    logout({
+      logoutParams: {
+        returnTo: window.location.origin,
+      },
+    })
     handleClose()
   }
 

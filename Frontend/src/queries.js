@@ -280,14 +280,26 @@ export const GET_MY_DECK = gql`
 export const GET_ALL_DECKS = gql`
   query {
     getAllDecks {
-      id
-      owner {
-        username
+      myDecks {
         id
+        owner {
+          username
+          id
+        }
+        name
+        public
+        cards
       }
-      name
-      public
-      cards
+      publicDecks {
+        id
+        owner {
+          username
+          id
+        }
+        name
+        public
+        cards
+      }
     }
   }
 `
