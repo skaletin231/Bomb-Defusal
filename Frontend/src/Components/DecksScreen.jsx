@@ -24,8 +24,6 @@ const DecksScreen = () => {
   const myDecks = deckResults.data.getAllDecks.myDecks
   const publicDecks = deckResults.data.getAllDecks.publicDecks
 
-  console.log(myDecks)
-
   const boxSX = {
     height: 'auto',
     flexFlow: 'wrap',
@@ -34,13 +32,11 @@ const DecksScreen = () => {
   }
 
   const handlePageChangeMine = (event, value) => {
-    console.log(value)
     setCurrentPageMine(value)
     setLeftMine(decksPerPage * (value - 1))
   }
 
   const handlePageChangePublic = (event, value) => {
-    console.log(value)
     setCurrentPagePublic(value)
     setLeftPublic(decksPerPage * (value - 1))
   }

@@ -36,10 +36,6 @@ const collapseContainerSX = {
   backgroundColor: '#ececec',
 }
 
-const selectedButton = {
-  backgroundColor: '#f3f0f0d5',
-}
-
 const ChatHintContainer = ({ gameID }) => {
   const [chatView, setChatView] = useState('Chat')
   const [open, setOpen] = useState(true)
