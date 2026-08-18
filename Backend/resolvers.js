@@ -12,6 +12,7 @@ const {
   invalidMoveError,
   wrongGamestateError,
   cantAccessDeckError,
+  notLoggedInOrGuestError,
 } = require('./graphQLErrors')
 const { MakeBoard } = require('./utils/GameboardUtils')
 
@@ -32,10 +33,10 @@ const resolvers = {
   DateTime: GraphQLDateTime,
   Query: {
     getGame: async (root, args, context) => {
-      checkIsLoggedIn(context)
+      checkLoggedInOrGuest(context)
 
-      const game = await Game.findById(args.id).populate('players')
-      if (!game || !includesPlayer(game, context.user)) notAPlayerError()
+      const game = await Game.findById(args.id).populate('players.officialUser')
+      if (!game || !includesPlayer(game, context)) notAPlayerError()
 
       return returnInfo(game, context)
     },
@@ -47,45 +48,48 @@ const resolvers = {
       return user
     },
     me: (root, args, context) => {
-      return context.user
+      if (context.user) {
+        return context.user
+      }
+
+      if (context.req.signedCookies?.game_session) {
+        return {
+          username: 'guest',
+          id: context.req.signedCookies?.game_session,
+        }
+      }
+
+      return null
     },
     getMessages: async (root, args, context) => {
-      checkIsLoggedIn(context)
+      checkLoggedInOrGuest(context)
 
-      const game = await Game.findById(args.gameID).populate('players')
+      const game = await Game.findById(args.gameID).populate(
+        'players.officialUser',
+      )
 
-      if (!game || !includesPlayer(game, context.user)) notAPlayerError()
+      if (!game || !includesPlayer(game, context)) notAPlayerError()
 
       const messages = await Message.find({ gameID: args.gameID }).populate(
-        'user',
+        'user.officialUser',
       )
       return messages.map((message) => ({
-        user: {
-          username: message.user.username,
-          id: message.user._id,
-        },
+        user: convertGamePlayer(message.user),
         text: message.text,
         createdAt: message.createdAt,
       }))
     },
     getHints: async (root, args, context) => {
-      checkIsLoggedIn(context)
+      checkLoggedInOrGuest(context)
 
-      const game = await Game.findById(args.gameID).populate('players')
+      const game = await Game.findById(args.gameID).populate(
+        'players.officialUser',
+      )
 
-      if (!game || !includesPlayer(game, context.user)) notAPlayerError()
-
-      const players = game.players
+      if (!game || !includesPlayer(game, context)) notAPlayerError()
 
       return game.hints.map((fullHint) => ({
-        player: {
-          username: fullHint.player.equals(players[0]._id)
-            ? players[0].username
-            : players[1].username,
-          id: fullHint.player.equals(players[0]._id)
-            ? players[0]._id
-            : players[1]._id,
-        },
+        player: convertGamePlayer(fullHint.player),
         hint: fullHint.hint,
         count: fullHint.count,
       }))
@@ -128,16 +132,23 @@ const resolvers = {
       }
     },
     getAllDecks: async (root, __, context) => {
-      checkIsLoggedIn(context)
+      checkLoggedInOrGuest(context)
 
-      const myDecks = await Deck.find({
-        owner: context.user._id,
-      }).populate('owner')
+      let myDecks = []
+      if (context.user)
+        myDecks = await Deck.find({
+          owner: context.user._id,
+        }).populate('owner')
 
-      const publicDecks = await Deck.find({
+      const query = {
         public: true,
-        owner: { $ne: context.user._id },
-      }).populate('owner')
+      }
+
+      if (context.user) {
+        query.owner = { $ne: context.user._id }
+      }
+
+      const publicDecks = await Deck.find(query).populate('owner')
 
       const myDecksObject = myDecks.map((deck) => ({
         id: deck.id,
@@ -169,20 +180,43 @@ const resolvers = {
   },
   Mutation: {
     startGame: async (root, args, context) => {
-      checkIsLoggedIn(context)
-
       const deck = await Deck.findById(args.deckID)
       if (!deck) deckNotFoundError()
 
-      const canUse = deck.public || deck.owner.equals(context.user._id)
+      const canUse = deck.public || deck.owner.equals(context.user?._id)
 
       if (!canUse) deckNotFoundError()
 
       const board = MakeBoard(deck.cards)
 
+      let player = {}
+
+      if (context.user) {
+        player = {
+          officialUser: context.user,
+        }
+      } else {
+        const token = crypto.randomUUID()
+        console.log(token)
+
+        context.res.cookie('game_session', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          signed: true,
+          sameSite: 'lax',
+        })
+
+        player = {
+          guestUser: {
+            username: 'Guest',
+            id: token,
+          },
+        }
+      }
+
       const game = new Game({
-        players: [context.user],
-        currentPlayer: context.user,
+        players: [player],
+        currentPlayer: player,
         board: {
           spots: board,
         },
@@ -197,18 +231,48 @@ const resolvers = {
       return game._id
     },
     joinGame: async (root, args, context) => {
-      checkIsLoggedIn(context)
-      const game = await Game.findById(args.gameID).populate('players')
+      const game = await Game.findById(args.gameID).populate(
+        'players.officialUser',
+      )
       if (!game) gameNotFoundError()
 
-      if (includesPlayer(game, context.user)) {
+      if (includesPlayer(game, context)) {
         return returnInfo(game, context)
       }
+
       if (game.players.length == 2) {
         gameFullError()
       }
 
-      game.players = game.players.concat(context.user)
+      let player = {}
+      let returnID = ''
+
+      if (context.user) {
+        player = {
+          officialUser: context.user,
+        }
+        returnID = context.user._id
+      } else {
+        const token = crypto.randomUUID()
+        console.log(token)
+
+        context.res.cookie('game_session', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          signed: true,
+          sameSite: 'lax',
+        })
+
+        player = {
+          guestUser: {
+            username: 'Guest',
+            id: token,
+          },
+        }
+        returnID = token
+      }
+
+      game.players = game.players.concat(player)
 
       await game.save()
 
@@ -216,12 +280,12 @@ const resolvers = {
 
       const gameUpdate = {
         gameID: game.id,
-        playerID: context.user.id,
+        playerID: returnID,
         type: 'New Player',
         gameUser: gameInfo.players[1],
       }
 
-      pubsub.publish('NEW_PLAYER_JOINED', { newPlayerJoined: gameUpdate })
+      await pubsub.publish('NEW_PLAYER_JOINED', { newPlayerJoined: gameUpdate })
 
       return gameInfo
     },
@@ -230,7 +294,7 @@ const resolvers = {
 
       const game = await Game.findById(args.gameID).populate('players')
 
-      if (!game || !includesPlayer(game, context.user)) notAPlayerError()
+      if (!game || !includesPlayer(game, context)) notAPlayerError()
 
       if (!context.user._id.equals(game.currentPlayer._id)) notYourTurnError()
 
@@ -261,7 +325,7 @@ const resolvers = {
               isPlayer1(game, context.user._id),
             )
             await game.save()
-            pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
+            await pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
             return returnInfo(game, context)
           }
 
@@ -272,7 +336,7 @@ const resolvers = {
             isPlayer1(game, context.user._id),
           )
           await game.save()
-          pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
+          await pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
           return returnInfo(game, context)
         }
       } else //player 2 move
@@ -293,7 +357,7 @@ const resolvers = {
               isPlayer1(game, context.user._id),
             )
             await game.save()
-            pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
+            await pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
 
             return returnInfo(game, context)
           }
@@ -305,7 +369,7 @@ const resolvers = {
             isPlayer1(game, context.user._id),
           )
           await game.save()
-          pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
+          await pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
           return returnInfo(game, context)
         }
       }
@@ -319,7 +383,7 @@ const resolvers = {
 
       await game.save()
 
-      pubsub.publish('GAME_UPDATE', { gameUpdate: returnValDud })
+      await pubsub.publish('GAME_UPDATE', { gameUpdate: returnValDud })
 
       return returnInfo(game, context)
     },
@@ -328,7 +392,7 @@ const resolvers = {
 
       const game = await Game.findById(args.gameID).populate('players')
 
-      if (!game || !includesPlayer(game, context.user)) notAPlayerError()
+      if (!game || !includesPlayer(game, context)) notAPlayerError()
 
       if (!game.currentPlayer.equals(context.user._id)) notYourTurnError()
 
@@ -347,7 +411,7 @@ const resolvers = {
         gameStateChange: game.gameState,
       }
 
-      pubsub.publish('GAME_UPDATE', { gameUpdate })
+      await pubsub.publish('GAME_UPDATE', { gameUpdate })
 
       return returnInfo(game, context)
     },
@@ -380,7 +444,7 @@ const resolvers = {
       checkIsLoggedIn(context)
 
       const game = await Game.findById(args.gameID)
-      if (!game || !includesPlayer(game, context.user)) notAPlayerError()
+      if (!game || !includesPlayer(game, context)) notAPlayerError()
 
       const message = new Message({
         gameID: args.gameID,
@@ -396,7 +460,7 @@ const resolvers = {
         createdAt: message.createdAt,
       }
 
-      pubsub.publish('MESSAGE_UPDATE', { messageUpdate: returnMessage })
+      await pubsub.publish('MESSAGE_UPDATE', { messageUpdate: returnMessage })
 
       return returnMessage
     },
@@ -404,7 +468,7 @@ const resolvers = {
       checkIsLoggedIn(context)
 
       const game = await Game.findById(args.gameID).populate('players')
-      if (!game || !includesPlayer(game, context.user)) notAPlayerError()
+      if (!game || !includesPlayer(game, context)) notAPlayerError()
 
       if (!context.user._id.equals(game.currentPlayer._id)) notYourTurnError()
 
@@ -436,7 +500,7 @@ const resolvers = {
         gameStateChange: game.gameState,
       }
 
-      pubsub.publish('HINT_UPDATE', { hintUpdate: gameUpdate })
+      await pubsub.publish('HINT_UPDATE', { hintUpdate: gameUpdate })
 
       return returnHint
     },
@@ -487,15 +551,12 @@ const resolvers = {
       }
     },
     removeDeck: async (root, args, context) => {
-      console.log(args)
       checkIsLoggedIn(context)
 
       const deck = await Deck.findById(args.deckID)
       if (!deck || !deck.owner.equals(context.user._id)) cantAccessDeckError()
-      console.log(deck)
 
       const deleted = await Deck.findByIdAndDelete(args.deckID)
-      console.log(deleted)
 
       return deleted._id
     },
@@ -504,7 +565,6 @@ const resolvers = {
 
       const deck = await Deck.findById(args.deckID)
       if (!deck || !deck.owner.equals(context.user._id)) cantAccessDeckError()
-      console.log(deck)
 
       const newDeck = new Deck({
         owner: context.user._id,
@@ -512,7 +572,6 @@ const resolvers = {
         public: false,
         cards: deck.cards,
       })
-      console.log(newDeck)
 
       await newDeck.save()
 
@@ -542,61 +601,6 @@ const resolvers = {
       subscribe: () => pubsub.asyncIterableIterator('NEW_PLAYER_JOINED'),
     },
   },
-}
-
-const returnInfo = (game, context) => {
-  return {
-    id: game.id,
-
-    players: game.players.map((player) => ({
-      username: player.username,
-      id: player._id,
-    })),
-
-    currentPlayer: {
-      username: isPlayer1(game, game.currentPlayer)
-        ? game.players[0].username
-        : game.players[1].username,
-      id: game.currentPlayer._id,
-    },
-
-    board: {
-      spots: game.board.spots.map((spot) => ({
-        word: spot.word,
-
-        myType: isPlayer1(game, context.user._id)
-          ? spot.player1Type
-          : spot.player2Type,
-
-        typeRevealed: isPlayer1(game, context.user._id)
-          ? {
-              myType: spot.typeRevealed.player1,
-              theirType: spot.typeRevealed.player2,
-            }
-          : {
-              myType: spot.typeRevealed.player2,
-              theirType: spot.typeRevealed.player1,
-            },
-      })),
-    },
-    gameState: game.gameState,
-    turnsRemaining: game.turnsRemaining,
-    remainingWires: game.board.spots.filter(
-      (spot) => spot.typeRevealed.player1 === 'wire',
-    ).length,
-    maxTurns: game.maxTurns,
-    mistakes: game.mistakes,
-    mistakeLimit: game.mistakeLimit,
-  }
-}
-
-const includesPlayer = (game, user) => {
-  const isAPlayer = game.players.some((player) => player._id.equals(user._id))
-  if (isAPlayer) {
-    return true
-  }
-
-  return false
 }
 
 const changeToHint = (game) => {
@@ -654,18 +658,6 @@ const changeTurn = (game) => {
   {
     return changeToPlaying(game)
   }
-}
-
-const isPlayer1 = (game, user) => {
-  return user.equals(game.players[0].id)
-}
-
-const player1IsDone = (game) => {
-  return game.playerState.player1RemainingWires === 0
-}
-
-const player2IsDone = (game) => {
-  return game.playerState.player2RemainingWires === 0
 }
 
 const endGame = (game, endState) => {
@@ -776,8 +768,123 @@ const updateSpotBomb = (context, game, spot, isPlayer1) => {
   return gameUpdate
 }
 
+//#region Data Helpers
+
+const returnInfo = (game, context) => {
+  return {
+    id: game.id,
+
+    players: game.players.map((player) => ({
+      ...convertGamePlayer(player),
+    })),
+
+    currentPlayer: {
+      ...convertGamePlayer(game.currentPlayer),
+      // username: isPlayer1(game, game.currentPlayer)
+      //   ? game.players[0].username
+      //   : game.players[1].username,
+      // id: game.currentPlayer._id,
+    },
+
+    board: {
+      spots: game.board.spots.map((spot) => ({
+        word: spot.word,
+
+        myType: isPlayer1(game, getIDFromContext(context))
+          ? spot.player1Type
+          : spot.player2Type,
+
+        typeRevealed: isPlayer1(game, getIDFromContext(context))
+          ? {
+              myType: spot.typeRevealed.player1,
+              theirType: spot.typeRevealed.player2,
+            }
+          : {
+              myType: spot.typeRevealed.player2,
+              theirType: spot.typeRevealed.player1,
+            },
+      })),
+    },
+    gameState: game.gameState,
+    turnsRemaining: game.turnsRemaining,
+    remainingWires: game.board.spots.filter(
+      (spot) => spot.typeRevealed.player1 === 'wire',
+    ).length,
+    maxTurns: game.maxTurns,
+    mistakes: game.mistakes,
+    mistakeLimit: game.mistakeLimit,
+  }
+}
+
+const includesPlayer = (game, context) => {
+  const playerID = getIDFromContext(context)
+
+  const isAPlayer = game.players.some(
+    (player) => convertGamePlayer(player).id == playerID,
+  )
+  if (isAPlayer) {
+    return true
+  }
+
+  return false
+}
+
+const isPlayer1 = (game, user) => {
+  return user === getIDFromPlayer(game.players[0])
+}
+
+const player1IsDone = (game) => {
+  return game.playerState.player1RemainingWires === 0
+}
+
+const player2IsDone = (game) => {
+  return game.playerState.player2RemainingWires === 0
+}
+
 const checkIsLoggedIn = (context) => {
+  console.log('Getting cookies: ', context.req.signedCookies?.game_session)
   if (!context.user) notLoggedInError()
 }
+
+const checkLoggedInOrGuest = (context) => {
+  if (!context.user || !context.req.signedCookies?.game_session)
+    notLoggedInOrGuestError()
+}
+
+//This converts from teh player that is stored in a DB to what is reutrned to the front end
+//the DB item could be either a officialUser or a guestUser, where officialUser is an actual user object
+//guest user is something created at the time of joining that only exists in this game and temporarily on the client side
+//this should allow most of the user.code to change easily to this
+const convertGamePlayer = (player) => {
+  if (player.officialUser) {
+    return {
+      username: player.officialUser.username,
+      id: String(player.officialUser._id),
+    }
+  } else {
+    return {
+      username: player.guestUser.username,
+      id: player.guestUser.id,
+    }
+  }
+}
+
+const getIDFromContext = (context) => {
+  if (context.user) {
+    return String(context.user._id)
+  } else {
+    return context.req.signedCookies?.game_session
+  }
+}
+
+const getIDFromPlayer = (player) => {
+  if (player.officialUser) {
+    return String(player.officialUser._id)
+  } else {
+    return player.guestUser.id
+  }
+}
+
+//#endregions
 
 module.exports = resolvers

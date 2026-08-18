@@ -9,9 +9,14 @@ const messageSchema = new mongoose.Schema(
       index: true,
     },
     user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
+      officialUser: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+      guestUser: {
+        username: String,
+        id: String,
+      },
     },
     text: {
       type: String,

@@ -27,6 +27,14 @@ function notLoggedInError() {
   })
 }
 
+function notLoggedInOrGuestError() {
+  throw new GraphQLError('Not logged in and no guest ID found.', {
+    extensions: {
+      code: graphQLErrorCodes.unauthenticated,
+    },
+  })
+}
+
 function notAPlayerError() {
   throw new GraphQLError('Game not found or not in the game', {
     extensions: {
@@ -93,4 +101,5 @@ module.exports = {
   invalidMoveError,
   wrongGamestateError,
   cantAccessDeckError,
+  notLoggedInOrGuestError,
 }

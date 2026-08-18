@@ -16,11 +16,19 @@ const spotSchema = new mongoose.Schema({
   },
 })
 
-const hintSchema = new mongoose.Schema({
-  player: {
+const player = new mongoose.Schema({
+  officialUser: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
   },
+  guestUser: {
+    username: String,
+    id: String,
+  },
+})
+
+const hintSchema = new mongoose.Schema({
+  player: player,
   hint: {
     type: String,
     required: true,
@@ -36,16 +44,8 @@ const boardSchema = new mongoose.Schema({
 })
 
 const gameSchema = new mongoose.Schema({
-  players: [
-    {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-    },
-  ],
-  currentPlayer: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-  },
+  players: [player],
+  currentPlayer: player,
   board: boardSchema,
   gameState: {
     type: String,

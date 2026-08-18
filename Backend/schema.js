@@ -89,7 +89,7 @@ const typeDefs = /* GraphQL */ `
   type User {
     username: String
     email: String
-    auth0_ID: String!
+    auth0_ID: String
     id: ID!
   }
 
