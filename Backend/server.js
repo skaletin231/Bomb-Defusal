@@ -145,6 +145,8 @@ const startServer = async (port) => {
           //return newUser
         }
 
+        //console.log('final context', user, req.signedCookies)
+
         return { auth, user, res, req }
       },
     }),

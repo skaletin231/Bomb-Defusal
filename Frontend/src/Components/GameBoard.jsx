@@ -219,6 +219,7 @@ const GameBoard = () => {
   }
 
   const game = gameResult.data?.getGame
+  console.log(gameResult)
 
   useEffect(() => {
     if (gameResult.loading) return
@@ -230,6 +231,8 @@ const GameBoard = () => {
   if (gameResult.loading) {
     return <div>loading...</div>
   }
+
+  console.log(game)
 
   const boardSpots = game.board.spots
 
