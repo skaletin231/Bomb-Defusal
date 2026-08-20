@@ -221,7 +221,7 @@ const GameBoard = () => {
   const game = gameResult.data?.getGame
 
   useEffect(() => {
-    if (gameResult.loading) return
+    if (gameResult.loading || !game) return
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (game.gameState === 'Win' || game.gameState === 'Lose') setOpen(true)
@@ -229,6 +229,10 @@ const GameBoard = () => {
 
   if (gameResult.loading) {
     return <div>loading...</div>
+  }
+
+  if (!game) {
+    return <div>Access Denied</div>
   }
 
   const boardSpots = game.board.spots
@@ -326,6 +330,8 @@ const GameBoard = () => {
       }
     }
   }
+
+  console.log(game.currentPlayer, me)
 
   const show =
     game.gameState === gameStates.hint && game.currentPlayer.id === me.id

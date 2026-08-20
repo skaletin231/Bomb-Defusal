@@ -16,7 +16,8 @@ const divStyle = {
 
 export default function BasicMenu() {
   const result = useQuery(ME, {})
-  const loggedIn = result.data?.me !== null
+  console.log(result.data)
+  const loggedIn = result.data?.me !== null && !result.data.me.isGuest
 
   const { loginWithRedirect, logout } = useAuth0()
   const navigate = useNavigate()

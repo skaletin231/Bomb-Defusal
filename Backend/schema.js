@@ -91,6 +91,7 @@ const typeDefs = /* GraphQL */ `
     email: String
     auth0_ID: String
     id: ID!
+    isGuest: Boolean!
   }
 
   type GameUser {

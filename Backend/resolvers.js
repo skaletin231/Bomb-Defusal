@@ -33,6 +33,7 @@ const resolvers = {
   DateTime: GraphQLDateTime,
   Query: {
     getGame: async (root, args, context) => {
+      console.log('get game ran')
       checkLoggedInOrGuest(context)
 
       const game = await Game.findById(args.id).populate('players.officialUser')
@@ -47,17 +48,24 @@ const resolvers = {
 
       if (!user) return null
 
-      return user
+      return { ...user, isGuest: false }
     },
     me: (root, args, context) => {
       if (context.user) {
-        return context.user
+        return {
+          username: context.user.username,
+          email: context.user.email,
+          auth0_ID: context.user.auth0_ID,
+          id: context.user._id,
+          isGuest: false,
+        }
       }
 
       if (context.req.signedCookies?.game_session) {
         return {
           username: 'guest',
           id: context.req.signedCookies?.game_session,
+          isGuest: true,
         }
       }
 
@@ -433,7 +441,7 @@ const resolvers = {
 
       await newUser.save()
 
-      return newUser
+      return { ...newUser, isGuest: false }
     },
     updateUserInfo: async (root, args, context) => {
       checkIsLoggedIn(context)
@@ -443,7 +451,7 @@ const resolvers = {
 
       await user.save()
 
-      return user
+      return { ...user, isGuest: false }
     },
     sendMessage: async (root, args, context) => {
       checkLoggedInOrGuest(context)
@@ -853,6 +861,7 @@ const returnInfo = (game, context) => {
 
 const includesPlayer = (game, context) => {
   const playerID = getIDFromContext(context)
+  console.log(playerID)
 
   const isAPlayer = game.players.some(
     (player) => convertGamePlayer(player).id == playerID,

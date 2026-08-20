@@ -6,8 +6,8 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { START_GAME } from '../queries'
-import NumberField from './NumberField'
+import { START_GAME, ME } from '../../queries'
+import NumberField from '.././NumberField'
 
 function CreateGameDialogue({ id, setID }) {
   const [mistakeLimit, setMistakeLimit] = useState(-1)
@@ -15,7 +15,9 @@ function CreateGameDialogue({ id, setID }) {
 
   const navigate = useNavigate()
 
-  const [startGame] = useMutation(START_GAME)
+  const [startGame] = useMutation(START_GAME, {
+    refetchQueries: [ME],
+  })
 
   const handleClose = (event, reason) => {
     if (reason === 'backdropClick') return

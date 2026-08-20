@@ -7,6 +7,7 @@ import { BrowserRouter as Router } from 'react-router-dom'
 import { ThemeProvider, createTheme } from '@mui/material/styles'
 import '@fontsource/reddit-sans'
 import ApolloProviderWithAuth from './Components/ApolloProviderWithAuth.jsx'
+import React from 'react'
 
 const theme = createTheme({
   typography: {
@@ -26,6 +27,22 @@ const theme = createTheme({
   },
 })
 
+class ErrorBoundary extends React.Component {
+  state = { hasError: false }
+
+  static getDerivedStateFromError() {
+    return { hasError: true }
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <h1>An error occurred</h1>
+    }
+
+    return this.props.children
+  }
+}
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Auth0Provider
@@ -39,7 +56,9 @@ createRoot(document.getElementById('root')).render(
       <ApolloProviderWithAuth>
         <Router>
           <ThemeProvider theme={theme}>
-            <App />
+            <ErrorBoundary>
+              <App />
+            </ErrorBoundary>
           </ThemeProvider>
         </Router>
       </ApolloProviderWithAuth>
