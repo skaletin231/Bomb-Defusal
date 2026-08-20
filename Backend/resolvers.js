@@ -33,16 +33,12 @@ const resolvers = {
   DateTime: GraphQLDateTime,
   Query: {
     getGame: async (root, args, context) => {
-      console.log(36)
       checkLoggedInOrGuest(context)
-      console.log(38)
 
       const game = await Game.findById(args.id).populate('players.officialUser')
       if (!game || !includesPlayer(game, context)) notAPlayerError()
-      console.log(42)
 
       const returnVal = returnInfo(game, context)
-      console.log(45)
 
       return returnVal
     },
@@ -201,8 +197,6 @@ const resolvers = {
         }
       } else {
         const token = crypto.randomUUID()
-        console.log(token)
-
         context.res.cookie('game_session', token, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production',
@@ -230,21 +224,16 @@ const resolvers = {
         mistakeLimit: args.mistakeLimit,
       })
 
-      console.log(game)
-
       await game.save()
 
       return game._id
     },
     joinGame: async (root, args, context) => {
-      console.log(234)
-
       const game = await Game.findById(args.gameID).populate(
         'players.officialUser',
       )
       if (!game) gameNotFoundError()
 
-      console.log(241)
       if (includesPlayer(game, context)) {
         return returnInfo(game, context)
       }
@@ -252,7 +241,6 @@ const resolvers = {
       if (game.players.length == 2) {
         gameFullError()
       }
-      console.log(249)
       let player = {}
       let returnID = ''
 
@@ -263,7 +251,6 @@ const resolvers = {
         returnID = context.user._id
       } else {
         const token = crypto.randomUUID()
-        console.log(token)
 
         context.res.cookie('game_session', token, {
           httpOnly: true,
@@ -280,7 +267,6 @@ const resolvers = {
         }
         returnID = token
       }
-      console.log(277)
 
       game.players = game.players.concat(player)
 
@@ -315,9 +301,7 @@ const resolvers = {
 
       if (game.gameState !== gameStates.playing) wrongGamestateError()
 
-      const isPlayer1 = isPlayer1(game, context)
-
-      const myTypeRevealed = isPlayer1
+      const myTypeRevealed = isPlayer1(game, context)
         ? game.board.spots[args.index].typeRevealed.player1
         : game.board.spots[args.index].typeRevealed.player2
 
@@ -326,7 +310,7 @@ const resolvers = {
         invalidMoveError()
       }
 
-      if (isPlayer1) {
+      if (isPlayer1(game, context)) {
         game.board.spots[args.index].typeRevealed.player1 =
           game.board.spots[args.index].player2Type
 
@@ -340,7 +324,7 @@ const resolvers = {
               context,
               game,
               game.board.spots[args.index],
-              isPlayer1,
+              isPlayer1(game, context),
             )
             await game.save()
             await pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
@@ -351,7 +335,7 @@ const resolvers = {
             context,
             game,
             game.board.spots[args.index],
-            isPlayer1,
+            isPlayer1(game, context),
           )
           await game.save()
           await pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
@@ -372,7 +356,7 @@ const resolvers = {
               context,
               game,
               game.board.spots[args.index],
-              isPlayer1,
+              isPlayer1(game, context),
             )
             await game.save()
             await pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
@@ -384,7 +368,7 @@ const resolvers = {
             context,
             game,
             game.board.spots[args.index],
-            isPlayer1,
+            isPlayer1(game, context),
           )
           await game.save()
           await pubsub.publish('GAME_UPDATE', { gameUpdate: returnVal })
@@ -396,7 +380,7 @@ const resolvers = {
         context,
         game,
         game.board.spots[args.index],
-        isPlayer1,
+        isPlayer1(game, context),
       )
 
       await game.save()
@@ -521,7 +505,7 @@ const resolvers = {
         count: args.count,
       }
 
-      const turnChange = changeTurn(game)
+      const turnChange = changeTurn(game, context)
       game.hints = game.hints.concat(hint)
 
       await game.save()
@@ -530,13 +514,13 @@ const resolvers = {
 
       if (context.user) {
         returnHint = {
-          user: { username: context.user.username, id: context.user._id },
+          player: { username: context.user.username, id: context.user._id },
           hint: hint.hint,
           count: hint.count,
         }
       } else {
         returnHint = {
-          user: {
+          player: {
             username: player.guestUser.username,
             id: player.guestUser.id,
           },
@@ -772,7 +756,10 @@ const updateSpotDud = (context, game, spot, isPlayer1) => {
 
   game.mistakes++
 
-  if (game.turnsRemaining === 0 || game.mistakes > game.mistakeLimit) {
+  if (
+    game.turnsRemaining === 0 ||
+    (game.mistakeLimit > -1 && game.mistakes > game.mistakeLimit)
+  ) {
     endGame(game, gameStates.lose)
   } else {
     turnChangeMade = changeTurn(game, context)
@@ -822,15 +809,11 @@ const updateSpotBomb = (context, game, spot, isPlayer1) => {
 //#region Data Helpers
 
 const returnInfo = (game, context) => {
-  console.log('start of return info')
+  const currentPlayer =
+    getIDFromPlayer(game.players[0]) === getIDFromPlayer(game.currentPlayer)
+      ? convertGamePlayer(game.players[0])
+      : convertGamePlayer(game.players[1])
 
-  game.players.forEach((player) => {
-    console.log(convertGamePlayer(player))
-  })
-
-  console.log(convertGamePlayer(game.currentPlayer))
-  console.log(isPlayer1(game, context))
-  console.log('about to return')
   return {
     id: game.id,
 
@@ -838,13 +821,7 @@ const returnInfo = (game, context) => {
       ...convertGamePlayer(player),
     })),
 
-    currentPlayer: {
-      ...convertGamePlayer(game.currentPlayer),
-      // username: isPlayer1(game, game.currentPlayer)
-      //   ? game.players[0].username
-      //   : game.players[1].username,
-      // id: game.currentPlayer._id,
-    },
+    currentPlayer: currentPlayer,
 
     board: {
       spots: game.board.spots.map((spot) => ({
@@ -900,7 +877,6 @@ const player2IsDone = (game) => {
 }
 
 const checkIsLoggedIn = (context) => {
-  // console.log('Getting cookies: ', context.req.signedCookies?.game_session)
   if (!context.user) notLoggedInError()
 }
 
@@ -950,6 +926,7 @@ const getIDFromContext = (context) => {
 
 const getIDFromPlayer = (player) => {
   if (player.officialUser) {
+    if (player.officialUser._id) return String(player.officialUser._id)
     return String(player.officialUser._id)
   } else {
     return player.guestUser.id
