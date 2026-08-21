@@ -1,5 +1,4 @@
 import { Button, Card, CardContent, Box, Typography } from '@mui/material'
-import EditIcon from '@mui/icons-material/Edit'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import IconButton from '@mui/material/IconButton'
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded'

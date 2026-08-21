@@ -12,6 +12,14 @@ import {
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { GET_MY_DECK, GET_MY_DECKS, MAKE_DECK, UPDATE_DECK } from '../queries'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import Checkbox from '@mui/material/Checkbox'
+import FormGroup from '@mui/material/FormGroup'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined'
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
+import InputAdornment from '@mui/material/InputAdornment'
 
 const formStyle = {
   justifyContent: 'flex-start',
@@ -19,17 +27,39 @@ const formStyle = {
   display: 'flex',
 }
 
-const center = {
-  justifyContent: 'center',
+const titleText = {
+  color: '#3A1605',
+  fontSize: '3rem',
+  margin: '20px 0',
+  fontFamily: '"Suwannaphum", serif',
+  fontWeight: 'bold',
+}
+
+const saveButton = {
+  '&&': {
+    width: 'auto',
+    alignSelf: 'center',
+    display: 'flex',
+    height: '50px',
+    gap: '7px',
+  },
+}
+
+const titleSaveBox = {
+  width: '50%',
   display: 'flex',
+  gap: '40px',
 }
 
 const maxCardSize = 15
 
 const MakeDeckScreen = () => {
+  const [addStyle, setAddStyle] = useState('left')
   const { id: deckID } = useParams()
   const editMode = deckID !== undefined
   const [cardToAdd, setCardToAdd] = useState('')
+  const [notes, setNotes] = useState('')
+
   const [deckName, setDeckName] = useState('')
   const [allCards, setAllCards] = useState([])
   const [isPublicDeck, setIsPublicDeck] = useState(false)
@@ -164,130 +194,313 @@ const MakeDeckScreen = () => {
     setAllCards(allCards.filter((card, i) => i !== index))
   }
 
-  return (
-    <div style={{ width: '90%', justifySelf: 'center' }}>
-      <div style={{ backgroundColor: '#d6d6d6' }}>
-        <Box
-          className={'nameHolder'}
-          sx={[center, { backgroundColor: '#e9e9e9' }]}
-        >
+  const handleAddStyle = (event, newAlignment) => {
+    if (newAlignment !== null) {
+      setAddStyle(newAlignment)
+    }
+  }
+
+  const headerUI = () => {
+    return (
+      <Box>
+        <Typography variant='h2' style={titleText}>
+          Edit Deck
+        </Typography>
+        <Box className='nameAndSaveChanges' sx={titleSaveBox}>
           <TextField
-            sx={[{ margin: '.4rem .1rem' }]}
+            //sx={[{ margin: '.4rem .1rem', flexGrow: '1' }]}
             variant='outlined'
-            label='Name'
+            placeholder='Name'
+            className='textFieldStyle3D'
             value={deckName}
             onChange={({ target }) => setDeckName(target.value)}
-          ></TextField>
-        </Box>
-        <div
-          className={'cardsHolder'}
-          style={{ height: '30rem', overflow: 'hidden' }}
-        >
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: {
-                xs: 'repeat(3, 1fr)',
-                sm: 'repeat(5, 1fr)',
-                md: 'repeat(7, 1fr)',
+            slotProps={{
+              input: {
+                endAdornment: (
+                  <InputAdornment position='end'>
+                    <EditOutlinedIcon />
+                  </InputAdornment>
+                ),
               },
-              gap: 2,
-              overflowY: 'auto',
-              maxHeight: '30rem',
-              padding: '.2rem',
             }}
+          />
+
+          <Button
+            variant='contained'
+            className='buttonStyle3D'
+            sx={saveButton}
+            onClick={tryVerifyDeckChanges}
           >
-            {allCards.map((card, i) => (
-              <Card key={i}>
-                <CardContent
-                  sx={{
-                    position: 'relative',
-                    padding: '16px',
-                    '&:last-child': {
-                      padding: '16px',
-                    },
-                    height: '4rem',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    display: 'flex',
-                  }}
-                >
-                  <IconButton
-                    sx={{
-                      position: 'absolute',
-                      right: '.1rem',
-                      top: '.1rem',
-                      margin: '0',
-                      padding: '0',
-                      fontSize: '1.1rem',
-                    }}
-                    onClick={() => removeCard(i)}
-                  >
-                    X
-                  </IconButton>
-                  <Typography
-                    sx={{
-                      lineHeight: '1.2',
-                      textAlign: 'center',
-                      overflowWrap: 'anywhere',
-                    }}
-                  >
-                    {card}
-                  </Typography>
-                </CardContent>
-              </Card>
-            ))}
-          </Box>
-        </div>
-        <Box sx={{ backgroundColor: '#e9e9e9' }}>
-          <div style={{ textAlign: 'center' }}>
-            <Button
-              variant='outlined'
-              onClick={() => setIsPublicDeck(!isPublicDeck)}
-              sx={{ marginLeft: 'auto', margin: '.4rem' }}
-            >
-              {isPublicDeck && 'Public'}
-              {!isPublicDeck && 'Private'}
-            </Button>
-          </div>
-
-          <div style={center}>
-            <div className={'addCardHolder'}>
-              <form onSubmit={tryAddCardsToList} style={formStyle}>
-                <div>
-                  <TextField
-                    sx={{ margin: '.4rem .1rem' }}
-                    variant='outlined'
-                    label='Card'
-                    value={cardToAdd}
-                    onChange={({ target }) => setCardToAdd(target.value)}
-                  ></TextField>
-                </div>
-
-                <Button
-                  type='submit'
-                  sx={{ marginLeft: 'auto', margin: '.4rem' }}
-                  variant='contained'
-                >
-                  Add Card
-                </Button>
-              </form>
-            </div>
-
-            <Button variant='contained' onClick={tryVerifyDeckChanges}>
-              {editMode && 'Update Deck'}
-              {!editMode && 'Create Deck'}
-            </Button>
-          </div>
+            <SaveOutlinedIcon />
+            {editMode && 'Save Changes'}
+            {!editMode && 'Create Deck'}
+          </Button>
         </Box>
-      </div>
 
-      <div style={{ textAlign: 'center', marginTop: '5rem' }}>
-        <Button variant='contained' component={Link} to={'/mydecks'}>
-          Back To Decks
+        <FormGroup>
+          <FormControlLabel control={<Checkbox />} label='Public' />
+        </FormGroup>
+      </Box>
+    )
+  }
+
+  const addStyleToggleUI = () => {
+    return (
+      <ToggleButtonGroup
+        value={addStyle}
+        exclusive
+        onChange={handleAddStyle}
+        aria-label='add style'
+      >
+        <ToggleButton value='left' aria-label='left aligned'>
+          Add and Delete
+        </ToggleButton>
+        <ToggleButton value='center' aria-label='centered'>
+          Quick Import
+        </ToggleButton>
+      </ToggleButtonGroup>
+    )
+  }
+
+  const addCardUI = () => {
+    return (
+      <form onSubmit={tryAddCardsToList} style={formStyle}>
+        <div>
+          <TextField
+            sx={{ margin: '.4rem .1rem' }}
+            variant='outlined'
+            label='Card'
+            value={cardToAdd}
+            onChange={({ target }) => setCardToAdd(target.value)}
+          ></TextField>
+        </div>
+
+        <Button
+          type='submit'
+          sx={{ marginLeft: 'auto', margin: '.4rem' }}
+          variant='contained'
+        >
+          Add Card
         </Button>
+      </form>
+    )
+  }
+
+  const deckUI = () => {
+    return (
+      <div style={{ width: '90%', justifySelf: 'center' }}>
+        <div style={{ backgroundColor: '#d6d6d6' }}>
+          <div
+            className={'cardsHolder'}
+            style={{ height: '30rem', overflow: 'hidden' }}
+          >
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: {
+                  xs: 'repeat(3, 1fr)',
+                  sm: 'repeat(5, 1fr)',
+                  md: 'repeat(7, 1fr)',
+                },
+                gap: 2,
+                overflowY: 'auto',
+                maxHeight: '30rem',
+                padding: '.2rem',
+              }}
+            >
+              {allCards.map((card, i) => (
+                <Card key={i}>
+                  <CardContent
+                    sx={{
+                      position: 'relative',
+                      padding: '16px',
+                      '&:last-child': {
+                        padding: '16px',
+                      },
+                      height: '4rem',
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      display: 'flex',
+                    }}
+                  >
+                    <IconButton
+                      sx={{
+                        position: 'absolute',
+                        right: '.1rem',
+                        top: '.1rem',
+                        margin: '0',
+                        padding: '0',
+                        fontSize: '1.1rem',
+                      }}
+                      onClick={() => removeCard(i)}
+                    >
+                      X
+                    </IconButton>
+                    <Typography
+                      sx={{
+                        lineHeight: '1.2',
+                        textAlign: 'center',
+                        overflowWrap: 'anywhere',
+                      }}
+                    >
+                      {card}
+                    </Typography>
+                  </CardContent>
+                </Card>
+              ))}
+            </Box>
+          </div>
+        </div>
       </div>
-    </div>
+    )
+  }
+
+  const notesUI = () => {
+    return (
+      <Box>
+        <Typography>Notes</Typography>
+        <TextField
+          sx={{ margin: '.4rem .1rem' }}
+          variant='outlined'
+          label='Type to add notes'
+          value={notes}
+          onChange={({ target }) => setNotes(target.value)}
+        ></TextField>
+      </Box>
+    )
+  }
+
+  return (
+    <Box sx={{ gap: '20px', display: 'flex', flexDirection: 'column' }}>
+      {headerUI()}
+      {addStyleToggleUI()}
+      {addCardUI()}
+      {deckUI()}
+      {notesUI()}
+    </Box>
+    // <div style={{ width: '90%', justifySelf: 'center' }}>
+    //   <div style={{ backgroundColor: '#d6d6d6' }}>
+    //     <Box
+    //       className={'nameHolder'}
+    //       sx={[center, { backgroundColor: '#e9e9e9' }]}
+    //     >
+    //       <TextField
+    //         sx={[{ margin: '.4rem .1rem' }]}
+    //         variant='outlined'
+    //         label='Name'
+    //         value={deckName}
+    //         onChange={({ target }) => setDeckName(target.value)}
+    //       ></TextField>
+    //     </Box>
+    //     <div
+    //       className={'cardsHolder'}
+    //       style={{ height: '30rem', overflow: 'hidden' }}
+    //     >
+    //       <Box
+    //         sx={{
+    //           display: 'grid',
+    //           gridTemplateColumns: {
+    //             xs: 'repeat(3, 1fr)',
+    //             sm: 'repeat(5, 1fr)',
+    //             md: 'repeat(7, 1fr)',
+    //           },
+    //           gap: 2,
+    //           overflowY: 'auto',
+    //           maxHeight: '30rem',
+    //           padding: '.2rem',
+    //         }}
+    //       >
+    //         {allCards.map((card, i) => (
+    //           <Card key={i}>
+    //             <CardContent
+    //               sx={{
+    //                 position: 'relative',
+    //                 padding: '16px',
+    //                 '&:last-child': {
+    //                   padding: '16px',
+    //                 },
+    //                 height: '4rem',
+    //                 justifyContent: 'center',
+    //                 alignItems: 'center',
+    //                 display: 'flex',
+    //               }}
+    //             >
+    //               <IconButton
+    //                 sx={{
+    //                   position: 'absolute',
+    //                   right: '.1rem',
+    //                   top: '.1rem',
+    //                   margin: '0',
+    //                   padding: '0',
+    //                   fontSize: '1.1rem',
+    //                 }}
+    //                 onClick={() => removeCard(i)}
+    //               >
+    //                 X
+    //               </IconButton>
+    //               <Typography
+    //                 sx={{
+    //                   lineHeight: '1.2',
+    //                   textAlign: 'center',
+    //                   overflowWrap: 'anywhere',
+    //                 }}
+    //               >
+    //                 {card}
+    //               </Typography>
+    //             </CardContent>
+    //           </Card>
+    //         ))}
+    //       </Box>
+    //     </div>
+    //     <Box sx={{ backgroundColor: '#e9e9e9' }}>
+    //       <div style={{ textAlign: 'center' }}>
+    //         <Button
+    //           variant='outlined'
+    //           onClick={() => setIsPublicDeck(!isPublicDeck)}
+    //           sx={{ marginLeft: 'auto', margin: '.4rem' }}
+    //         >
+    //           {isPublicDeck && 'Public'}
+    //           {!isPublicDeck && 'Private'}
+    //         </Button>
+    //       </div>
+
+    //       <div style={center}>
+    //         <div className={'addCardHolder'}>
+    //           <form onSubmit={tryAddCardsToList} style={formStyle}>
+    //             <div>
+    //               <TextField
+    //                 sx={{ margin: '.4rem .1rem' }}
+    //                 variant='outlined'
+    //                 label='Card'
+    //                 value={cardToAdd}
+    //                 onChange={({ target }) => setCardToAdd(target.value)}
+    //               ></TextField>
+    //             </div>
+
+    //             <Button
+    //               type='submit'
+    //               sx={{ marginLeft: 'auto', margin: '.4rem' }}
+    //               variant='contained'
+    //             >
+    //               Add Card
+    //             </Button>
+    //           </form>
+    //         </div>
+
+    //         <Button variant='contained' onClick={tryVerifyDeckChanges}>
+    //           {editMode && 'Update Deck'}
+    //           {!editMode && 'Create Deck'}
+    //         </Button>
+    //       </div>
+    //     </Box>
+    //   </div>
+
+    //   <div style={{ textAlign: 'center', marginTop: '5rem' }}>
+    //     <Button variant='contained' component={Link} to={'/mydecks'}>
+    //       Back To Decks
+    //     </Button>
+    //   </div>
+    // </div>
   )
 }
 

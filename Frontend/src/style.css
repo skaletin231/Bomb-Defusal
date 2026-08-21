@@ -76,6 +76,36 @@ a.buttonStyle3D {
   font-size: 17px;
 }
 
+div.textFieldStyle3D {
+  background-color: #ede2d9;
+  border-radius: 10px;
+  border: 0.15rem solid #84582e;
+  flex-grow: 1;
+  height: 50px;
+}
+
+div.textFieldStyle3D input {
+  font-size: 1.5rem;
+}
+
+div.textFieldStyle3D .css-dm7idj-MuiInputBase-root-MuiOutlinedInput-root {
+  height: stretch;
+}
+
+.textFieldStyle3D::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: -2px;
+  right: -2px;
+  bottom: -8px;
+  display: block;
+  border: 0.15rem solid #84582e;
+  background-color: #d1d1d1;
+  border-radius: 10px;
+  z-index: -1;
+}
+
 a.buttonStyle3D {
   display: inline-flex;
 }
