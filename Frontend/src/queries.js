@@ -140,6 +140,7 @@ export const ME = gql`
       id
       username
       email
+      isGuest
     }
   }
 `

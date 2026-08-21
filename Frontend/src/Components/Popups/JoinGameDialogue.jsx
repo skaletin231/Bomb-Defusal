@@ -6,10 +6,12 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import TextField from '@mui/material/TextField'
 import { useNavigate } from 'react-router-dom'
-import { JOIN_GAME } from '../../queries'
+import { JOIN_GAME, ME } from '../../queries'
 
 function JoinGameDialogue({ open, setOpen }) {
-  const [joinGame] = useMutation(JOIN_GAME)
+  const [joinGame] = useMutation(JOIN_GAME, {
+    refetchQueries: [ME],
+  })
   const navigate = useNavigate()
 
   const handleSubmit = async (event) => {
