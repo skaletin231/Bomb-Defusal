@@ -130,6 +130,24 @@ const MyDecks = () => {
     console.log('removed deck')
   }
 
+  const sortedDecks = useMemo(() => {
+    return [...decks].sort((a, b) => {
+      switch (sortBy) {
+        case 'recent':
+          return new Date(b.createdAt) - new Date(a.createdAt)
+
+        case 'name':
+          return a.name.localeCompare(b.name)
+
+        case 'cards':
+          return b.cardCount - a.cardCount
+
+        default:
+          return 0
+      }
+    })
+  }, [decks, sortBy])
+
   return (
     <Box>
       <Typography
@@ -146,7 +164,7 @@ const MyDecks = () => {
           </Box>
         </Button>
 
-        {decks.map((deck, i) => (
+        {decks.sort().map((deck, i) => (
           <DeckObject
             key={i}
             deck={deck}

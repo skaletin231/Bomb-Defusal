@@ -77,18 +77,23 @@ a.buttonStyle3D {
 }
 
 div.textFieldStyle3D {
-  background-color: #ede2d9;
+  background-color: #fefefe;
   border-radius: 10px;
   border: 0.15rem solid #84582e;
   flex-grow: 1;
   height: 50px;
 }
 
-div.textFieldStyle3D input {
-  font-size: 1.5rem;
+div.textFieldStyle3D input::placeholder {
+  color: #808080;
 }
 
-div.textFieldStyle3D .css-dm7idj-MuiInputBase-root-MuiOutlinedInput-root {
+div.textFieldStyle3D input {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+div.textFieldStyle3D .MuiInputBase-root {
   height: stretch;
 }
 
