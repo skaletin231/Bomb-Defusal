@@ -1,33 +1,27 @@
-import { gql } from '@apollo/client'
 import { useMutation, useQuery } from '@apollo/client/react'
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
+import ImportExportIcon from '@mui/icons-material/ImportExport'
+import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined'
+import SearchIcon from '@mui/icons-material/Search'
 import {
   Box,
   Button,
   Card,
   CardContent,
   IconButton,
-  Paper,
   TextField,
   Typography,
 } from '@mui/material'
-import { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
-import { GET_MY_DECK, GET_MY_DECKS, MAKE_DECK, UPDATE_DECK } from '../queries'
-import FormControlLabel from '@mui/material/FormControlLabel'
 import Checkbox from '@mui/material/Checkbox'
+import FormControlLabel from '@mui/material/FormControlLabel'
 import FormGroup from '@mui/material/FormGroup'
+import InputAdornment from '@mui/material/InputAdornment'
+import InputBase from '@mui/material/InputBase'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
-import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined'
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
-import InputAdornment from '@mui/material/InputAdornment'
-import ImportExportIcon from '@mui/icons-material/ImportExport'
-import InputBase from '@mui/material/InputBase'
-import Divider from '@mui/material/Divider'
-import MenuIcon from '@mui/icons-material/Menu'
-import SearchIcon from '@mui/icons-material/Search'
-import DirectionsIcon from '@mui/icons-material/Directions'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useMemo, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { GET_MY_DECK, UPDATE_DECK } from '../queries'
 
 const formStyle = {
   justifyContent: 'flex-start',
@@ -103,16 +97,10 @@ const deckCardsx = {
   color: '#84582E',
 }
 
-const deckSearchSX = {
-  borderWidth: '0px',
-}
-
 const maxCardSize = 15
 
 const MakeDeckScreen = () => {
-  const navigate = useNavigate()
   const { id: deckID } = useParams()
-  const editMode = deckID !== undefined
 
   const [addStyle, setAddStyle] = useState('left')
   const [sortBy, setSortBy] = useState('name')
@@ -129,43 +117,6 @@ const MakeDeckScreen = () => {
   const deckResults = useQuery(GET_MY_DECK, {
     variables: { deckID: deckID },
     skip: !deckID,
-  })
-
-  const [makeDeck] = useMutation(MAKE_DECK, {
-    refetchQueries: [GET_MY_DECKS],
-    update(cache, { data }) {
-      console.log(data.makeDeck)
-      const newRef = cache.writeFragment({
-        data: data.makeDeck,
-        fragment: gql`
-          fragment Deck on Deck {
-            id
-            owner {
-              __typename
-              username
-              id
-            }
-            name
-            public
-            cards
-          }
-        `,
-      })
-
-      //if i ever add pagination, this may not be a good thing to do anymore
-      cache.modify({
-        fields: {
-          getMyDecks(existing = []) {
-            return [...existing, newRef]
-          },
-          getAllDecks(existing = []) {
-            return [...existing, newRef]
-          },
-        },
-      })
-
-      navigate(`/mydecks/${data.makeDeck.id}`)
-    },
   })
 
   const [updateDeck] = useMutation(UPDATE_DECK, {
@@ -220,37 +171,24 @@ const MakeDeckScreen = () => {
     return <div>{deckResults.error.message}</div>
   }
 
-  if (editMode && !deckResults.data?.getMyDeck)
-    return <div>Issue Loading Deck</div>
+  if (!deckResults.data?.getMyDeck) return <div>Issue Loading Deck</div>
 
   const tryVerifyDeckChanges = async (event) => {
     event.preventDefault()
-
-    if (editMode) {
-      console.log('updateDeck: ', {
+    console.log('updateDeck: ', {
+      deckID: deckResults.data?.getMyDeck.id,
+      name: deckName,
+      public: isPublicDeck,
+      cards: allCards,
+    })
+    await updateDeck({
+      variables: {
         deckID: deckResults.data?.getMyDeck.id,
         name: deckName,
         public: isPublicDeck,
         cards: allCards,
-      })
-      await updateDeck({
-        variables: {
-          deckID: deckResults.data?.getMyDeck.id,
-          name: deckName,
-          public: isPublicDeck,
-          cards: allCards,
-        },
-      })
-    } else {
-      console.log('makeDeck')
-      await makeDeck({
-        variables: {
-          name: deckName,
-          public: isPublicDeck,
-          cards: allCards,
-        },
-      })
-    }
+      },
+    })
   }
 
   function capitalizeWords(str) {
@@ -315,8 +253,7 @@ const MakeDeckScreen = () => {
             onClick={tryVerifyDeckChanges}
           >
             <SaveOutlinedIcon />
-            {editMode && 'Save Changes'}
-            {!editMode && 'Create Deck'}
+            Save Changes
           </Button>
         </Box>
 
@@ -576,9 +513,6 @@ const MakeDeckScreen = () => {
       </Box>
     )
   }
-
-  console.log(sortedCards)
-  console.log(allCards)
 
   return (
     <Box sx={{ gap: '30px', display: 'flex', flexDirection: 'column' }}>

@@ -1,22 +1,22 @@
-import { useMutation, useQuery } from '@apollo/client/react'
-import { Button, Card, CardContent, Box, Typography } from '@mui/material'
-import { Link } from 'react-router-dom'
-import { GET_ALL_DECKS, GET_MY_DECKS, COPY_DECK, REMOVE_DECK } from '../queries'
-import DeckObject from './DeckObject'
-import AddOutlinedIcon from '@mui/icons-material/AddOutlined'
-import IconButton from '@mui/material/IconButton'
 import { gql } from '@apollo/client'
-import { useState } from 'react'
-import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
+import { useMutation, useQuery } from '@apollo/client/react'
 import '@fontsource/suwannaphum'
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined'
+import { Box, Button, Typography } from '@mui/material'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { COPY_DECK, GET_MY_DECKS, MAKE_DECK, REMOVE_DECK } from '../queries'
+import DeckObject from './DeckObject'
+import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
 
 const MyDecks = () => {
+  const navigate = useNavigate()
+
   const [selectedDeck, setSelectedDeck] = useState(null)
   const deckResults = useQuery(GET_MY_DECKS)
 
   const [copyDeck] = useMutation(COPY_DECK, {
     update(cache, { data }) {
-      console.log(data.copyDeck)
       const newRef = cache.writeFragment({
         data: data.copyDeck,
         fragment: gql`
@@ -72,6 +72,41 @@ const MyDecks = () => {
     },
   })
 
+  const [makeDeck] = useMutation(MAKE_DECK, {
+    refetchQueries: [GET_MY_DECKS],
+    update(cache, { data }) {
+      const newRef = cache.writeFragment({
+        data: data.makeDeck,
+        fragment: gql`
+          fragment Deck on Deck {
+            id
+            owner {
+              __typename
+              username
+              id
+            }
+            name
+            public
+            cards
+          }
+        `,
+      })
+
+      cache.modify({
+        fields: {
+          getMyDecks(existing = []) {
+            return [...existing, newRef]
+          },
+          getAllDecks(existing = []) {
+            return [...existing, newRef]
+          },
+        },
+      })
+
+      navigate(`/mydecks/${data.makeDeck.id}`)
+    },
+  })
+
   if (deckResults.loading) return <div>LOADING...</div>
 
   const decks = deckResults.data.getMyDecks
@@ -112,7 +147,17 @@ const MyDecks = () => {
     fontSize: '1.3rem',
   }
 
-  const tryMakeDeck = async (deckID) => {
+  const tryMakeDeck = async () => {
+    await makeDeck({
+      variables: {
+        name: 'New Deck',
+        public: false,
+        cards: [],
+      },
+    })
+  }
+
+  const tryMakeCopy = async (deckID) => {
     await copyDeck({
       variables: {
         deckID: deckID,
@@ -127,26 +172,7 @@ const MyDecks = () => {
       },
     })
     setSelectedDeck(null)
-    console.log('removed deck')
   }
-
-  const sortedDecks = useMemo(() => {
-    return [...decks].sort((a, b) => {
-      switch (sortBy) {
-        case 'recent':
-          return new Date(b.createdAt) - new Date(a.createdAt)
-
-        case 'name':
-          return a.name.localeCompare(b.name)
-
-        case 'cards':
-          return b.cardCount - a.cardCount
-
-        default:
-          return 0
-      }
-    })
-  }, [decks, sortBy])
 
   return (
     <Box>
@@ -157,19 +183,19 @@ const MyDecks = () => {
       </Typography>
 
       <Box sx={boxSX}>
-        <Button sx={buttonSX} component={Link} to={'/mydecks/new'}>
+        <Button sx={buttonSX} onClick={tryMakeDeck}>
           <Box sx={innerboxSX}>
             <AddOutlinedIcon sx={{ fontSize: '2.5rem' }} />
             <Typography sx={textSX}>Add New Deck</Typography>
           </Box>
         </Button>
 
-        {decks.sort().map((deck, i) => (
+        {decks.map((deck, i) => (
           <DeckObject
             key={i}
             deck={deck}
             type={'edit'}
-            tryMakeDeck={tryMakeDeck}
+            tryMakeDeck={tryMakeCopy}
             setSelectedDeck={setSelectedDeck}
           />
         ))}
