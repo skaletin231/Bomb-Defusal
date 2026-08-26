@@ -8,9 +8,13 @@ import { useNavigate } from 'react-router-dom'
 import { COPY_DECK, GET_MY_DECKS, MAKE_DECK, REMOVE_DECK } from '../queries'
 import DeckObject from './DeckObject'
 import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
+import NotificationPopup from './Popups/NotificationPopup'
 
 const MyDecks = () => {
   const navigate = useNavigate()
+
+  const [openCreatePopup, setOpenCreatePopup] = useState(false)
+  const [openRemovePopup, setOpenRemovePopup] = useState(false)
 
   const [selectedDeck, setSelectedDeck] = useState(null)
   const deckResults = useQuery(GET_MY_DECKS)
@@ -45,6 +49,8 @@ const MyDecks = () => {
           },
         },
       })
+
+      setOpenCreatePopup(true)
     },
   })
 
@@ -66,6 +72,8 @@ const MyDecks = () => {
           },
         },
       })
+
+      setOpenRemovePopup(true)
     },
     onError: (error) => {
       console.log(error.message)
@@ -204,6 +212,18 @@ const MyDecks = () => {
         open={selectedDeck !== null}
         onConfirm={tryRemoveDeck}
         setSelectedDeck={setSelectedDeck}
+      />
+      <NotificationPopup
+        message={'Deck Created'}
+        color={'success'}
+        open={openCreatePopup}
+        setOpen={setOpenCreatePopup}
+      />
+      <NotificationPopup
+        message={'Deck Removed'}
+        color={'success'}
+        open={openRemovePopup}
+        setOpen={setOpenRemovePopup}
       />
     </Box>
   )

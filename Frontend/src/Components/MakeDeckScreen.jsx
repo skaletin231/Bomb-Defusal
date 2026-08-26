@@ -1,6 +1,5 @@
 import { useMutation, useQuery } from '@apollo/client/react'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
-import ImportExportIcon from '@mui/icons-material/ImportExport'
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined'
 import SearchIcon from '@mui/icons-material/Search'
 import {
@@ -22,12 +21,17 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { GET_MY_DECK, UPDATE_DECK } from '../queries'
+import NotificationPopup from './Popups/NotificationPopup'
+import SortMenu from './SortMenu'
+import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft'
+import DownloadIcon from '@mui/icons-material/Download'
 
 const formStyle = {
   justifyContent: 'flex-start',
   flexDirection: 'row',
   display: 'flex',
-  width: '50%',
+  width: 'calc(50VW - 3rem)',
+  minWidth: '30rem',
   gap: '40px',
 }
 
@@ -37,15 +41,17 @@ const titleText = {
   margin: '10px 0 0 0',
   fontFamily: '"Suwannaphum", serif',
   fontWeight: 'bold',
+  width: 'fit-content',
 }
 
 const saveButton = {
   '&&': {
-    width: 'auto',
+    width: 'fit-content',
     alignSelf: 'center',
     display: 'flex',
-    height: '50px',
     gap: '7px',
+    height: '50px',
+    flexShrink: '0',
   },
 }
 
@@ -54,11 +60,26 @@ const addCardButton = {
     width: 'auto',
     alignSelf: 'center',
     height: '50px',
+    display: 'flex',
+    gap: '7px',
+    flexShrink: '0',
+  },
+}
+
+const importButton = {
+  '&&': {
+    width: 'auto',
+    alignSelf: 'center',
+    height: '50px',
+    display: 'flex',
+    gap: '7px',
+    flexShrink: '0',
   },
 }
 
 const titleSaveBox = {
-  width: '50%',
+  width: 'calc(50VW - 3rem)',
+  minWidth: '30rem',
   display: 'flex',
   gap: '40px',
 }
@@ -102,17 +123,22 @@ const maxCardSize = 15
 const MakeDeckScreen = () => {
   const { id: deckID } = useParams()
 
-  const [addStyle, setAddStyle] = useState('left')
-  const [sortBy, setSortBy] = useState('name')
-  const [sortOrder, setSortOrder] = useState('default')
+  const [addStyle, setAddStyle] = useState('default')
+  const [sortBy, setSortBy] = useState('Name (a-z)')
+  //const [sortOrder, setSortOrder] = useState('default')
 
   const [cardToAdd, setCardToAdd] = useState('')
+  const [openPopup, setOpenPopup] = useState(false)
+
   const [notes, setNotes] = useState('')
   const [filterDeck, setFilterDeck] = useState('')
   const [deckName, setDeckName] = useState('')
   const [allCards, setAllCards] = useState([])
   const [isPublicDeck, setIsPublicDeck] = useState(false)
   const [selectMultiple, setSelectMultiple] = useState(false)
+
+  const [importWords, setImportWords] = useState('')
+  const [override, setOverride] = useState(false)
 
   const deckResults = useQuery(GET_MY_DECK, {
     variables: { deckID: deckID },
@@ -132,28 +158,28 @@ const MakeDeckScreen = () => {
           cards: () => data.updateDeck.cards,
         },
       })
+
+      setOpenPopup(true)
     },
   })
 
-  const sortCombined = `${sortBy} ${sortOrder}`
-
   const sortedCards = useMemo(() => {
-    if (sortCombined === 'Date default') return allCards
-    if (sortCombined === 'Date reverse') return [...allCards].reverse()
+    if (sortBy === 'Date Added (Newest First)') return allCards
+    if (sortBy === 'Date Added (Oldest First)') return [...allCards].reverse()
 
     return [...allCards].sort((a, b) => {
-      switch (sortCombined) {
-        case 'Name default':
+      switch (sortBy) {
+        case 'Name (a-z)':
           return a.localeCompare(b)
 
-        case 'Name reverse':
+        case 'Name (z-a)':
           return b.localeCompare(a)
 
         default:
           return 0
       }
     })
-  }, [allCards, sortCombined])
+  }, [allCards, sortBy])
 
   useEffect(() => {
     if (deckResults.data?.getMyDeck) {
@@ -198,15 +224,18 @@ const MakeDeckScreen = () => {
       .join(' ')
   }
 
-  const tryAddCardsToList = (event) => {
-    event.preventDefault()
-    const formattedWord = capitalizeWords(cardToAdd.trim())
+  const tryAddCardToList = (card) => {
+    //event.preventDefault()
+    console.log(card)
+    const formattedWord = capitalizeWords(card.trim())
+    console.log(formattedWord)
     if (
       formattedWord !== '' &&
       formattedWord.length <= maxCardSize &&
       !allCards.includes(formattedWord)
     ) {
-      setAllCards(allCards.concat(formattedWord))
+      //setAllCards(allCards.concat(formattedWord))
+      setAllCards((prevCards) => prevCards.concat(formattedWord))
     }
     setCardToAdd('')
     return
@@ -222,9 +251,23 @@ const MakeDeckScreen = () => {
     }
   }
 
+  const tryImportCards = () => {
+    //const words = importWords.split(',')
+    const words = importWords.split(/,|\r?\n/)
+    words.forEach((word) => tryAddCardToList(word))
+    setImportWords('')
+  }
+
   const headerUI = () => {
     return (
-      <Box sx={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+          width: 'fit-content',
+        }}
+      >
         <Typography variant='h2' style={titleText}>
           Edit Deck
         </Typography>
@@ -286,15 +329,15 @@ const MakeDeckScreen = () => {
       >
         <ToggleButton
           sx={styleToggleButtonSX}
-          value='left'
-          aria-label='left aligned'
+          value='default'
+          aria-label='default'
         >
           Add and Delete
         </ToggleButton>
         <ToggleButton
           sx={styleToggleButtonSX}
-          value='center'
-          aria-label='centered'
+          value='import'
+          aria-label='import'
         >
           Quick Import
         </ToggleButton>
@@ -304,7 +347,7 @@ const MakeDeckScreen = () => {
 
   const addCardUI = () => {
     return (
-      <form onSubmit={tryAddCardsToList} style={formStyle}>
+      <Box style={formStyle}>
         <TextField
           variant='outlined'
           placeholder='Type to add a card'
@@ -314,14 +357,17 @@ const MakeDeckScreen = () => {
         ></TextField>
 
         <Button
-          type='submit'
+          onClick={() => {
+            tryAddCardToList(cardToAdd)
+            setCardToAdd('')
+          }}
           variant='contained'
           className='buttonStyle3D'
           sx={addCardButton}
         >
-          Add Card
+          <SubdirectoryArrowLeftIcon /> Add Card
         </Button>
-      </form>
+      </Box>
     )
   }
 
@@ -341,6 +387,7 @@ const MakeDeckScreen = () => {
           border: '0.15rem solid #D1D1D1',
           borderWidth: '0 0 .15rem 0',
           gap: '20px',
+          height: '3.13rem',
         }}
       >
         <InputBase
@@ -363,32 +410,7 @@ const MakeDeckScreen = () => {
             filterDeck === '' ? <SearchIcon sx={{ color: '#808080' }} /> : null
           }
         />
-        <Box>
-          <Button
-            sx={{ p: '10px', color: '#3A1605' }}
-            onClick={() =>
-              sortBy === 'Name' ? setSortBy('Date') : setSortBy('Name')
-            }
-          >
-            Sort By: {sortBy}
-          </Button>
-          <Button
-            sx={{
-              color: '#3A1605',
-              padding: '0px',
-              justifyContent: 'start',
-              minWidth: '0',
-            }}
-            disableRipple
-            onClick={() =>
-              sortOrder === 'default'
-                ? setSortOrder('reverse')
-                : setSortOrder('default')
-            }
-          >
-            <ImportExportIcon />
-          </Button>
-        </Box>
+        <SortMenu sortBy={sortBy} setSortBy={setSortBy} />
 
         <FormGroup sx={{ width: 'fit-content' }}>
           <FormControlLabel
@@ -412,7 +434,7 @@ const MakeDeckScreen = () => {
     return (
       <div
         style={{
-          width: '90%',
+          width: 'calc(90VW - 6rem)',
           justifySelf: 'center',
           backgroundColor: '#F5F5F5',
           borderRadius: '10px',
@@ -425,10 +447,11 @@ const MakeDeckScreen = () => {
             display: 'flex',
             flexWrap: 'wrap',
             height: '30rem',
-            gap: 2,
+            gap: '10px',
             maxHeight: '30rem',
             padding: '.2rem 1rem',
             overflow: 'auto',
+            alignContent: 'start',
           }}
         >
           {sortedCards.map((card, i) => (
@@ -481,15 +504,18 @@ const MakeDeckScreen = () => {
 
   const notesUI = () => {
     return (
-      <Box>
-        <Typography sx={{ color: '#3A1605', fontWeight: 'bold' }}>
+      <Box sx={{ width: 'fit-content', gap: '10px' }} className='flexColumn'>
+        <Typography
+          variant='h5'
+          sx={{ color: '#3A1605', fontWeight: 'bold', width: 'fit-content' }}
+        >
           Notes
         </Typography>
         <TextField
           multiline
           sx={{
             margin: '.4rem .1rem',
-            width: '90%',
+            width: 'calc(90VW - 6rem)',
             '& .MuiInputBase-root': {
               backgroundColor: '#F5F5F5',
               borderRadius: '10px',
@@ -514,13 +540,93 @@ const MakeDeckScreen = () => {
     )
   }
 
+  const addAndDeleteStyle = () => {
+    return (
+      <>
+        {addCardUI()}
+        {deckUI()}
+      </>
+    )
+  }
+
+  const quickAddStyle = () => {
+    return (
+      <Box sx={{ gap: '10px' }} className='flexColumn'>
+        <Typography
+          variant='h5'
+          sx={{ color: '#3A1605', fontWeight: 'bold', width: 'fit-content' }}
+        >
+          Card List
+        </Typography>
+        <TextField
+          multiline
+          value={importWords}
+          onChange={({ target }) => setImportWords(target.value)}
+          sx={{
+            width: 'calc(90VW - 6rem)',
+            justifySelf: 'center',
+            backgroundColor: '#F5F5F5',
+            borderRadius: '10px',
+            border: '0.15rem solid #D1D1D1',
+            // '& .MuiInputBase-root': {
+            //   height: '33.13rem',
+            // },
+          }}
+          placeholder='Appble, Banana, Cherry, ...'
+          rows={20}
+        ></TextField>
+        <Box sx={{ gap: '40px', alignItems: 'center' }} className='flexRow'>
+          <Button
+            variant='contained'
+            className='buttonStyle3D'
+            sx={importButton}
+            onClick={tryImportCards}
+          >
+            <DownloadIcon />
+            Import Deck
+          </Button>
+          <FormGroup sx={{ width: 'fit-content' }}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={override}
+                  onChange={(event) => setOverride(event.target.checked)}
+                  sx={{ color: '#808080' }}
+                />
+              }
+              label='Override Existing Deck'
+              sx={{ color: '#3A1605' }}
+              className='overrideDeckButton'
+            />
+          </FormGroup>
+        </Box>
+      </Box>
+    )
+  }
+
   return (
-    <Box sx={{ gap: '30px', display: 'flex', flexDirection: 'column' }}>
+    <Box
+      sx={{
+        gap: '2rem',
+        display: 'flex',
+        flexDirection: 'column',
+        width: 'fit-content',
+        justifySelf: 'center',
+        marginTop: '2rem',
+      }}
+    >
       {headerUI()}
       {addStyleToggleUI()}
-      {addCardUI()}
-      {deckUI()}
+      {addStyle === 'default' && addAndDeleteStyle()}
+      {addStyle === 'import' && quickAddStyle()}
+
       {notesUI()}
+      <NotificationPopup
+        message={'Deck Updated'}
+        color={'success'}
+        open={openPopup}
+        setOpen={setOpenPopup}
+      />
     </Box>
   )
 }

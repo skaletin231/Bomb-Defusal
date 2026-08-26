@@ -7,6 +7,7 @@ import MenuItem from '@mui/material/MenuItem'
 import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ME } from '../queries'
+import { useState, useId } from 'react'
 
 const divStyle = {
   position: 'fixed',
@@ -16,16 +17,15 @@ const divStyle = {
 
 export default function BasicMenu() {
   const result = useQuery(ME, {})
-  console.log(result.data)
   const loggedIn = result.data?.me !== null && !result.data.me.isGuest
 
   const { loginWithRedirect, logout } = useAuth0()
   const navigate = useNavigate()
 
-  const id = React.useId()
+  const id = useId()
   const buttonId = `${id}-button`
   const menuId = `${id}-menu`
-  const [anchorEl, setAnchorEl] = React.useState(null)
+  const [anchorEl, setAnchorEl] = useState(null)
   const open = Boolean(anchorEl)
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget)

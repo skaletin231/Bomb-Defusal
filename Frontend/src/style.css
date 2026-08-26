@@ -2,6 +2,16 @@ body {
   margin: 0px;
 }
 
+.flexRow {
+  display: flex;
+  flex-direction: row;
+}
+
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+}
+
 .basicBackground {
   background-color: #fff8e9;
 }
