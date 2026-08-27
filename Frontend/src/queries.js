@@ -259,6 +259,7 @@ export const GET_MY_DECKS = gql`
       name
       public
       cards
+      notes
     }
   }
 `
@@ -274,6 +275,7 @@ export const GET_MY_DECK = gql`
       name
       public
       cards
+      notes
     }
   }
 `
@@ -290,6 +292,7 @@ export const GET_ALL_DECKS = gql`
         name
         public
         cards
+        notes
       }
       publicDecks {
         id
@@ -300,14 +303,15 @@ export const GET_ALL_DECKS = gql`
         name
         public
         cards
+        notes
       }
     }
   }
 `
 
 export const MAKE_DECK = gql`
-  mutation makeDeck($name: String!, $public: Boolean!, $cards: [String!]!) {
-    makeDeck(name: $name, public: $public, cards: $cards) {
+  mutation {
+    makeDeck {
       id
       owner {
         username
@@ -316,6 +320,7 @@ export const MAKE_DECK = gql`
       name
       public
       cards
+      notes
     }
   }
 `
@@ -331,6 +336,7 @@ export const COPY_DECK = gql`
       name
       public
       cards
+      notes
     }
   }
 `
@@ -347,8 +353,15 @@ export const UPDATE_DECK = gql`
     $name: String!
     $public: Boolean!
     $cards: [String!]!
+    $notes: String!
   ) {
-    updateDeck(deckID: $deckID, name: $name, public: $public, cards: $cards) {
+    updateDeck(
+      deckID: $deckID
+      name: $name
+      public: $public
+      cards: $cards
+      notes: $notes
+    ) {
       id
       owner {
         username
@@ -357,6 +370,7 @@ export const UPDATE_DECK = gql`
       name
       public
       cards
+      notes
     }
   }
 `

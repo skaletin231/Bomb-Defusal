@@ -156,13 +156,7 @@ const MyDecks = () => {
   }
 
   const tryMakeDeck = async () => {
-    await makeDeck({
-      variables: {
-        name: 'New Deck',
-        public: false,
-        cards: [],
-      },
-    })
+    await makeDeck()
   }
 
   const tryMakeCopy = async (deckID) => {

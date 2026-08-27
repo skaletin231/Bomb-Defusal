@@ -64,6 +64,7 @@ const typeDefs = /* GraphQL */ `
     name: String!
     public: Boolean!
     cards: [String!]!
+    notes: String!
   }
 
   type Mutation { #player should be obtainable from context now if player is me
@@ -75,12 +76,13 @@ const typeDefs = /* GraphQL */ `
     updateUserInfo(username: String!): User
     sendMessage(gameID: ID!, text: String!): ChatMessage
     sendHint(gameID: ID!, hint: String!, count: Int!): Hint
-    makeDeck(name: String!, public: Boolean!, cards: [String!]!): Deck
+    makeDeck: Deck
     updateDeck(
       deckID: ID!
       name: String
       public: Boolean
       cards: [String!]
+      notes: String!
     ): Deck
     removeDeck(deckID: ID!): ID
     copyDeck(deckID: ID!): Deck

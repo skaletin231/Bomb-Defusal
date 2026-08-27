@@ -135,7 +135,7 @@ const MakeDeckScreen = () => {
   const [deckName, setDeckName] = useState('')
   const [allCards, setAllCards] = useState([])
   const [isPublicDeck, setIsPublicDeck] = useState(false)
-  const [selectMultiple, setSelectMultiple] = useState(false)
+  //const [selectMultiple, setSelectMultiple] = useState(false)
 
   const [importWords, setImportWords] = useState('')
   const [override, setOverride] = useState(false)
@@ -147,6 +147,7 @@ const MakeDeckScreen = () => {
 
   const [updateDeck] = useMutation(UPDATE_DECK, {
     update(cache, { data }) {
+      console.log('try run update')
       cache.modify({
         id: cache.identify({
           __typename: 'Deck',
@@ -156,6 +157,7 @@ const MakeDeckScreen = () => {
           name: () => data.updateDeck.name,
           public: () => data.updateDeck.public,
           cards: () => data.updateDeck.cards,
+          notes: () => data.updateDeck.notes,
         },
       })
 
@@ -188,6 +190,7 @@ const MakeDeckScreen = () => {
       setDeckName(deck.name)
       setAllCards(deck.cards)
       setIsPublicDeck(deck.public)
+      setNotes(deck.notes)
     }
   }, [deckResults.data])
 
@@ -206,6 +209,7 @@ const MakeDeckScreen = () => {
       name: deckName,
       public: isPublicDeck,
       cards: allCards,
+      notes: notes,
     })
     await updateDeck({
       variables: {
@@ -213,6 +217,7 @@ const MakeDeckScreen = () => {
         name: deckName,
         public: isPublicDeck,
         cards: allCards,
+        notes: notes,
       },
     })
   }
@@ -225,16 +230,12 @@ const MakeDeckScreen = () => {
   }
 
   const tryAddCardToList = (card) => {
-    //event.preventDefault()
-    console.log(card)
     const formattedWord = capitalizeWords(card.trim())
-    console.log(formattedWord)
     if (
       formattedWord !== '' &&
       formattedWord.length <= maxCardSize &&
       !allCards.includes(formattedWord)
     ) {
-      //setAllCards(allCards.concat(formattedWord))
       setAllCards((prevCards) => prevCards.concat(formattedWord))
     }
     setCardToAdd('')
@@ -252,7 +253,7 @@ const MakeDeckScreen = () => {
   }
 
   const tryImportCards = () => {
-    //const words = importWords.split(',')
+    if (override) setAllCards([])
     const words = importWords.split(/,|\r?\n/)
     words.forEach((word) => tryAddCardToList(word))
     setImportWords('')
@@ -412,7 +413,7 @@ const MakeDeckScreen = () => {
         />
         <SortMenu sortBy={sortBy} setSortBy={setSortBy} />
 
-        <FormGroup sx={{ width: 'fit-content' }}>
+        {/* <FormGroup sx={{ width: 'fit-content' }}>
           <FormControlLabel
             control={
               <Checkbox
@@ -425,7 +426,7 @@ const MakeDeckScreen = () => {
             sx={{ color: '#3A1605' }}
             className='selectMultipleButton'
           />
-        </FormGroup>
+        </FormGroup> */}
       </Box>
     )
   }

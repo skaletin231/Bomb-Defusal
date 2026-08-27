@@ -120,6 +120,7 @@ const resolvers = {
         name: deck.name,
         public: deck.public,
         cards: deck.cards,
+        notes: deck.notes ?? '',
       }))
     },
     getMyDeck: async (root, args, context) => {
@@ -139,6 +140,7 @@ const resolvers = {
         name: myDeck.name,
         public: myDeck.public,
         cards: myDeck.cards,
+        notes: myDeck.notes ?? '',
       }
     },
     getAllDecks: async (root, __, context) => {
@@ -167,6 +169,7 @@ const resolvers = {
         name: deck.name,
         public: deck.public,
         cards: deck.cards,
+        notes: deck.notes ?? '',
       }))
 
       const publicDecksObject = publicDecks.map((deck) => ({
@@ -555,9 +558,10 @@ const resolvers = {
 
       const newDeck = new Deck({
         owner: context.user._id,
-        name: args.name,
-        public: args.public,
-        cards: args.cards,
+        name: 'New Deck',
+        public: false,
+        cards: [],
+        notes: '',
       })
 
       await newDeck.save()
@@ -571,10 +575,12 @@ const resolvers = {
         name: newDeck.name,
         public: newDeck.public,
         cards: newDeck.cards,
+        notes: newDeck.notes,
       }
     },
     updateDeck: async (root, args, context) => {
       checkIsLoggedIn(context)
+      console.log('in update backend')
 
       const deck = await Deck.findById(args.deckID)
       if (!deck || !deck.owner.equals(context.user._id)) cantAccessDeckError()
@@ -582,6 +588,7 @@ const resolvers = {
       deck.name = args.name !== undefined ? args.name : deck.name
       deck.public = args.public !== undefined ? args.public : deck.public
       deck.cards = args.cards !== undefined ? args.cards : deck.cards
+      deck.notes = args.notes !== undefined ? args.notes : deck.notes
 
       await deck.save()
 
@@ -594,6 +601,7 @@ const resolvers = {
         public: deck.public,
         cards: deck.cards,
         id: deck.id,
+        notes: deck.notes,
       }
     },
     removeDeck: async (root, args, context) => {
@@ -617,6 +625,7 @@ const resolvers = {
         name: deck.name,
         public: false,
         cards: deck.cards,
+        notes: deck.notes,
       })
 
       await newDeck.save()
@@ -630,6 +639,7 @@ const resolvers = {
         name: newDeck.name,
         public: newDeck.public,
         cards: newDeck.cards,
+        notes: newDeck.notes,
       }
     },
   },
