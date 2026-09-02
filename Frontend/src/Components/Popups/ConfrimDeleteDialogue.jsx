@@ -7,15 +7,9 @@ import TextField from '@mui/material/TextField'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import { Typography } from '@mui/material'
 
-function ConfirmDeleteDialogue({ open, setSelectedDeck, onConfirm }) {
+function ConfirmDeleteDialogue({ open, setDeckToDelete, onConfirm }) {
   const handleClose = (event, reason) => {
-    //Figure out if we want auto close or not
-    //also ask if we really need the x when we alreayd have the cancel
-    // if (reason === 'backdropClick') {
-    //   return
-    // }
-
-    setSelectedDeck(null)
+    setDeckToDelete(null)
   }
 
   const dialogueSX = {

@@ -25,6 +25,7 @@ import NotificationPopup from './Popups/NotificationPopup'
 import SortMenu from './SortMenu'
 import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft'
 import DownloadIcon from '@mui/icons-material/Download'
+import CheckIcon from '@mui/icons-material/Check'
 
 const formStyle = {
   justifyContent: 'flex-start',
@@ -52,6 +53,11 @@ const saveButton = {
     gap: '7px',
     height: '50px',
     flexShrink: '0',
+  },
+  '&.Mui-disabled': {
+    backgroundColor: '#588A29',
+    color: '#FFFFFF',
+    borderColor: '#1E5C15',
   },
 }
 
@@ -140,6 +146,8 @@ const MakeDeckScreen = () => {
   const [importWords, setImportWords] = useState('')
   const [override, setOverride] = useState(false)
 
+  const [needsSave, setNeedsSave] = useState(true)
+
   const deckResults = useQuery(GET_MY_DECK, {
     variables: { deckID: deckID },
     skip: !deckID,
@@ -162,6 +170,7 @@ const MakeDeckScreen = () => {
       })
 
       setOpenPopup(true)
+      setNeedsSave(false)
     },
   })
 
@@ -278,7 +287,10 @@ const MakeDeckScreen = () => {
             placeholder='Name'
             className='textFieldStyle3D'
             value={deckName}
-            onChange={({ target }) => setDeckName(target.value)}
+            onChange={({ target }) => {
+              setDeckName(target.value)
+              setNeedsSave(true)
+            }}
             slotProps={{
               input: {
                 endAdornment: (
@@ -295,9 +307,12 @@ const MakeDeckScreen = () => {
             className='buttonStyle3D'
             sx={saveButton}
             onClick={tryVerifyDeckChanges}
+            disabled={!needsSave}
           >
-            <SaveOutlinedIcon />
-            Save Changes
+            {needsSave && <SaveOutlinedIcon />}
+            {!needsSave && <CheckIcon />}
+            {needsSave && 'Save Changes'}
+            {!needsSave && 'Saved'}
           </Button>
         </Box>
 
@@ -361,6 +376,7 @@ const MakeDeckScreen = () => {
           onClick={() => {
             tryAddCardToList(cardToAdd)
             setCardToAdd('')
+            setNeedsSave(true)
           }}
           variant='contained'
           className='buttonStyle3D'
@@ -480,7 +496,10 @@ const MakeDeckScreen = () => {
                     fontSize: '1.1rem',
                     color: '#B43131',
                   }}
-                  onClick={() => removeCard(i)}
+                  onClick={() => {
+                    removeCard(i)
+                    setNeedsSave(true)
+                  }}
                 >
                   X
                 </IconButton>
@@ -534,7 +553,10 @@ const MakeDeckScreen = () => {
           }}
           placeholder='Type to add notes'
           value={notes}
-          onChange={({ target }) => setNotes(target.value)}
+          onChange={({ target }) => {
+            setNotes(target.value)
+            setNeedsSave(true)
+          }}
           rows={4}
         ></TextField>
       </Box>

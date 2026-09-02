@@ -1,9 +1,22 @@
-import { Button, Card, CardContent, Box, Typography } from '@mui/material'
+import {
+  Button,
+  Card,
+  CardContent,
+  Box,
+  Typography,
+  CardActionArea,
+  CardActions,
+} from '@mui/material'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import IconButton from '@mui/material/IconButton'
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
 import { Link } from 'react-router-dom'
+import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
+import { useState } from 'react'
+import { useMutation } from '@apollo/client/react'
+import { REMOVE_DECK } from '../queries'
+import NotificationPopup from './Popups/NotificationPopup'
 
 const deckCardSX = {
   width: '15rem',
@@ -55,21 +68,14 @@ const deckNameSX = {
   color: '#84582e',
 }
 
-const DeckObject = ({ deck, type, tryMakeDeck, setID, setSelectedDeck }) => {
-  const playGameButton = () => {
-    return (
-      <Box sx={buttonHolderSX}>
-        <Button
-          sx={copyButton}
-          className='copyButton'
-          variant='contained'
-          onClick={() => setID(deck.id)}
-        >
-          Use Deck
-        </Button>
-      </Box>
-    )
-  }
+const DeckObject = ({
+  deck,
+  type,
+  tryMakeDeck,
+  setDeckToDelete,
+  setSelectedDeck,
+}) => {
+  // const [selected, setSelected] = useState(false)
 
   const myDeckButtons = () => {
     return (
@@ -99,7 +105,7 @@ const DeckObject = ({ deck, type, tryMakeDeck, setID, setSelectedDeck }) => {
           sx={deleteButton}
           className='deleteButton'
           variant='contained'
-          onClick={() => setSelectedDeck(deck.id)}
+          onClick={() => setDeckToDelete(deck.id)}
         >
           <DeleteForeverOutlinedIcon
             sx={{ color: '#9b2a2a', '&:hover': { color: '#B43131' } }}
@@ -109,18 +115,37 @@ const DeckObject = ({ deck, type, tryMakeDeck, setID, setSelectedDeck }) => {
     )
   }
 
+  const cardClicked = () => {
+    if (setSelectedDeck !== null) setSelectedDeck(deck)
+  }
+
   return (
-    <Card key={deck.name} sx={deckCardSX}>
-      <CardContent sx={cardContentSX}>
-        <Typography className='deckUsername'>{deck.owner.username}</Typography>
-        <Typography className='deckCardCount'>{deck.cards.length}</Typography>
-        <Typography className='deckName' sx={deckNameSX}>
-          {deck.name}
-        </Typography>
-        {type === 'edit' && myDeckButtons()}
-        {type === 'play' && playGameButton()}
-      </CardContent>
-    </Card>
+    <>
+      <Card key={deck.name} sx={deckCardSX}>
+        <CardActionArea
+          disableRipple
+          onClick={cardClicked}
+          sx={{
+            '&:hover .MuiCardActionArea-focusHighlight': {
+              opacity: 0,
+            },
+          }}
+        >
+          <CardContent sx={cardContentSX}>
+            <Typography className='deckUsername'>
+              {deck.owner.username}
+            </Typography>
+            <Typography className='deckCardCount'>
+              {deck.cards.length} cards
+            </Typography>
+            <Typography className='deckName' sx={deckNameSX}>
+              {deck.name}
+            </Typography>
+          </CardContent>
+        </CardActionArea>
+        <CardActions>{type === 'mine' && myDeckButtons()}</CardActions>
+      </Card>
+    </>
   )
 }
 

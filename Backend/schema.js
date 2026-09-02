@@ -7,6 +7,7 @@ const typeDefs = /* GraphQL */ `
     getMyDecks: [Deck!]
     getMyDeck(deckID: ID!): Deck
     getAllDecks: AllDecks!
+    getOneDeck(deckID: ID!): Deck
     me: User
   }
 
@@ -68,7 +69,14 @@ const typeDefs = /* GraphQL */ `
   }
 
   type Mutation { #player should be obtainable from context now if player is me
-    startGame(deckID: ID!, mistakeLimit: Int, turnLimit: Int): ID
+    startGame(
+      deckID: ID!
+      gridsX: Int
+      gridsY: Int
+      turnLimit: Int
+      mistakeLimit: Int
+      wordsPerHint: Int
+    ): ID
     joinGame(gameID: ID!): Game
     makeMove(gameID: ID!, index: Int!): Game
     endTurn(gameID: ID!): Game

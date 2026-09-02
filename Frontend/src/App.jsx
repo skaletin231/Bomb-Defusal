@@ -9,6 +9,7 @@ import MyDecks from './Components/MyDecks'
 import MakeDeckScreen from './Components/MakeDeckScreen'
 import { Box } from '@mui/material'
 import NavigationBar from './Components/NavigationBar'
+import DeckView from './Components/DeckView'
 
 function App() {
   const result = useQuery(ME, {})
@@ -45,6 +46,7 @@ function App() {
           <Route path='/mydecks' element={<MyDecks />} />
           <Route path='/mydecks/new' element={<MakeDeckScreen />} />
           <Route path='/mydecks/:id' element={<MakeDeckScreen />} />
+          <Route path='/decks/:id' element={<DeckView />} />
           <Route path='*' element={noPageError()} />
         </Routes>
       </Box>
