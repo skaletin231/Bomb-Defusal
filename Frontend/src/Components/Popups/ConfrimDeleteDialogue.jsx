@@ -8,7 +8,7 @@ import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import { Typography } from '@mui/material'
 
 function ConfirmDeleteDialogue({ open, setDeckToDelete, onConfirm }) {
-  const handleClose = (event, reason) => {
+  const handleClose = () => {
     setDeckToDelete(null)
   }
 

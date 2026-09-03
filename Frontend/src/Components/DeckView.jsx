@@ -3,36 +3,93 @@ import {
   Button,
   Card,
   CardContent,
-  IconButton,
-  TextField,
+  Pagination,
   Typography,
 } from '@mui/material'
-import { useQuery } from '@apollo/client/react'
-import { Link } from 'react-router-dom'
+import { useMutation, useQuery } from '@apollo/client/react'
+import { REMOVE_DECK } from '../queries'
+
+import { Link, useNavigate } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
 import { GET_ONE_DECK } from '../queries'
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
-import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft'
+import { useMemo, useState } from 'react'
 import SortMenu from './SortMenu'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
+import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
+
+const deckCardsx = {
+  height: '6rem',
+  width: '10rem',
+  borderRadius: '10px',
+  border: '0.15rem solid #84582E',
+  backgroundColor: '#ffffff',
+  color: '#84582E',
+}
+
+const myButtonsSX = {
+  '&&': {
+    //width: 'fit-content',
+    width: '10rem',
+    alignSelf: 'center',
+    display: 'flex',
+    gap: '7px',
+    height: '50px',
+    flexShrink: '0',
+  },
+}
 
 export default function DeckView() {
   const { id: deckID } = useParams()
   const [sortBy, setSortBy] = useState('Name (a-z)')
-  const [firstItem, setFirstItem] = useState(0)
-
-  //resize pagination
-  const containerRef = useRef(null)
-  const [itemsPerRow, setItemsPerRow] = useState(1)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [deletePanelOpen, setDeletePanelOpen] = useState(false)
+  const navigate = useNavigate()
 
   const deckResults = useQuery(GET_ONE_DECK, {
     variables: { deckID: deckID },
     skip: !deckID,
   })
-
-  const cardsPerPage = itemsPerRow * 5
   const deck = deckResults.data?.getOneDeck
+
+  const [removeDeck] = useMutation(REMOVE_DECK, {
+    update: (cache, response) => {
+      cache.modify({
+        fields: {
+          getMyDecks(existingDeckRefs = [], { readField }) {
+            return existingDeckRefs.filter(
+              (deckRef) =>
+                readField('id', deckRef) !== response.data.removeDeck,
+            )
+          },
+          getAllDecks(existingDeckRefs, { readField }) {
+            if (!existingDeckRefs) return existingDeckRefs
+
+            return {
+              ...existingDeckRefs,
+              myDecks: existingDeckRefs.myDecks.filter(
+                (deckRef) =>
+                  readField('id', deckRef) !== response.data.removeDeck,
+              ),
+            }
+          },
+        },
+      })
+      navigate('/')
+    },
+    onError: (error) => {
+      console.log(error.message)
+    },
+  })
+
+  const tryRemoveDeck = async () => {
+    await removeDeck({
+      variables: {
+        deckID: deckID,
+      },
+    })
+    setDeletePanelOpen(false)
+  }
 
   const sortedCards = useMemo(() => {
     if (!deck) return []
@@ -53,47 +110,23 @@ export default function DeckView() {
     })
   }, [deck, sortBy])
 
-  useLayoutEffect(() => {
-    const grid = containerRef.current
-
-    if (!grid) return
-
-    const updateItemsPerRow = () => {
-      const children = [...grid.children]
-
-      if (children.length === 0) {
-        setItemsPerRow(1)
-        return
-      }
-
-      const firstRowTop = children[0].offsetTop
-
-      const count = children.filter(
-        (child) => child.offsetTop === firstRowTop,
-      ).length
-
-      setItemsPerRow(count)
-    }
-
-    // Calculate initially
-    updateItemsPerRow()
-
-    // Recalculate whenever the grid changes size
-    const observer = new ResizeObserver(updateItemsPerRow)
-    observer.observe(grid)
-
-    return () => observer.disconnect()
-  }, [sortedCards])
+  const cardsPerPage = 24
+  const currentLeftItem = (currentPage - 1) * cardsPerPage
+  const paginationCount = Math.trunc(sortedCards.length / cardsPerPage) + 1
 
   const visibleCardsInDeck = sortedCards.slice(
-    firstItem,
-    firstItem + cardsPerPage,
+    currentLeftItem,
+    currentLeftItem + cardsPerPage,
   )
 
   if (deckResults.loading) return <div>loading...</div>
 
   if (deckResults.error || !deck) {
     return <div>{deckResults.error.message}</div>
+  }
+
+  const handlePageChangePublic = (event, value) => {
+    setCurrentPage(value)
   }
 
   const headerUI = () => {
@@ -117,21 +150,12 @@ export default function DeckView() {
     )
   }
 
-  const myButtonsSX = {
-    '&&': {
-      //width: 'fit-content',
-      width: '10rem',
-      alignSelf: 'center',
-      display: 'flex',
-      gap: '7px',
-      height: '50px',
-      flexShrink: '0',
-    },
-  }
-
   const buttonsUIMine = () => {
     return (
-      <Box className='flexRow deckViewButtons'>
+      <Box
+        className='flexRow deckViewButtons'
+        sx={{ justifyContent: 'space-between' }}
+      >
         <Box className='flexRow deckViewButtons' sx={{ gap: '10px' }}>
           <Button
             className='buttonStyle3D'
@@ -144,7 +168,7 @@ export default function DeckView() {
           </Button>
 
           <Button
-            onClick={() => console.log('test')}
+            onClick={() => setDeletePanelOpen(true)}
             className='buttonStyle3D warning'
             variant='contained'
             sx={myButtonsSX}
@@ -160,25 +184,14 @@ export default function DeckView() {
     )
   }
 
-  const deckCardsx = {
-    height: '6rem',
-    width: '10rem',
-    borderRadius: '10px',
-    border: '0.15rem solid #84582E',
-    backgroundColor: '#ffffff',
-    color: '#84582E',
-  }
-
   const deckLAyoutUI = () => {
     return (
       <Box
-        ref={containerRef}
         sx={{
           gridTemplateColumns: 'repeat(auto-fill, 160px)',
           display: 'grid',
           justifyContent: 'space-between',
           gap: '10px',
-          maxHeight: 'calc(30rem + 60px)',
           padding: '.2rem 1rem',
           overflow: 'auto',
           alignContent: 'start',
@@ -217,14 +230,35 @@ export default function DeckView() {
     )
   }
 
-  console.log(itemsPerRow)
+  const closePopup = () => {
+    setDeletePanelOpen(false)
+  }
 
   return (
     <Box className='flexColumn' sx={{ gap: '30px' }}>
-      {headerUI()}
-      {buttonsUIMine()}
+      <Box className='flexColumn' sx={{ gap: '30px', padding: '0 1rem' }}>
+        {headerUI()}
+        {buttonsUIMine()}
+      </Box>
+
       <br />
       {deckLAyoutUI()}
+      <Box sx={{ justifyItems: 'center' }}>
+        {paginationCount > 1 && (
+          <Pagination
+            page={currentPage}
+            count={paginationCount}
+            variant='outlined'
+            onChange={handlePageChangePublic}
+          />
+        )}
+      </Box>
+
+      <ConfirmDeleteDialogue
+        open={deletePanelOpen}
+        onConfirm={tryRemoveDeck}
+        setDeckToDelete={closePopup}
+      />
     </Box>
   )
 }
