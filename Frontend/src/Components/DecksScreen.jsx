@@ -1,5 +1,11 @@
 import { useQuery } from '@apollo/client/react'
-import { Button, Box, ToggleButtonGroup, ToggleButton } from '@mui/material'
+import {
+  Button,
+  Box,
+  ToggleButtonGroup,
+  ToggleButton,
+  Typography,
+} from '@mui/material'
 import { useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { GET_ALL_DECKS } from '../queries'
@@ -7,10 +13,24 @@ import DeckObject from './DeckObject'
 import Pagination from '@mui/material/Pagination'
 import StartGameDrawer from './Popups/StartGameDrawer'
 import ListOfMyDecks from './ListOfMyDecks'
+import Divider from '@mui/material/Divider'
+
+const toggleButtonSX = {
+  borderStyle: 'none',
+  color: 'black',
+  textTransform: 'none',
+  fontSize: '1.2rem',
+  '&&': {
+    borderRadius: '10px',
+  },
+  '&.Mui-selected, &:hover, &.Mui-selected:hover': {
+    backgroundColor: '#9F4B24',
+    color: 'white',
+  },
+}
 
 const DecksScreen = () => {
   const decksPerPage = 8
-  //const [currentPageMine, setCurrentPageMine] = useState(1)
   const [currentPagePublic, setCurrentPagePublic] = useState(1)
   const [currentDeckTab, setCurrentDeckTab] = useState('mine')
   const navigate = useNavigate()
@@ -18,7 +38,6 @@ const DecksScreen = () => {
   const [searchParams] = useSearchParams()
 
   //use to indicate the left most deck recorded for pagination purposes
-  //const [leftMine, setLeftMine] = useState(0)
   const [leftPublic, setLeftPublic] = useState(0)
 
   const deckResults = useQuery(GET_ALL_DECKS)
@@ -37,9 +56,11 @@ const DecksScreen = () => {
         null)
 
   const boxSX = {
+    gridTemplateColumns: 'repeat(auto-fill, 266px)',
+    display: 'grid',
+    justifyContent: 'space-between',
     height: 'auto',
     flexFlow: 'wrap',
-    display: 'flex',
     gap: '10px',
   }
 
@@ -48,27 +69,21 @@ const DecksScreen = () => {
     else navigate(`?deck=${deck.id}`, { replace: true })
   }
 
-  // const handlePageChangeMine = (event, value) => {
-  //   setCurrentPageMine(value)
-  //   setLeftMine(decksPerPage * (value - 1))
-  // }
-
   const handlePageChangePublic = (event, value) => {
     setCurrentPagePublic(value)
     setLeftPublic(decksPerPage * (value - 1))
   }
 
-  //const visibleDecksMine = myDecks.slice(leftMine, leftMine + decksPerPage)
   const visibleDecksPublic = publicDecks.slice(
     leftPublic,
     leftPublic + decksPerPage,
   )
 
-  //const paginationCountMine = Math.trunc(myDecks.length / decksPerPage) + 1
   const paginationCountPublic =
     Math.trunc(publicDecks.length / decksPerPage) + 1
 
-  const handleAddStyle = (event, newAlignment) => {
+  const handleDeckTab = (event, newAlignment) => {
+    console.log(newAlignment)
     if (newAlignment !== null) {
       setCurrentDeckTab(newAlignment)
     }
@@ -77,78 +92,98 @@ const DecksScreen = () => {
   const screenToggle = () => {
     return (
       <ToggleButtonGroup
-        // sx={styleToggleSX}
+        sx={{ gap: '15px' }}
         value={currentDeckTab}
         exclusive
-        onChange={handleAddStyle}
+        onChange={handleDeckTab}
         aria-label='deck tab'
       >
-        <ToggleButton
-          // sx={styleToggleButtonSX}
-          value='mine'
-          aria-label='mine'
-        >
+        <ToggleButton value='mine' aria-label='mine' sx={toggleButtonSX}>
           My Decks
         </ToggleButton>
         <ToggleButton
-          // sx={styleToggleButtonSX}
           value='community'
           aria-label='community'
+          sx={toggleButtonSX}
         >
-          Community Decks
+          Community
         </ToggleButton>
       </ToggleButtonGroup>
     )
   }
 
-  return (
-    <>
-      <h1>Start Game</h1>
+  const myDecksPage = () => {
+    if (myDecks.length === 0)
+      return (
+        <Typography variant='h5' sx={{ color: '#3A1605' }}>
+          No Decks Found ...{' '}
+        </Typography>
+      )
 
-      {screenToggle()}
-
-      <h2>My Decks</h2>
+    return (
       <Box sx={boxSX}>
         <ListOfMyDecks setSelectedDeck={openRightPanel} />
       </Box>
-      {/* {paginationCountMine > 1 && (
-        <Pagination
-          page={currentPageMine}
-          count={paginationCountMine}
-          variant='outlined'
-          onChange={handlePageChangeMine}
-        />
-      )} */}
+    )
+  }
+  const communityDecksPage = () => {
+    if (visibleDecksPublic.length === 0)
+      return (
+        <Typography variant='h5' sx={{ color: '#3A1605' }}>
+          No Decks Found ...{' '}
+        </Typography>
+      )
+    return (
+      <>
+        <Box sx={boxSX}>
+          {visibleDecksPublic.map((deck, i) => (
+            <DeckObject
+              key={i}
+              deck={deck}
+              type={'public'}
+              setSelectedDeck={openRightPanel}
+            />
+          ))}
+        </Box>
 
-      <h2>Public Decks</h2>
-      <Box sx={boxSX}>
-        {visibleDecksPublic.map((deck, i) => (
-          <DeckObject
-            key={i}
-            deck={deck}
-            type={'public'}
-            setSelectedDeck={openRightPanel}
+        {paginationCountPublic > 1 && (
+          <Pagination
+            page={currentPagePublic}
+            count={paginationCountPublic}
+            variant='outlined'
+            onChange={handlePageChangePublic}
           />
-        ))}
-      </Box>
-      {paginationCountPublic > 1 && (
-        <Pagination
-          page={currentPagePublic}
-          count={paginationCountPublic}
-          variant='outlined'
-          onChange={handlePageChangePublic}
-        />
-      )}
+        )}
+      </>
+    )
+  }
 
-      <Button component={Link} to='/'>
-        Go Back
-      </Button>
+  return (
+    <Box className='flexColumn' sx={{ gap: '20px' }}>
+      <Typography variant='h2' sx={{ color: '#3A1605' }}>
+        Choose a Deck
+      </Typography>
+
+      {screenToggle()}
+
+      <Divider
+        sx={{
+          borderColor: '#84582E',
+          margin: '2rem 0',
+          borderBottomWidth: '.15rem',
+        }}
+      />
+
+      {currentDeckTab === 'mine' && myDecksPage()}
+
+      {currentDeckTab === 'community' && communityDecksPage()}
+
       <StartGameDrawer
         open={deckToDisplay !== null}
         setSelectedDeck={openRightPanel}
         selectedDeck={deckToDisplay}
       />
-    </>
+    </Box>
   )
 }
 
