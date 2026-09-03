@@ -136,11 +136,12 @@ const MakeDeckScreen = () => {
   const [cardToAdd, setCardToAdd] = useState('')
   const [openPopup, setOpenPopup] = useState(false)
 
-  const [notes, setNotes] = useState('')
-  const [filterDeck, setFilterDeck] = useState('')
   const [deckName, setDeckName] = useState('')
   const [allCards, setAllCards] = useState([])
   const [isPublicDeck, setIsPublicDeck] = useState(false)
+  const [notes, setNotes] = useState('')
+
+  const [filterDeck, setFilterDeck] = useState('')
   //const [selectMultiple, setSelectMultiple] = useState(false)
 
   const [importWords, setImportWords] = useState('')

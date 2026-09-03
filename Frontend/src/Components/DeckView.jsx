@@ -17,6 +17,7 @@ import SortMenu from './SortMenu'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
 import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
+import Divider from '@mui/material/Divider'
 
 const deckCardsx = {
   height: '6rem',
@@ -235,17 +236,36 @@ export default function DeckView() {
   }
 
   return (
-    <Box className='flexColumn' sx={{ gap: '30px' }}>
+    <Box className='flexColumn' sx={{ gap: '10px' }}>
       <Box className='flexColumn' sx={{ gap: '30px', padding: '0 1rem' }}>
         {headerUI()}
         {buttonsUIMine()}
       </Box>
 
-      <br />
+      <Divider
+        sx={{
+          borderColor: '#84582E',
+          margin: '2rem 0',
+          borderBottomWidth: '.15rem',
+        }}
+      />
       {deckLAyoutUI()}
       <Box sx={{ justifyItems: 'center' }}>
         {paginationCount > 1 && (
           <Pagination
+            sx={{
+              '& .MuiPaginationItem-root': {
+                color: '#84582E',
+                borderColor: '#84582E',
+              },
+              '& .Mui-selected': {
+                color: 'white',
+                backgroundColor: '#84582E',
+              },
+              '& .MuiPaginationItem-previousNext': {
+                borderStyle: 'none',
+              },
+            }}
             page={currentPage}
             count={paginationCount}
             variant='outlined'
