@@ -129,8 +129,8 @@ Button.buttonStyle3D.Mui-disabled,
 a.buttonStyle3D.Mui-disabled {
   top: 6px;
   left: 0px;
-  background-color: #808080;
-  border-color: #5d5d5d;
+  /* background-color: #808080;
+  border-color: #5d5d5d; */
 }
 
 Button.buttonStyle3D.Mui-disabled::after,
@@ -161,7 +161,8 @@ a.buttonStyle3D::after {
   border-color: #414141;
 }
 
-.confirmDelete Button.buttonStyle3D.warning {
+.confirmDelete Button.buttonStyle3D.warning,
+.deckViewButtons Button.buttonStyle3D.warning {
   background-color: #b43131;
   border-color: #690f0f;
 }
@@ -171,7 +172,8 @@ a.buttonStyle3D::after {
   border-color: #414141;
 }
 
-.confirmDelete Button.buttonStyle3D.warning:after {
+.confirmDelete Button.buttonStyle3D.warning:after,
+.deckViewButtons Button.buttonStyle3D.warning:after {
   background-color: #881c1c;
   border-color: #690f0f;
 }

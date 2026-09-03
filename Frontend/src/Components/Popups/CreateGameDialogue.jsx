@@ -7,7 +7,7 @@ import DialogTitle from '@mui/material/DialogTitle'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { START_GAME, ME } from '../../queries'
-import NumberField from '.././NumberField'
+import NumberField from '../NumberField'
 
 function CreateGameDialogue({ id, setID }) {
   const [mistakeLimit, setMistakeLimit] = useState(-1)

@@ -3,82 +3,15 @@ import { useMutation, useQuery } from '@apollo/client/react'
 import '@fontsource/suwannaphum'
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined'
 import { Box, Button, Typography } from '@mui/material'
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { COPY_DECK, GET_MY_DECKS, MAKE_DECK, REMOVE_DECK } from '../queries'
-import DeckObject from './DeckObject'
-import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
+import { GET_MY_DECKS, MAKE_DECK } from '../queries'
 import NotificationPopup from './Popups/NotificationPopup'
+import ListOfMyDecks from './ListOfMyDecks'
 
 const MyDecks = () => {
   const navigate = useNavigate()
 
-  const [openCreatePopup, setOpenCreatePopup] = useState(false)
-  const [openRemovePopup, setOpenRemovePopup] = useState(false)
-
-  const [selectedDeck, setSelectedDeck] = useState(null)
   const deckResults = useQuery(GET_MY_DECKS)
-
-  const [copyDeck] = useMutation(COPY_DECK, {
-    update(cache, { data }) {
-      const newRef = cache.writeFragment({
-        data: data.copyDeck,
-        fragment: gql`
-          fragment Deck on Deck {
-            id
-            owner {
-              __typename
-              username
-              id
-            }
-            name
-            public
-            cards
-          }
-        `,
-      })
-
-      //if i ever add pagination, this may not be a good thing to do anymore
-      cache.modify({
-        fields: {
-          getMyDecks(existing = []) {
-            return [...existing, newRef]
-          },
-          getAllDecks(existing = []) {
-            return [...existing, newRef]
-          },
-        },
-      })
-
-      setOpenCreatePopup(true)
-    },
-  })
-
-  const [removeDeck] = useMutation(REMOVE_DECK, {
-    update: (cache, response) => {
-      cache.modify({
-        fields: {
-          getMyDecks(existingDeckRefs = [], { readField }) {
-            return existingDeckRefs.filter(
-              (deckRef) =>
-                readField('id', deckRef) !== response.data.removeDeck,
-            )
-          },
-          getAllDecks(existingDeckRefs = [], { readField }) {
-            return existingDeckRefs.filter(
-              (deckRef) =>
-                readField('id', deckRef) !== response.data.removeDeck,
-            )
-          },
-        },
-      })
-
-      setOpenRemovePopup(true)
-    },
-    onError: (error) => {
-      console.log(error.message)
-    },
-  })
 
   const [makeDeck] = useMutation(MAKE_DECK, {
     refetchQueries: [GET_MY_DECKS],
@@ -116,8 +49,6 @@ const MyDecks = () => {
   })
 
   if (deckResults.loading) return <div>LOADING...</div>
-
-  const decks = deckResults.data.getMyDecks
 
   const boxSX = {
     display: 'flex',
@@ -159,23 +90,6 @@ const MyDecks = () => {
     await makeDeck()
   }
 
-  const tryMakeCopy = async (deckID) => {
-    await copyDeck({
-      variables: {
-        deckID: deckID,
-      },
-    })
-  }
-
-  const tryRemoveDeck = async () => {
-    await removeDeck({
-      variables: {
-        deckID: selectedDeck,
-      },
-    })
-    setSelectedDeck(null)
-  }
-
   return (
     <Box>
       <Typography
@@ -192,33 +106,8 @@ const MyDecks = () => {
           </Box>
         </Button>
 
-        {decks.map((deck, i) => (
-          <DeckObject
-            key={i}
-            deck={deck}
-            type={'edit'}
-            tryMakeDeck={tryMakeCopy}
-            setSelectedDeck={setSelectedDeck}
-          />
-        ))}
+        <ListOfMyDecks />
       </Box>
-      <ConfirmDeleteDialogue
-        open={selectedDeck !== null}
-        onConfirm={tryRemoveDeck}
-        setSelectedDeck={setSelectedDeck}
-      />
-      <NotificationPopup
-        message={'Deck Created'}
-        color={'success'}
-        open={openCreatePopup}
-        setOpen={setOpenCreatePopup}
-      />
-      <NotificationPopup
-        message={'Deck Removed'}
-        color={'success'}
-        open={openRemovePopup}
-        setOpen={setOpenRemovePopup}
-      />
     </Box>
   )
 }

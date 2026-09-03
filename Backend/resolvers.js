@@ -181,6 +181,7 @@ const resolvers = {
         name: deck.name,
         public: deck.public,
         cards: deck.cards,
+        notes: deck.notes ?? '',
       }))
 
       return {
@@ -188,9 +189,37 @@ const resolvers = {
         publicDecks: publicDecksObject,
       }
     },
+    getOneDeck: async (root, args, context) => {
+      checkIsLoggedIn(context)
+
+      const deck = await Deck.findById(args.deckID).populate('owner')
+
+      if (!deck || !(deck.owner._id.equals(context.user._id) || deck.public))
+        deckNotFoundError()
+
+      return {
+        id: deck._id,
+        owner: {
+          username: deck.owner.username,
+          id: deck.owner._id,
+        },
+        name: deck.name,
+        public: deck.public,
+        cards: deck.cards,
+        notes: deck.notes ?? '',
+      }
+    },
   },
   Mutation: {
     startGame: async (root, args, context) => {
+      /*
+        deckID: ID!
+        gridsX: Int
+        gridsY: Int
+        turnLimit: Int
+        mistakeLimit: Int
+        wordsPerHint: Int
+      */
       const deck = await Deck.findById(args.deckID)
       if (!deck) deckNotFoundError()
 
@@ -625,7 +654,7 @@ const resolvers = {
         name: deck.name,
         public: false,
         cards: deck.cards,
-        notes: deck.notes,
+        notes: deck.notes ?? '',
       })
 
       await newDeck.save()
@@ -639,7 +668,7 @@ const resolvers = {
         name: newDeck.name,
         public: newDeck.public,
         cards: newDeck.cards,
-        notes: newDeck.notes,
+        notes: newDeck.notes ?? '',
       }
     },
   },
