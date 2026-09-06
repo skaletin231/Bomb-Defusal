@@ -8,8 +8,9 @@ import {
 } from '@mui/material'
 import { useMutation, useQuery } from '@apollo/client/react'
 import { REMOVE_DECK } from '../queries'
+import '@fontsource/suwannaphum'
 
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
 import { GET_ONE_DECK } from '../queries'
 import { useMemo, useState } from 'react'
@@ -41,6 +42,7 @@ const myButtonsSX = {
 }
 
 export default function DeckView() {
+  const location = useLocation()
   const { id: deckID } = useParams()
   const [sortBy, setSortBy] = useState('Name (a-z)')
   const [currentPage, setCurrentPage] = useState(1)
@@ -53,6 +55,7 @@ export default function DeckView() {
   })
   const deck = deckResults.data?.getOneDeck
 
+  const from = location.state?.from
   const [removeDeck] = useMutation(REMOVE_DECK, {
     update: (cache, response) => {
       cache.modify({
@@ -76,7 +79,8 @@ export default function DeckView() {
           },
         },
       })
-      navigate('/')
+      console.log('in delete', from)
+      navigate(from ?? '/', { replace: true })
     },
     onError: (error) => {
       console.log(error.message)
@@ -132,8 +136,15 @@ export default function DeckView() {
 
   const headerUI = () => {
     return (
-      <Box>
-        <Typography variant='h2' sx={{ fontWeight: 'bold', color: '#3A1605' }}>
+      <Box className='flexColumn' sx={{ gap: '15px' }}>
+        <Typography
+          variant='h2'
+          sx={{
+            fontFamily: '"Suwannaphum", serif',
+            fontWeight: 'bold',
+            color: '#3A1605',
+          }}
+        >
           {deck.name}
         </Typography>
         <Box className='flexRow' sx={{ gap: '10px' }}>
@@ -146,7 +157,9 @@ export default function DeckView() {
           </Typography>
         </Box>
 
-        <Typography>{deck.cards.notes}</Typography>
+        <Typography sx={{ color: '#3A1605', width: '70%' }}>
+          {deck.notes}
+        </Typography>
       </Box>
     )
   }
@@ -236,7 +249,10 @@ export default function DeckView() {
   }
 
   return (
-    <Box className='flexColumn' sx={{ gap: '10px' }}>
+    <Box
+      className='flexColumn'
+      sx={{ gap: '10px', marginInline: 'auto', maxWidth: '80rem' }}
+    >
       <Box className='flexColumn' sx={{ gap: '30px', padding: '0 1rem' }}>
         {headerUI()}
         {buttonsUIMine()}
@@ -250,7 +266,7 @@ export default function DeckView() {
         }}
       />
       {deckLAyoutUI()}
-      <Box sx={{ justifyItems: 'center' }}>
+      <Box sx={{ justifyItems: 'center', marginTop: '30px' }}>
         {paginationCount > 1 && (
           <Pagination
             sx={{
@@ -258,7 +274,11 @@ export default function DeckView() {
                 color: '#84582E',
                 borderColor: '#84582E',
               },
-              '& .Mui-selected': {
+              '& .MuiPaginationItem-root.Mui-selected': {
+                color: 'white',
+                backgroundColor: '#84582E',
+              },
+              '& .MuiPaginationItem-root:hover': {
                 color: 'white',
                 backgroundColor: '#84582E',
               },

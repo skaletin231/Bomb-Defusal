@@ -49,11 +49,9 @@ const DecksScreen = () => {
 
   const deckURL = searchParams.get('deck')
   const deckToDisplay =
-    deckURL === null
-      ? null
-      : (myDecks.find((x) => x.id === deckURL) ??
-        publicDecks.find((x) => x.id === deckURL) ??
-        null)
+    myDecks.find((x) => x.id === deckURL) ??
+    publicDecks.find((x) => x.id === deckURL) ??
+    null
 
   const boxSX = {
     gridTemplateColumns: 'repeat(auto-fill, 266px)',

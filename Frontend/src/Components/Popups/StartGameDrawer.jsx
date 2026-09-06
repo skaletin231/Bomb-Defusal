@@ -15,7 +15,7 @@ import AddIcon from '@mui/icons-material/Add'
 import RemoveIcon from '@mui/icons-material/Remove'
 import VisibilityIcon from '@mui/icons-material/Visibility'
 import EditIcon from '@mui/icons-material/Edit'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { START_GAME, ME } from '../../queries'
 import { useMutation } from '@apollo/client/react'
 import { Link } from 'react-router-dom'
@@ -75,6 +75,7 @@ export default function StartGameDrawer({
   setSelectedDeck,
   selectedDeck,
 }) {
+  const location = useLocation()
   const [gridSizeX, setGridSizeX] = useState(5)
   const [gridSizeY, setGridSizeY] = useState(5)
 
@@ -192,7 +193,11 @@ export default function StartGameDrawer({
               </Typography>
             </Box>
             <Box className='flexRow'>
-              <Button component={Link} to={`/decks/${selectedDeck?.id}`}>
+              <Button
+                component={Link}
+                to={`/decks/${selectedDeck?.id}`}
+                state={{ from: location.pathname }}
+              >
                 <VisibilityIcon sx={{ color: '#84582E' }} />
               </Button>
               <Button component={Link} to={`/mydecks/${selectedDeck?.id}`}>
