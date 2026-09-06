@@ -5,7 +5,6 @@ import bomb from '../../images/bomb.svg'
 import JoinGameDialogue from './Popups/JoinGameDialogue'
 import JoinGameDialogueNew from './Popups/JoinGameDialogueNew'
 
-
 const boxStyle = {
   justifyContent: 'space-evenly',
   display: 'flex',
@@ -50,8 +49,8 @@ const HomePage = () => {
           </Button>
         </Box>
       </Container>
-      <JoinGameDialogue open={open} setOpen={setOpen} />
-      <JoinGameDialogueNew opne={open} onConfirm={() => console.log('test')}/>
+      {/* <JoinGameDialogue open={open} setOpen={setOpen} /> */}
+      <JoinGameDialogueNew open={open} setOpen={setOpen} />
     </Box>
   )
 }

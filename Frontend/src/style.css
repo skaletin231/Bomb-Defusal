@@ -167,6 +167,11 @@ a.buttonStyle3D::after {
   border-color: #690f0f;
 }
 
+.homePage Button.buttonStyle3D.JoinGameButton {
+  background-color: #b36c1b;
+  border-color: #834724;
+}
+
 .confirmDelete Button.buttonStyle3D.cancel:after {
   background-color: #5d5d5d;
   border-color: #414141;
@@ -176,6 +181,11 @@ a.buttonStyle3D::after {
 .deckViewButtons Button.buttonStyle3D.warning:after {
   background-color: #881c1c;
   border-color: #690f0f;
+}
+
+.homePage Button.buttonStyle3D.JoinGameButton:after {
+  background-color: #9d501c;
+  border-color: #834724;
 }
 
 Button.buttonStyle3D:hover,

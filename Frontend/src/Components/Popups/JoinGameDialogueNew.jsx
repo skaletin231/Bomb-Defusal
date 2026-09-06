@@ -5,55 +5,74 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import TextField from '@mui/material/TextField'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
-import { Typography } from '@mui/material'
+import { IconButton, Typography } from '@mui/material'
+import { useMutation } from '@apollo/client/react'
+import { JOIN_GAME, ME } from '../../queries'
+import { useNavigate } from 'react-router-dom'
+import CloseIcon from '@mui/icons-material/Close'
 
-function ConfirmDeleteDialogue({ open, setDeckToDelete, onConfirm }) {
+function JoinGameDialogueNew({ open, setOpen }) {
+  console.log(open)
   const handleClose = () => {
-    setDeckToDelete(null)
+    setOpen(false)
   }
 
+  const [joinGame] = useMutation(JOIN_GAME, {
+    refetchQueries: [ME],
+  })
+  const navigate = useNavigate()
+
   const dialogueSX = {
-    borderColor: '#881C1C',
+    borderColor: '#834724',
     borderStyle: 'solid',
     borderWidth: '4px',
     backgroundColor: '#FFFBF3',
     width: '50vw',
-    padding: '2.5rem',
+    padding: '6rem',
     borderRadius: '20px',
   }
 
-  const actionSX = {
-    justifyContent: 'space-around',
-    isolation: 'isolate',
-    padding: '8px 0px 0px 0px',
-  }
-
   const contentSX = {
-    textAlign: 'center',
-    padding: '0px 0px 20px 0px',
+    isolation: 'isolate',
   }
 
-  const warningSX = {
-    color: '#B43131',
-    fontSize: '4rem',
+  const joinButtonSX = {
+    '&&': {
+      alignSelf: 'center',
+      height: '50px',
+      flexShrink: '0',
+    },
   }
 
-  const headerSX = {
-    color: '#3A1605',
-    fontSize: '1.8rem',
-    fontWeight: 'bold',
-  }
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    const formData = new FormData(event.currentTarget)
+    const formJson = Object.fromEntries(formData.entries())
 
-  const textSX = {
-    color: '#737373',
-    fontStyle: 'italic',
+    try {
+      const result = await joinGame({
+        variables: {
+          gameID: formJson.gameID.trim(),
+        },
+      })
+
+      if (result.data === null || result.data.joinGame === null) return
+
+      navigate(`/playing/${result.data.joinGame.id}`)
+    } catch (error) {
+      if (error?.errors?.[0]?.extensions?.code === 'INTERNAL_SERVER_ERROR') {
+        console.error(`Invalid ID recieved: ${formJson.gameID}`)
+      } else {
+        console.error(error)
+      }
+    }
   }
 
   return (
     <Dialog
-      className='confirmDelete'
+      className='confirmJoin'
       open={open}
-      onClose={(event, reason) => handleClose(event, reason)}
+      onClose={handleClose}
       slotProps={{
         paper: {
           sx: dialogueSX,
@@ -61,29 +80,66 @@ function ConfirmDeleteDialogue({ open, setDeckToDelete, onConfirm }) {
         },
       }}
     >
-      <DialogContent sx={contentSX}>
-        <WarningAmberIcon sx={warningSX} />
-        <Typography sx={headerSX}>Are you sure?</Typography>
-        <Typography sx={textSX}>This action cannot be undone.</Typography>
-      </DialogContent>
-      <DialogActions sx={actionSX}>
-        <Button
-          className='buttonStyle3D cancel'
-          variant='contained'
+      <DialogTitle
+        variant='h3'
+        sx={{
+          textAlign: 'center',
+          color: '#3A1605',
+          fontWeight: 'bold',
+          padding: '0 0 3.5rem 0',
+        }}
+      >
+        Join Game
+        <IconButton
+          aria-label='close'
           onClick={handleClose}
+          sx={{
+            position: 'absolute',
+            right: 8,
+            top: 8,
+          }}
         >
-          Cancel
-        </Button>
-        <Button
-          className='buttonStyle3D warning'
-          variant='contained'
-          onClick={onConfirm}
+          <CloseIcon
+            sx={{
+              fontSize: '3rem',
+            }}
+          />
+        </IconButton>
+      </DialogTitle>
+      <DialogContent sx={contentSX}>
+        <form
+          className='flexRow'
+          onSubmit={handleSubmit}
+          id='join-game-form'
+          style={{ gap: '20px' }}
         >
-          Delete
-        </Button>
-      </DialogActions>
+          <TextField
+            variant='outlined'
+            autoFocus
+            required
+            id='gameID'
+            name='gameID'
+            placeholder='Enter Invite Code'
+            className='textFieldStyle3D'
+            sx={{
+              '& input::placeholder': {
+                fontStyle: 'italic',
+              },
+            }}
+          />
+
+          <Button
+            sx={joinButtonSX}
+            className='buttonStyle3D'
+            variant='contained'
+            type='submit'
+          >
+            Join
+          </Button>
+        </form>
+      </DialogContent>
     </Dialog>
   )
 }
 
-export default ConfirmDeleteDialogue
+export default JoinGameDialogueNew
