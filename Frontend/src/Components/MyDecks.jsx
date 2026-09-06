@@ -3,13 +3,14 @@ import { useMutation, useQuery } from '@apollo/client/react'
 import '@fontsource/suwannaphum'
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined'
 import { Box, Button, Typography } from '@mui/material'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { GET_MY_DECKS, MAKE_DECK } from '../queries'
 import NotificationPopup from './Popups/NotificationPopup'
 import ListOfMyDecks from './ListOfMyDecks'
 
 const MyDecks = () => {
   const navigate = useNavigate()
+  const location = useLocation()
 
   const deckResults = useQuery(GET_MY_DECKS)
 
@@ -90,6 +91,14 @@ const MyDecks = () => {
     await makeDeck()
   }
 
+  const goToDeckPage = (deck) => {
+    navigate(`/decks/${deck.id}`, { 
+      state: { 
+        from:location.pathname
+      } 
+    })
+  }
+
   return (
     <Box>
       <Typography
@@ -106,7 +115,7 @@ const MyDecks = () => {
           </Box>
         </Button>
 
-        <ListOfMyDecks />
+        <ListOfMyDecks setSelectedDeck={goToDeckPage}/>
       </Box>
     </Box>
   )

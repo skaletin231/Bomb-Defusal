@@ -12,7 +12,7 @@ import '@fontsource/suwannaphum'
 
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useParams } from 'react-router-dom'
-import { GET_ONE_DECK } from '../queries'
+import { GET_ONE_DECK, ME } from '../queries'
 import { useMemo, useState } from 'react'
 import SortMenu from './SortMenu'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
@@ -42,6 +42,9 @@ const myButtonsSX = {
 }
 
 export default function DeckView() {
+  const { data: meData } = useQuery(ME, {})
+  const me = meData.me
+
   const location = useLocation()
   const { id: deckID } = useParams()
   const [sortBy, setSortBy] = useState('Name (a-z)')
@@ -54,6 +57,8 @@ export default function DeckView() {
     skip: !deckID,
   })
   const deck = deckResults.data?.getOneDeck
+  const myDeck = me?.id === deck?.owner?.id
+  console.log(myDeck, deck)
 
   const from = location.state?.from
   const [removeDeck] = useMutation(REMOVE_DECK, {
@@ -79,7 +84,6 @@ export default function DeckView() {
           },
         },
       })
-      console.log('in delete', from)
       navigate(from ?? '/', { replace: true })
     },
     onError: (error) => {
@@ -255,7 +259,7 @@ export default function DeckView() {
     >
       <Box className='flexColumn' sx={{ gap: '30px', padding: '0 1rem' }}>
         {headerUI()}
-        {buttonsUIMine()}
+        {myDeck && buttonsUIMine()}
       </Box>
 
       <Divider
@@ -275,6 +279,10 @@ export default function DeckView() {
                 borderColor: '#84582E',
               },
               '& .MuiPaginationItem-root.Mui-selected': {
+                color: 'white',
+                backgroundColor: '#84582E',
+              },
+              '& .MuiPaginationItem-root.Mui-selected:hover': {
                 color: 'white',
                 backgroundColor: '#84582E',
               },

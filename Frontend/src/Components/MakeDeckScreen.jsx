@@ -252,8 +252,8 @@ const MakeDeckScreen = () => {
     return
   }
 
-  const removeCard = (index) => {
-    setAllCards(allCards.filter((card, i) => i !== index))
+  const removeCard = (name) => {
+    setAllCards(allCards.filter((card) => name !== card))
   }
 
   const handleAddStyle = (event, newAlignment) => {
@@ -365,7 +365,8 @@ const MakeDeckScreen = () => {
   const addCardUI = () => {
     return (
       <Box style={formStyle}>
-        <TextField
+        <form> 
+      <TextField
           variant='outlined'
           placeholder='Type to add a card'
           className='textFieldStyle3D'
@@ -385,6 +386,8 @@ const MakeDeckScreen = () => {
         >
           <SubdirectoryArrowLeftIcon /> Add Card
         </Button>
+        </form>
+        
       </Box>
     )
   }
@@ -498,7 +501,7 @@ const MakeDeckScreen = () => {
                     color: '#B43131',
                   }}
                   onClick={() => {
-                    removeCard(i)
+                    removeCard(card)
                     setNeedsSave(true)
                   }}
                 >
