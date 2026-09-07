@@ -6,7 +6,7 @@ import bomb from '../../images/bomb.svg'
 const navBarStyle = {
   position: 'sticky',
   top: '0px',
-  width: 'calc(100vw - 6rem)',
+  width: 'calc(100vw - 7rem)',
   zIndex: '100',
   backgroundColor: '#FFF8E9',
   height: '7vh',

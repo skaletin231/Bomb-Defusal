@@ -92,15 +92,15 @@ const MyDecks = () => {
   }
 
   const goToDeckPage = (deck) => {
-    navigate(`/decks/${deck.id}`, { 
-      state: { 
-        from:location.pathname
-      } 
+    navigate(`/decks/${deck.id}`, {
+      state: {
+        from: location.pathname,
+      },
     })
   }
 
   return (
-    <Box>
+    <Box className='content'>
       <Typography
         sx={{ fontSize: '2rem', margin: '10px 0px', fontWeight: 'bold' }}
       >
@@ -115,7 +115,7 @@ const MyDecks = () => {
           </Box>
         </Button>
 
-        <ListOfMyDecks setSelectedDeck={goToDeckPage}/>
+        <ListOfMyDecks setSelectedDeck={goToDeckPage} />
       </Box>
     </Box>
   )

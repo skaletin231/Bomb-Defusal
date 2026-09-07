@@ -362,32 +362,33 @@ const MakeDeckScreen = () => {
     )
   }
 
+  const submitForm = (event) => {
+    event?.preventDefault()
+    tryAddCardToList(cardToAdd)
+    setCardToAdd('')
+    setNeedsSave(true)
+  }
+
   const addCardUI = () => {
     return (
-      <Box style={formStyle}>
-        <form>
-          <TextField
-            variant='outlined'
-            placeholder='Type to add a card'
-            className='textFieldStyle3D'
-            value={cardToAdd}
-            onChange={({ target }) => setCardToAdd(target.value)}
-          ></TextField>
+      <form style={formStyle} onSubmit={submitForm}>
+        <TextField
+          variant='outlined'
+          placeholder='Type to add a card'
+          className='textFieldStyle3D'
+          value={cardToAdd}
+          onChange={({ target }) => setCardToAdd(target.value)}
+        ></TextField>
 
-          <Button
-            onClick={() => {
-              tryAddCardToList(cardToAdd)
-              setCardToAdd('')
-              setNeedsSave(true)
-            }}
-            variant='contained'
-            className='buttonStyle3D'
-            sx={addCardButton}
-          >
-            <SubdirectoryArrowLeftIcon /> Add Card
-          </Button>
-        </form>
-      </Box>
+        <Button
+          type='submit'
+          variant='contained'
+          className='buttonStyle3D'
+          sx={addCardButton}
+        >
+          <SubdirectoryArrowLeftIcon /> Add Card
+        </Button>
+      </form>
     )
   }
 

@@ -157,7 +157,7 @@ const DecksScreen = () => {
   }
 
   return (
-    <Box className='flexColumn' sx={{ gap: '20px' }}>
+    <Box className='flexColumn content' sx={{ gap: '20px' }}>
       <Typography variant='h2' sx={{ color: '#3A1605' }}>
         Choose a Deck
       </Typography>
