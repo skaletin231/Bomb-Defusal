@@ -149,7 +149,7 @@ const HomePage = () => {
           id='backgroundImage'
           sx={{
             width: '140vw',
-            height: '33vw',
+            height: '32.6vw',
             backgroundImage: `url(${fullScreenImageBig})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center top',

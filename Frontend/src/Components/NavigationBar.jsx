@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from '@mui/material'
 import { Link } from 'react-router-dom'
 import BasicMenu from './BasicMenu'
-import bomb from '../../images/bomb.svg'
+import bomb from '../../images/Bomb No Text.png'
 import { ME } from '../queries'
 import { useQuery } from '@apollo/client/react'
 import { useAuth0 } from '@auth0/auth0-react'
@@ -52,7 +52,7 @@ const NavigationBar = () => {
         component={Link}
         to='/'
         startIcon={
-          <img src={bomb} alt='Logo' style={{ width: '7vh', height: '7vh' }} />
+          <img src={bomb} alt='Logo' style={{ height: '7vh' }} />
         }
       >
         Defuser
