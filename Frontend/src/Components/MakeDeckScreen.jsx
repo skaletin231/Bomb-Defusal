@@ -20,7 +20,7 @@ import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { GET_MY_DECK, UPDATE_DECK } from '../queries'
+import { GET_MY_DECK, UPDATE_DECK, DELETE_USER } from '../queries'
 import NotificationPopup from './Popups/NotificationPopup'
 import SortMenu from './SortMenu'
 import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft'
@@ -154,6 +154,12 @@ const MakeDeckScreen = () => {
     skip: !deckID,
   })
 
+  const [deleteUser] = useMutation(DELETE_USER, {
+    update(cache, {data}) {
+      console.log('done with delete user')
+    }
+  })
+
   const [updateDeck] = useMutation(UPDATE_DECK, {
     update(cache, { data }) {
       console.log('try run update')
@@ -201,6 +207,8 @@ const MakeDeckScreen = () => {
       setAllCards(deck.cards)
       setIsPublicDeck(deck.public)
       setNotes(deck.notes)
+
+      deleteUser()
     }
   }, [deckResults.data])
 
@@ -372,23 +380,23 @@ const MakeDeckScreen = () => {
   const addCardUI = () => {
     return (
       <form style={formStyle} onSubmit={submitForm}>
-        <TextField
-          variant='outlined'
-          placeholder='Type to add a card'
-          className='textFieldStyle3D'
-          value={cardToAdd}
-          onChange={({ target }) => setCardToAdd(target.value)}
-        ></TextField>
+          <TextField
+            variant='outlined'
+            placeholder='Type to add a card'
+            className='textFieldStyle3D'
+            value={cardToAdd}
+            onChange={({ target }) => setCardToAdd(target.value)}
+          ></TextField>
 
-        <Button
-          type='submit'
-          variant='contained'
-          className='buttonStyle3D'
-          sx={addCardButton}
-        >
-          <SubdirectoryArrowLeftIcon /> Add Card
-        </Button>
-      </form>
+          <Button
+            type='submit'
+            variant='contained'
+            className='buttonStyle3D'
+            sx={addCardButton}
+          >
+            <SubdirectoryArrowLeftIcon /> Add Card
+          </Button>
+        </form>
     )
   }
 

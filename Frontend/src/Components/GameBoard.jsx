@@ -142,7 +142,7 @@ const GameBoard = () => {
         },
       )
 
-      if (update.gameState === 'Win' || update.gameState === 'Lose')
+      if (update.gameStateChange === 'Win' || update.gameStateChange === 'Lose')
         setOpen(true)
     },
   })

@@ -52,7 +52,7 @@ const NavigationBar = () => {
         component={Link}
         to='/'
         startIcon={
-          <img src={bomb} alt='Logo' style={{ height: '7vh' }} />
+          <img src={bomb} alt='Logo' style={{ height: '6.5vh' }} />
         }
       >
         Defuser

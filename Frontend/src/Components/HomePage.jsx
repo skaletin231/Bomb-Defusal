@@ -162,7 +162,7 @@ const HomePage = () => {
       <Box className='content'>
         <Box
           className='mainContent flexColumn'
-          sx={{ height: 'calc(93vh - 33vw)' }}
+          sx={{ height: 'calc(93vh - 32.6vw)' }}
         >
           <div
             className={'background'}

@@ -81,6 +81,7 @@ const typeDefs = /* GraphQL */ `
     makeMove(gameID: ID!, index: Int!): Game
     endTurn(gameID: ID!): Game
     addUser(username: String!, email: String!, auth0_ID: String!): User
+    deleteUser: Boolean!
     updateUserInfo(username: String!): User
     sendMessage(gameID: ID!, text: String!): ChatMessage
     sendHint(gameID: ID!, hint: String!, count: Int!): Hint

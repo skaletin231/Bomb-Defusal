@@ -29,6 +29,14 @@ const gameStates = {
 const { GraphQLError } = require('graphql')
 const { GraphQLDateTime } = require('graphql-scalars')
 
+const { ManagementClient } = require("auth0")
+
+const management = new ManagementClient({
+  domain: process.env.AUTH0_DOMAIN,
+  clientId: process.env.AUTH0_M2M_CLIENT_ID,
+  clientSecret: process.env.AUTH0_M2M_CLIENT_SECRET,
+})
+
 const resolvers = {
   DateTime: GraphQLDateTime,
   Query: {
@@ -474,6 +482,14 @@ const resolvers = {
       await newUser.save()
 
       return { ...newUser, isGuest: false }
+    },
+    deleteUser: async (root, _, context) => {
+      checkIsLoggedIn(context)
+      console.log(context.user)
+
+
+      //await management.users.delete(auth0UserId)
+      return true
     },
     updateUserInfo: async (root, args, context) => {
       checkIsLoggedIn(context)

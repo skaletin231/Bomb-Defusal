@@ -78,6 +78,12 @@ export const SEND_MESSAGE = gql`
   }
 `
 
+export const DELETE_USER = gql`
+  mutation {
+    deleteUser
+  }
+`
+
 export const JOIN_GAME = gql`
   mutation joinGame($gameID: ID!) {
     joinGame(gameID: $gameID) {
