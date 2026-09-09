@@ -59,6 +59,7 @@ const gameStates = {
   win: 'Win',
   lose: 'Lose',
   playing: 'Playing',
+  waiting: 'waiting',
 }
 
 const GameBoard = () => {
@@ -166,6 +167,8 @@ const GameBoard = () => {
             getGame: {
               ...data.getGame,
               players: [...data.getGame.players, update.gameUser],
+              gameState: update.gameStateChange,
+              currentPlayer: update.turnChange.turnUpdate,
             },
           }
         },
@@ -239,7 +242,7 @@ const GameBoard = () => {
 
   const trySetSelected = (selected) => {
     if (
-      me.id === game.currentPlayer.id &&
+      me.id === game.currentPlayer?.id &&
       game.gameState === gameStates.playing
     ) {
       setSelectedCard(selected)
@@ -331,10 +334,8 @@ const GameBoard = () => {
     }
   }
 
-  console.log(game.currentPlayer, me)
-
-  const show =
-    game.gameState === gameStates.hint && game.currentPlayer.id === me.id
+  const showHintHeader =
+    game.gameState === gameStates.hint && game.currentPlayer?.id === me.id
 
   const classesForColors = {
     wire: 'wireColor',
@@ -420,20 +421,42 @@ const GameBoard = () => {
     )
   }
 
+  const gameInfo = () => {
+    return (
+      <Typography sx={gameBoardHeader}>
+        Round {game.maxTurns - game.turnsRemaining}/{game.maxTurns} •{' '}
+        {game.remainingWires}/{15} guessed{' '}
+        {game.mistakeLimit !== -1 && (
+          <>
+            • {game.mistakes}/{game.mistakeLimit} mistakes made
+          </>
+        )}
+      </Typography>
+    )
+  }
+
+  console.log('game:', game)
+
+  if (game.gameState === gameStates.waiting) {
+    return (
+      <div className='gameBoard'>
+        {gameInfo()}
+        <Typography variant='h2' style={turnText}>
+          Waiting for other player to join.
+        </Typography>
+        <Typography variant='h2' style={turnText}>
+          Invite code: {game.id}
+        </Typography>
+      </div>
+    )
+  }
+
   return (
     <div className='gameBoard'>
       <Box className='headerContainer'>
-        <Typography sx={gameBoardHeader}>
-          Round {game.maxTurns - game.turnsRemaining}/{game.maxTurns} •{' '}
-          {game.remainingWires}/{15} guessed{' '}
-          {game.mistakeLimit !== -1 && (
-            <>
-              • {game.mistakes}/{game.mistakeLimit} mistakes made
-            </>
-          )}
-        </Typography>
+        {gameInfo()}
         {header()}
-        {show && <GameBoardHintHeader />}
+        {showHintHeader && <GameBoardHintHeader />}
       </Box>
 
       {yourBoard && playBoard()}

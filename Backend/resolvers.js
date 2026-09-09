@@ -42,13 +42,15 @@ const resolvers = {
   DateTime: GraphQLDateTime,
   Query: {
     getGame: async (root, args, context) => {
-      console.log('get game ran')
       checkLoggedInOrGuest(context)
+      console.log('get game ran', args)
 
       const game = await Game.findById(args.id).populate('players.officialUser')
+      console.log(game)
       if (!game || !includesPlayer(game, context)) notAPlayerError()
 
       const returnVal = returnInfo(game, context)
+      console.log('about to return in get game')
 
       return returnVal
     },
@@ -255,12 +257,12 @@ const resolvers = {
 
       const game = new Game({
         players: [player],
-        currentPlayer: player,
+        currentPlayer: null,
         board: {
           spots: board,
         },
-        gameState: gameStates.hint,
-        turnsRemaining: args.turnLimit, //if not given, these are udnefined so goes to default
+        gameState: gameStates.waiting,
+        turnsRemaining: args.turnLimit,
         maxTurns: args.turnLimit,
         mistakeLimit: args.mistakeLimit,
       })
@@ -310,6 +312,10 @@ const resolvers = {
       }
 
       game.players = game.players.concat(player)
+      game.gameState = gameStates.hint
+
+      const playerIndex = Math.floor(Math.random() * 2)
+      game.currentPlayer = game.players[playerIndex]
 
       await game.save()
 
@@ -320,6 +326,10 @@ const resolvers = {
         playerID: returnID,
         type: 'New Player',
         gameUser: gameInfo.players[1],
+        gameStateChange: game.gameState,
+        turnChange: {
+          turnUpdate: convertGamePlayer(game.currentPlayer),
+        },
       }
 
       await pubsub.publish('NEW_PLAYER_JOINED', { newPlayerJoined: gameUpdate })
@@ -874,10 +884,15 @@ const updateSpotBomb = (context, game, spot, isPlayer1) => {
 //#region Data Helpers
 
 const returnInfo = (game, context) => {
-  const currentPlayer =
-    getIDFromPlayer(game.players[0]) === getIDFromPlayer(game.currentPlayer)
-      ? convertGamePlayer(game.players[0])
-      : convertGamePlayer(game.players[1])
+  let currentPlayer = null
+  //game.currentPlayer at this moment does not have all the player info
+  //only game.players does
+  if (game.currentPlayer !== null) {
+    currentPlayer =
+      getIDFromPlayer(game.players[0]) === getIDFromPlayer(game.currentPlayer)
+        ? convertGamePlayer(game.players[0])
+        : convertGamePlayer(game.players[1])
+  }
 
   return {
     id: game.id,
@@ -918,11 +933,12 @@ const returnInfo = (game, context) => {
 
 const includesPlayer = (game, context) => {
   const playerID = getIDFromContext(context)
-  console.log(playerID)
+  console.log('927', playerID)
 
   const isAPlayer = game.players.some(
     (player) => convertGamePlayer(player).id == playerID,
   )
+
   if (isAPlayer) {
     return true
   }

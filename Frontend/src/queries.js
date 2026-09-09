@@ -26,6 +26,7 @@ const GAME_DETAILS = gql`
     mistakes
     mistakeLimit
     remainingWires
+    id
   }
 `
 
@@ -237,7 +238,7 @@ export const HINT_UPDATE = gql`
     }
   }
 `
-//newPlayerJoined: GameUser!
+
 export const NEW_PLAYER_JOINED = gql`
   subscription {
     newPlayerJoined {
@@ -247,6 +248,13 @@ export const NEW_PLAYER_JOINED = gql`
       gameUser {
         username
         id
+      }
+      gameStateChange
+      turnChange {
+        turnUpdate {
+          username
+          id
+        }
       }
     }
   }

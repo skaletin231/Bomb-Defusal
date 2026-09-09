@@ -49,7 +49,7 @@ const gameSchema = new mongoose.Schema({
   board: boardSchema,
   gameState: {
     type: String,
-    enum: ['Win', 'Lose', 'Playing', 'Hint'],
+    enum: ['Win', 'Lose', 'Playing', 'Hint', 'waiting'],
   },
   playerState: {
     //this may be best tracked as green count remaining

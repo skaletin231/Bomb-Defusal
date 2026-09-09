@@ -155,9 +155,9 @@ const MakeDeckScreen = () => {
   })
 
   const [deleteUser] = useMutation(DELETE_USER, {
-    update(cache, {data}) {
+    update(cache, { data }) {
       console.log('done with delete user')
-    }
+    },
   })
 
   const [updateDeck] = useMutation(UPDATE_DECK, {
@@ -380,23 +380,23 @@ const MakeDeckScreen = () => {
   const addCardUI = () => {
     return (
       <form style={formStyle} onSubmit={submitForm}>
-          <TextField
-            variant='outlined'
-            placeholder='Type to add a card'
-            className='textFieldStyle3D'
-            value={cardToAdd}
-            onChange={({ target }) => setCardToAdd(target.value)}
-          ></TextField>
+        <TextField
+          variant='outlined'
+          placeholder='Type to add a card'
+          className='textFieldStyle3D'
+          value={cardToAdd}
+          onChange={({ target }) => setCardToAdd(target.value)}
+        ></TextField>
 
-          <Button
-            type='submit'
-            variant='contained'
-            className='buttonStyle3D'
-            sx={addCardButton}
-          >
-            <SubdirectoryArrowLeftIcon /> Add Card
-          </Button>
-        </form>
+        <Button
+          type='submit'
+          variant='contained'
+          className='buttonStyle3D'
+          sx={addCardButton}
+        >
+          <SubdirectoryArrowLeftIcon /> Add Card
+        </Button>
+      </form>
     )
   }
 
