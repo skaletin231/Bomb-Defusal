@@ -2,8 +2,8 @@ import { Box, Button, Typography } from '@mui/material'
 import { Link } from 'react-router-dom'
 import BasicMenu from './BasicMenu'
 import bomb from '../../images/Bomb No Text.png'
-import { ME } from '../queries'
-import { useQuery } from '@apollo/client/react'
+import { DELETE_USER, ME } from '../queries'
+import { useMutation, useQuery, useApolloClient } from '@apollo/client/react'
 import { useAuth0 } from '@auth0/auth0-react'
 
 const navBarStyle = {
@@ -23,6 +23,7 @@ const buttonSX = {
 }
 
 const NavigationBar = () => {
+  const client = useApolloClient()
   const result = useQuery(ME, {})
   const loggedIn = result.data?.me !== null && !result.data.me.isGuest
 
@@ -40,6 +41,35 @@ const NavigationBar = () => {
     loginWithRedirect()
   }
 
+  const [deleteUser] = useMutation(DELETE_USER, {
+    update(cache, { data }) {
+      console.log('done with delete user')
+    },
+  })
+
+  const tryDeleteUser = async () => {
+    console.log('try delete')
+    // await deleteUser()
+    // await client.clearStore()
+    // await logout()
+
+    console.log('finished deleting')
+  }
+
+  const loggedInButtns = () => {
+    return (
+      <>
+        <Button sx={buttonSX} onClick={handleLogout}>
+          Log out
+        </Button>
+        <Typography sx={{ color: '#3A1605' }}>•</Typography>
+        <Button sx={buttonSX} onClick={tryDeleteUser}>
+          Delete Account
+        </Button>
+      </>
+    )
+  }
+
   return (
     <Box sx={navBarStyle} className='navigationBar flexRow'>
       <Button
@@ -51,9 +81,7 @@ const NavigationBar = () => {
         }}
         component={Link}
         to='/'
-        startIcon={
-          <img src={bomb} alt='Logo' style={{ height: '6.5vh' }} />
-        }
+        startIcon={<img src={bomb} alt='Logo' style={{ height: '6.5vh' }} />}
       >
         Defuser
       </Button>
@@ -75,11 +103,7 @@ const NavigationBar = () => {
             Log In
           </Button>
         )}
-        {loggedIn && (
-          <Button sx={buttonSX} onClick={handleLogout}>
-            Log out
-          </Button>
-        )}
+        {loggedIn && loggedInButtns()}
       </Box>
       {/* <BasicMenu /> */}
     </Box>

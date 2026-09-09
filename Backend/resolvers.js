@@ -24,12 +24,13 @@ const gameStates = {
   win: 'Win',
   lose: 'Lose',
   playing: 'Playing',
+  waiting: 'waiting',
 }
 
 const { GraphQLError } = require('graphql')
 const { GraphQLDateTime } = require('graphql-scalars')
 
-const { ManagementClient } = require("auth0")
+const { ManagementClient } = require('auth0')
 
 const management = new ManagementClient({
   domain: process.env.AUTH0_DOMAIN,
@@ -220,14 +221,6 @@ const resolvers = {
   },
   Mutation: {
     startGame: async (root, args, context) => {
-      /*
-        deckID: ID!
-        gridsX: Int
-        gridsY: Int
-        turnLimit: Int
-        mistakeLimit: Int
-        wordsPerHint: Int
-      */
       const deck = await Deck.findById(args.deckID)
       if (!deck) deckNotFoundError()
 
@@ -486,20 +479,29 @@ const resolvers = {
     deleteUser: async (root, _, context) => {
       checkIsLoggedIn(context)
       console.log(context.user)
+      const userID = context.user.auth0_ID
+      await Deck.deleteMany({ owner: context.user._id })
+      await context.user.deleteOne()
 
-
-      //await management.users.delete(auth0UserId)
+      await management.users.delete(userID)
       return true
     },
     updateUserInfo: async (root, args, context) => {
       checkIsLoggedIn(context)
-
+      console.log('is logged in')
       const user = context.user
       user.username = args.username
+      console.log(user)
 
       await user.save()
-
-      return { ...user, isGuest: false }
+      console.log('saved', user)
+      return {
+        username: user.username,
+        email: user.email,
+        auth0_ID: user.autho0_ID,
+        id: user._id,
+        isGuest: false,
+      }
     },
     sendMessage: async (root, args, context) => {
       checkLoggedInOrGuest(context)
