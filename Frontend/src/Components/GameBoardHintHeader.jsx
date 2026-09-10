@@ -64,10 +64,6 @@ const hintCountBox = {
   },
 }
 
-const hintCountText = {
-  textAlign: 'center',
-}
-
 const GameBoardHintHeader = () => {
   const [hintText, setHintText] = useState('')
   const [error, setError] = useState(false)

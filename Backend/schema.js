@@ -49,6 +49,7 @@ const typeDefs = /* GraphQL */ `
     mistakes: Int!
     mistakeLimit: Int!
     remainingWires: Int!
+    deckID: ID!
   }
 
   scalar DateTime

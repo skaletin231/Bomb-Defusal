@@ -43,14 +43,11 @@ const resolvers = {
   Query: {
     getGame: async (root, args, context) => {
       checkLoggedInOrGuest(context)
-      console.log('get game ran', args)
 
       const game = await Game.findById(args.id).populate('players.officialUser')
-      console.log(game)
       if (!game || !includesPlayer(game, context)) notAPlayerError()
-
+      console.log('get game:', game)
       const returnVal = returnInfo(game, context)
-      console.log('about to return in get game')
 
       return returnVal
     },
@@ -265,6 +262,7 @@ const resolvers = {
         turnsRemaining: args.turnLimit,
         maxTurns: args.turnLimit,
         mistakeLimit: args.mistakeLimit,
+        deckID: args.deckID,
       })
 
       await game.save()
@@ -488,7 +486,6 @@ const resolvers = {
     },
     deleteUser: async (root, _, context) => {
       checkIsLoggedIn(context)
-      console.log(context.user)
       const userID = context.user.auth0_ID
       await Deck.deleteMany({ owner: context.user._id })
       await context.user.deleteOne()
@@ -498,13 +495,10 @@ const resolvers = {
     },
     updateUserInfo: async (root, args, context) => {
       checkIsLoggedIn(context)
-      console.log('is logged in')
       const user = context.user
       user.username = args.username
-      console.log(user)
 
       await user.save()
-      console.log('saved', user)
       return {
         username: user.username,
         email: user.email,
@@ -637,7 +631,6 @@ const resolvers = {
     },
     updateDeck: async (root, args, context) => {
       checkIsLoggedIn(context)
-      console.log('in update backend')
 
       const deck = await Deck.findById(args.deckID)
       if (!deck || !deck.owner.equals(context.user._id)) cantAccessDeckError()
@@ -894,6 +887,8 @@ const returnInfo = (game, context) => {
         : convertGamePlayer(game.players[1])
   }
 
+  console.log(game)
+
   return {
     id: game.id,
 
@@ -928,12 +923,12 @@ const returnInfo = (game, context) => {
     maxTurns: game.maxTurns,
     mistakes: game.mistakes,
     mistakeLimit: game.mistakeLimit,
+    deckID: game.deckID,
   }
 }
 
 const includesPlayer = (game, context) => {
   const playerID = getIDFromContext(context)
-  console.log('927', playerID)
 
   const isAPlayer = game.players.some(
     (player) => convertGamePlayer(player).id == playerID,

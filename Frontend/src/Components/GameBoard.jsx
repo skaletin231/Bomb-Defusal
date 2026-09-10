@@ -6,7 +6,14 @@ import {
 } from '@apollo/client/react'
 import '@fontsource/suwannaphum'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
-import { Box, Button, Card, CardContent, Typography } from '@mui/material'
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  TextField,
+  Typography,
+} from '@mui/material'
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import {
@@ -21,7 +28,9 @@ import {
 import ChatHintContainer from './ChatHintContainer'
 import GameBoardHintHeader from './GameBoardHintHeader'
 import GameCard from './GameCard'
-import GameOverScreen from './GameOverScreen'
+import GameOverScreen from './Popups/GameOverDialogue'
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded'
+import CheckIcon from '@mui/icons-material/Check'
 
 const boardStyle = {
   display: 'grid',
@@ -54,6 +63,12 @@ const turnText = {
   fontWeight: 'bold',
 }
 
+const inviteSX = {
+  color: '#3A1605',
+  fontSize: '2rem',
+  fontFamily: '"Suwannaphum", serif',
+}
+
 const gameStates = {
   hint: 'Hint',
   win: 'Win',
@@ -65,6 +80,7 @@ const gameStates = {
 const GameBoard = () => {
   const [yourBoard, setYourBord] = useState(true)
   const [open, setOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const [selectedCard, setSelectedCard] = useState(null)
 
@@ -435,18 +451,62 @@ const GameBoard = () => {
     )
   }
 
-  console.log('game:', game)
+  const handleCopy = async (value) => {
+    try {
+      await navigator.clipboard.writeText(value)
+      setCopied(true)
 
+      setTimeout(() => {
+        setCopied(false)
+      }, 2000)
+    } catch (error) {
+      console.error('Failed to copy:', error)
+    }
+  }
+
+  //TODO: seperate this out into it's own component as well to reduce this file's size
   if (game.gameState === gameStates.waiting) {
     return (
       <div className='gameBoard'>
-        {gameInfo()}
-        <Typography variant='h2' style={turnText}>
-          Waiting for other player to join.
-        </Typography>
-        <Typography variant='h2' style={turnText}>
-          Invite code: {game.id}
-        </Typography>
+        <Typography sx={turnText}>Waiting for player to join...</Typography>
+        <Typography sx={inviteSX}>Your invite code:</Typography>
+        <Box className='flexRow' sx={{ gap: '40px' }}>
+          <TextField
+            className='textFieldStyle3D'
+            sx={{ '&&': { flexGrow: '0' }, width: '35rem' }}
+            value={game.id}
+            slotProps={{
+              input: {
+                readOnly: true,
+              },
+            }}
+          />
+          <Button
+            className='buttonStyle3D'
+            variant='contained'
+            sx={{
+              '&&': {
+                display: 'flex',
+                width: 'fit-content',
+                height: '50px',
+                flexShrink: '0',
+                gap: '10px',
+              },
+            }}
+            onClick={() => handleCopy(game.id)}
+          >
+            {!copied && (
+              <>
+                <ContentCopyRoundedIcon /> Copy Code
+              </>
+            )}
+            {copied && (
+              <>
+                <CheckIcon /> Copied!
+              </>
+            )}
+          </Button>
+        </Box>
       </div>
     )
   }
@@ -463,11 +523,7 @@ const GameBoard = () => {
       {!yourBoard && hintBoard()}
 
       <ChatHintContainer gameID={gameID} />
-      <GameOverScreen
-        open={open}
-        setOpen={setOpen}
-        gameState={game.gameState}
-      />
+      <GameOverScreen open={open} setOpen={setOpen} game={game} />
     </div>
   )
 }

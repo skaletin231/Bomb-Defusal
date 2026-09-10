@@ -53,7 +53,6 @@ const saveButton = {
     gap: '7px',
     height: '50px',
     flexShrink: '0',
-    padding: '0px 10px',
   },
   '&.Mui-disabled': {
     backgroundColor: '#588A29',

@@ -10,7 +10,6 @@ import { useNavigate } from 'react-router-dom'
 import CloseIcon from '@mui/icons-material/Close'
 
 function JoinGameDialogue({ open, setOpen }) {
-  console.log(open)
   const handleClose = () => {
     setOpen(false)
   }
@@ -46,13 +45,15 @@ function JoinGameDialogue({ open, setOpen }) {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
     const formJson = Object.fromEntries(formData.entries())
-
+    const formatedString = formJson.gameID.trim()
+    console.log(formatedString)
     try {
       const result = await joinGame({
         variables: {
-          gameID: formJson.gameID.trim(),
+          gameID: formatedString,
         },
       })
+      console.log('results:', result)
 
       if (result.data === null || result.data.joinGame === null) return
 

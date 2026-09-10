@@ -98,6 +98,7 @@ const startServer = async (port) => {
     checkJwtOptional,
     expressMiddleware(server, {
       context: async ({ req, res }) => {
+        console.log('made it to server')
         if (!req.auth) {
           console.log('people without any authentication, so guests i guess')
           return {
@@ -109,6 +110,8 @@ const startServer = async (port) => {
         }
         const auth = req.auth.payload
         const id = auth?.sub
+
+        console.log('made it to 114')
 
         if (!id) {
           //this would be a valid request by a guest i think?
@@ -122,6 +125,7 @@ const startServer = async (port) => {
         }
 
         let user = await User.findOne({ auth0_ID: id })
+        console.log('made it to 128:', id)
 
         if (!user) {
           const token = req.auth.token
@@ -144,6 +148,7 @@ const startServer = async (port) => {
 
           //return newUser
         }
+        console.log('made it to 151')
 
         //console.log('final context', user, req.signedCookies)
 

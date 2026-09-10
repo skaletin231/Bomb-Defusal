@@ -179,7 +179,7 @@ const HomePage = () => {
                 Start Game
               </Button>
               <Button
-                className='JoinGameButton buttonStyle3D'
+                className='brown buttonStyle3D'
                 variant='contained'
                 onClick={() => setOpen(true)}
               >

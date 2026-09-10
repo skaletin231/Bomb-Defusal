@@ -76,22 +76,23 @@ div.cardSelected {
 
 Button.buttonStyle3D,
 a.buttonStyle3D {
+  box-sizing: content-box;
   display: block;
   background-color: #588a29;
   border: 0.15rem solid #286b1f;
   width: 100px;
   height: 44px;
   border-radius: 10px;
-  padding: 6px 10px;
+  padding: 0px 10px;
   font-size: 17px;
 }
 
 div.textFieldStyle3D {
   background-color: #fefefe;
   border-radius: 10px;
+  height: 50px;
   border: 0.15rem solid #84582e;
   flex-grow: 1;
-  height: 50px;
 }
 
 div.textFieldStyle3D input::placeholder {
@@ -167,7 +168,8 @@ a.buttonStyle3D::after {
   border-color: #690f0f;
 }
 
-.homePage Button.buttonStyle3D.JoinGameButton {
+.homePage Button.buttonStyle3D.brown,
+.gameOverDialogue Button.buttonStyle3D.brown {
   background-color: #b36c1b;
   border-color: #834724;
 }
@@ -183,7 +185,8 @@ a.buttonStyle3D::after {
   border-color: #690f0f;
 }
 
-.homePage Button.buttonStyle3D.JoinGameButton:after {
+.homePage Button.buttonStyle3D.brown:after,
+.gameOverDialogue Button.buttonStyle3D.brown:after {
   background-color: #9d501c;
   border-color: #834724;
 }

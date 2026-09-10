@@ -79,6 +79,11 @@ const gameSchema = new mongoose.Schema({
     type: Number,
     default: -1,
   },
+  deckID: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Deck',
+    required: true,
+  },
 })
 
 module.exports = mongoose.model('Game', gameSchema)

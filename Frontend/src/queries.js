@@ -27,6 +27,7 @@ const GAME_DETAILS = gql`
     mistakeLimit
     remainingWires
     id
+    deckID
   }
 `
 
