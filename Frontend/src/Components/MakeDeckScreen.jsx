@@ -20,7 +20,7 @@ import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { GET_MY_DECK, UPDATE_DECK, DELETE_USER } from '../queries'
+import { GET_MY_DECK, UPDATE_DECK } from '../queries'
 import NotificationPopup from './Popups/NotificationPopup'
 import SortMenu from './SortMenu'
 import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft'
@@ -53,6 +53,7 @@ const saveButton = {
     gap: '7px',
     height: '50px',
     flexShrink: '0',
+    padding: '0px 10px',
   },
   '&.Mui-disabled': {
     backgroundColor: '#588A29',
@@ -69,6 +70,7 @@ const addCardButton = {
     display: 'flex',
     gap: '7px',
     flexShrink: '0',
+    padding: '0px 10px',
   },
 }
 
@@ -154,12 +156,6 @@ const MakeDeckScreen = () => {
     skip: !deckID,
   })
 
-  const [deleteUser] = useMutation(DELETE_USER, {
-    update(cache, { data }) {
-      console.log('done with delete user')
-    },
-  })
-
   const [updateDeck] = useMutation(UPDATE_DECK, {
     update(cache, { data }) {
       console.log('try run update')
@@ -207,8 +203,6 @@ const MakeDeckScreen = () => {
       setAllCards(deck.cards)
       setIsPublicDeck(deck.public)
       setNotes(deck.notes)
-
-      deleteUser()
     }
   }, [deckResults.data])
 
