@@ -113,6 +113,7 @@ function JoinGameDialogue({ open, setOpen }) {
           style={{ gap: '20px' }}
         >
           <TextField
+            autoComplete='off'
             variant='outlined'
             autoFocus
             required

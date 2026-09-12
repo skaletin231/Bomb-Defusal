@@ -154,6 +154,7 @@ const GameBoardHintHeader = () => {
     >
       <Box className='HintInput'>
         <TextField
+          autoComplete='off'
           label='Hint'
           sx={hintTextBox}
           error={error}
@@ -209,9 +210,8 @@ const GameBoardHintHeader = () => {
       </Box>
       <Box className='HintSubmit'>
         <Button
-          className='HintSubmitButton'
           variant='contained'
-          className='buttonStyle3D'
+          className='HintSubmitButton buttonStyle3D'
           onClick={trySendHint}
         >
           Send Hint

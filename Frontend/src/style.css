@@ -76,6 +76,7 @@ div.cardSelected {
 
 Button.buttonStyle3D,
 a.buttonStyle3D {
+  transition: none;
   box-sizing: content-box;
   display: block;
   background-color: #588a29;
