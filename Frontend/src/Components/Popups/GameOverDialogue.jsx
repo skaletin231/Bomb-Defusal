@@ -42,7 +42,6 @@ function GameOverScreen({ open, setOpen, game }) {
     fontFamily: '"Luckiest Guy", serif',
     color: gameWon ? '#286B1F' : '#B43131',
     textAlign: 'center',
-    //marginBlock: '-12px',
     lineHeight: '1',
   }
 

@@ -2,6 +2,11 @@ body {
   margin: 0px;
 }
 
+hr.MuiDivider-root {
+  border-bottom-width: 0.15rem;
+  border-color: #84582e;
+}
+
 .flexRow {
   display: flex;
   flex-direction: row;
@@ -12,11 +17,61 @@ body {
   flex-direction: column;
 }
 
+.warning {
+  color: #b43131;
+  font-size: 1.25rem;
+}
+
+.MuiTypography-root.normalText {
+  font-size: 1.2rem;
+  color: #3a1605;
+  font-weight: bold;
+}
+
+.MuiTypography-root.bigText,
+span.bigText {
+  font-size: 1.5rem;
+  color: #3a1605;
+  font-weight: bold;
+}
+
+.MuiTypography-root.biggerText {
+  font-size: 2rem;
+  color: #3a1605;
+  font-weight: bold;
+}
+
+.MuiTypography-root.mainHeader {
+  font-size: 3.5rem;
+  color: #3a1605;
+  font-family: 'Suwannaphum', serif;
+  font-weight: bold;
+}
+
+.MuiTypography-root.secondaryHeader {
+  font-size: 3rem;
+  color: #3a1605;
+  font-family: 'Suwannaphum', serif;
+  font-weight: bold;
+}
+
+.MuiTypography-root.Header {
+  font-size: 3rem;
+  color: #3a1605;
+  font-family: 'Suwannaphum', serif;
+  font-weight: bold;
+}
+
 .basicBackground {
   background-color: #fff8e9;
 }
 
-.content,
+.content {
+  padding: 0rem 3rem 0rem 3rem;
+  max-width: 80rem;
+  margin-inline: auto;
+}
+
 .navigationBar {
   padding: 0rem 3rem 0rem 3rem;
 }
@@ -164,13 +219,15 @@ a.buttonStyle3D::after {
 }
 
 .confirmDelete Button.buttonStyle3D.warning,
-.deckViewButtons Button.buttonStyle3D.warning {
+.deckViewButtons Button.buttonStyle3D.warning,
+.accountPage Button.buttonStyle3D.warning {
   background-color: #b43131;
   border-color: #690f0f;
 }
 
 .homePage Button.buttonStyle3D.brown,
-.gameOverDialogue Button.buttonStyle3D.brown {
+.gameOverDialogue Button.buttonStyle3D.brown,
+.accountPage Button.buttonStyle3D.brown {
   background-color: #b36c1b;
   border-color: #834724;
 }
@@ -181,13 +238,15 @@ a.buttonStyle3D::after {
 }
 
 .confirmDelete Button.buttonStyle3D.warning:after,
-.deckViewButtons Button.buttonStyle3D.warning:after {
+.deckViewButtons Button.buttonStyle3D.warning:after,
+.accountPage Button.buttonStyle3D.warning:after {
   background-color: #881c1c;
   border-color: #690f0f;
 }
 
 .homePage Button.buttonStyle3D.brown:after,
-.gameOverDialogue Button.buttonStyle3D.brown:after {
+.gameOverDialogue Button.buttonStyle3D.brown:after,
+.accountPage Button.buttonStyle3D.brown:after {
   background-color: #9d501c;
   border-color: #834724;
 }

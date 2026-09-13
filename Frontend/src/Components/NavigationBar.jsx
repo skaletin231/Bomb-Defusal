@@ -1,10 +1,11 @@
 import { Box, Button, Typography } from '@mui/material'
 import { Link } from 'react-router-dom'
-import BasicMenu from './BasicMenu'
+import BasicMenu from './AccountMenu'
 import bomb from '../../images/Bomb No Text.png'
 import { DELETE_USER, ME } from '../queries'
 import { useMutation, useQuery, useApolloClient } from '@apollo/client/react'
 import { useAuth0 } from '@auth0/auth0-react'
+import AccountMenu from './AccountMenu'
 
 const navBarStyle = {
   position: 'sticky',
@@ -103,7 +104,8 @@ const NavigationBar = () => {
             Log In
           </Button>
         )}
-        {loggedIn && loggedInButtns()}
+        {/* {loggedIn && loggedInButtns()} */}
+        {loggedIn && <AccountMenu />}
       </Box>
       {/* <BasicMenu /> */}
     </Box>

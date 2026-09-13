@@ -1,24 +1,25 @@
 import { useQuery } from '@apollo/client/react'
 import { useAuth0 } from '@auth0/auth0-react'
-import ViewHeadlineIcon from '@mui/icons-material/ViewHeadline'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import { useNavigate } from 'react-router-dom'
 import { ME } from '../queries'
 import { useState, useId } from 'react'
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined'
+import { Box } from '@mui/material'
 
 const divStyle = {
-  position: 'fixed',
-  top: 'calc(3.5vh - 16px)',
-  right: '3rem',
+  //position: 'fixed',
+  //top: 'calc(3.5vh - 16px)',
+  //right: '3rem',
 }
 
-export default function BasicMenu() {
+export default function AccountMenu() {
   const result = useQuery(ME, {})
   const loggedIn = result.data?.me !== null && !result.data.me.isGuest
 
-  const { loginWithRedirect, logout } = useAuth0()
+  const { logout } = useAuth0()
   const navigate = useNavigate()
 
   const id = useId()
@@ -33,10 +34,10 @@ export default function BasicMenu() {
     setAnchorEl(null)
   }
 
-  // const handleProfileTransition = () => {
-  //   console.log('not implamented yet')
-  //   handleClose()
-  // }
+  const handleAccountTransition = () => {
+    navigate('/account')
+    handleClose()
+  }
 
   const handleLogout = () => {
     logout({
@@ -47,47 +48,27 @@ export default function BasicMenu() {
     handleClose()
   }
 
-  const handleLogin = () => {
-    handleClose()
-    loginWithRedirect()
-  }
-
-  const handleMyDeckTransition = () => {
-    handleClose()
-    navigate('/mydecks')
-  }
-
-  const handleBackToHome = () => {
-    handleClose()
-    navigate('/')
-  }
-
-  const loggedOutMenu = () => {
-    return <MenuItem onClick={handleLogin}>Login</MenuItem>
-  }
-
   const loggedInMenu = () => {
     return (
       <>
-        {/* <MenuItem onClick={handleProfileTransition}>Profile</MenuItem> */}
-        <MenuItem onClick={handleBackToHome}>Home</MenuItem>
-        <MenuItem onClick={handleMyDeckTransition}>My deck</MenuItem>
+        <MenuItem onClick={handleAccountTransition}>My Account</MenuItem>
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </>
     )
   }
 
   return (
-    <div style={divStyle}>
+    <Box sx={divStyle}>
       <IconButton
         onClick={handleClick}
         size='small'
-        sx={{ ml: 2 }}
         aria-controls={open ? 'account-menu' : undefined}
         aria-haspopup='true'
         aria-expanded={open}
       >
-        <ViewHeadlineIcon sx={{ width: 32, height: 32 }} />
+        <AccountCircleOutlinedIcon
+          sx={{ fontSize: '2.5rem', color: '#9F4B24' }}
+        />
       </IconButton>
       <Menu
         id={menuId}
@@ -100,9 +81,8 @@ export default function BasicMenu() {
           },
         }}
       >
-        {loggedIn && loggedInMenu()}
-        {!loggedIn && loggedOutMenu()}
+        {loggedInMenu()}
       </Menu>
-    </div>
+    </Box>
   )
 }

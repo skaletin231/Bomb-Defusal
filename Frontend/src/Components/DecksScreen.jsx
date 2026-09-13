@@ -112,11 +112,7 @@ const DecksScreen = () => {
 
   const myDecksPage = () => {
     if (myDecks.length === 0)
-      return (
-        <Typography variant='h5' sx={{ color: '#3A1605' }}>
-          No Decks Found ...{' '}
-        </Typography>
-      )
+      return <Typography className='bigText'>No Decks Found ... </Typography>
 
     return (
       <Box sx={boxSX}>
@@ -126,11 +122,7 @@ const DecksScreen = () => {
   }
   const communityDecksPage = () => {
     if (visibleDecksPublic.length === 0)
-      return (
-        <Typography variant='h5' sx={{ color: '#3A1605' }}>
-          No Decks Found ...{' '}
-        </Typography>
-      )
+      return <Typography className='bigText'>No Decks Found ... </Typography>
     return (
       <>
         <Box sx={boxSX}>
@@ -158,17 +150,13 @@ const DecksScreen = () => {
 
   return (
     <Box className='flexColumn content' sx={{ gap: '20px' }}>
-      <Typography variant='h2' sx={{ color: '#3A1605' }}>
-        Choose a Deck
-      </Typography>
+      <Typography className='mainHeader'>Choose a Deck</Typography>
 
       {screenToggle()}
 
       <Divider
         sx={{
-          borderColor: '#84582E',
           margin: '2rem 0',
-          borderBottomWidth: '.15rem',
         }}
       />
 
