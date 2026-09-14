@@ -37,11 +37,7 @@ const formStyle = {
 }
 
 const titleText = {
-  color: '#3A1605',
-  fontSize: '3rem',
   margin: '10px 0 0 0',
-  fontFamily: '"Suwannaphum", serif',
-  fontWeight: 'bold',
   width: 'fit-content',
 }
 
@@ -280,7 +276,7 @@ const MakeDeckScreen = () => {
           width: 'fit-content',
         }}
       >
-        <Typography variant='h2' style={titleText}>
+        <Typography className='mainHeader' style={titleText}>
           Edit Deck
         </Typography>
         <Box className='nameAndSaveChanges' sx={titleSaveBox}>
@@ -530,10 +526,7 @@ const MakeDeckScreen = () => {
   const notesUI = () => {
     return (
       <Box sx={{ width: 'fit-content', gap: '10px' }} className='flexColumn'>
-        <Typography
-          variant='h5'
-          sx={{ color: '#3A1605', fontWeight: 'bold', width: 'fit-content' }}
-        >
+        <Typography className='bigText' sx={{ width: 'fit-content' }}>
           Notes
         </Typography>
         <TextField
@@ -580,10 +573,7 @@ const MakeDeckScreen = () => {
   const quickAddStyle = () => {
     return (
       <Box sx={{ gap: '10px' }} className='flexColumn'>
-        <Typography
-          variant='h5'
-          sx={{ color: '#3A1605', fontWeight: 'bold', width: 'fit-content' }}
-        >
+        <Typography className='bigText' sx={{ width: 'fit-content' }}>
           Card List
         </Typography>
         <TextField

@@ -56,11 +56,7 @@ const changeBoardStyle = {
 }
 
 const turnText = {
-  color: '#3A1605',
-  fontSize: '3rem',
   margin: '20px 0',
-  fontFamily: '"Suwannaphum", serif',
-  fontWeight: 'bold',
 }
 
 const inviteSX = {
@@ -282,7 +278,7 @@ const GameBoard = () => {
     if (game.currentPlayer.id === me.id) {
       return (
         <>
-          <Typography variant='h2' style={turnText}>
+          <Typography className='secondaryHeader' style={turnText}>
             It's your turn!
           </Typography>
 
@@ -330,18 +326,18 @@ const GameBoard = () => {
     } else {
       if (isPlaying) {
         return (
-          <Typography variant='h2' style={turnText}>
+          <Typography className='secondaryHeader' style={turnText}>
             It is the other player's turn!
           </Typography>
         )
       } else {
         return (
           <>
-            <Typography variant='h2' style={turnText}>
+            <Typography className='secondaryHeader' style={turnText}>
               It is the other player's turn!
             </Typography>
 
-            <Typography className='hintText waitingForHint'>
+            <Typography className='hintText waitingForHint bigText'>
               Waiting for hint...
             </Typography>
           </>
@@ -369,10 +365,7 @@ const GameBoard = () => {
     return (
       <>
         <Box sx={{ position: 'relative' }}>
-          <Typography
-            variant='h4'
-            sx={{ textAlign: 'center', fontWeight: 'bold', color: '#3A1605' }}
-          >
+          <Typography className='biggerText' sx={{ textAlign: 'center' }}>
             Their Board
           </Typography>
         </Box>
@@ -409,10 +402,7 @@ const GameBoard = () => {
     return (
       <>
         <Box sx={{ position: 'relative' }}>
-          <Typography
-            variant='h4'
-            sx={{ textAlign: 'center', fontWeight: 'bold', color: '#3A1605' }}
-          >
+          <Typography className='biggerText' sx={{ textAlign: 'center' }}>
             Key Card
           </Typography>
         </Box>

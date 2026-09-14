@@ -10,6 +10,10 @@ import MakeDeckScreen from './Components/MakeDeckScreen'
 import { Box } from '@mui/material'
 import NavigationBar from './Components/NavigationBar'
 import DeckView from './Components/DeckView'
+import AccountPage from './Components/AccountPage'
+import FooterBar from './Components/FooterBar'
+import TermsOfService from './Components/TermsOfService'
+import PrivacyPolicy from './Components/PrivacyPolicy'
 
 function App() {
   const result = useQuery(ME, {})
@@ -35,7 +39,7 @@ function App() {
   }
 
   return (
-    <Box className='EntirePage'>
+    <Box className='EntirePage flexColumn' sx={{ minHeight: '100vh' }}>
       <NavigationBar />
       <div className='background'></div>
       <Box className='mainContainer'>
@@ -47,8 +51,14 @@ function App() {
           <Route path='/mydecks/new' element={<MakeDeckScreen />} />
           <Route path='/mydecks/:id' element={<MakeDeckScreen />} />
           <Route path='/decks/:id' element={<DeckView />} />
+          <Route path='/account' element={<AccountPage />} />
+          <Route path='/terms-of-service' element={<TermsOfService />} />
+          <Route path='/privacy-policy' element={<PrivacyPolicy />} />
           <Route path='*' element={noPageError()} />
         </Routes>
+      </Box>
+      <Box sx={{ flexGrow: '1', alignContent: 'end' }}>
+        <FooterBar />
       </Box>
     </Box>
   )

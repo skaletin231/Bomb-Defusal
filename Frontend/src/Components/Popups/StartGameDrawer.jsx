@@ -76,8 +76,8 @@ export default function StartGameDrawer({
   selectedDeck,
 }) {
   const location = useLocation()
-  const [gridSizeX, setGridSizeX] = useState(5)
-  const [gridSizeY, setGridSizeY] = useState(5)
+  // const [gridSizeX, setGridSizeX] = useState(5)
+  // const [gridSizeY, setGridSizeY] = useState(5)
 
   const [mistakeLimitExists, setMistakeLimitExists] = useState(false)
   const [roundLimit, setRoundLimit] = useState(9)
@@ -159,8 +159,8 @@ export default function StartGameDrawer({
   }
 
   const setDefaults = () => {
-    setGridSizeX(5)
-    setGridSizeY(5)
+    //setGridSizeX(5)
+    //setGridSizeY(5)
     setMistakeLimitExists(false)
     setRoundLimit(9)
     setMistakeLimit(0)
@@ -187,9 +187,11 @@ export default function StartGameDrawer({
         <Box sx={{ gap: '30px' }} id='InnerBox' className='flexColumn'>
           <Box className='flexRow'>
             <Box className='flexColumn'>
-              <Typography variant='h4'>{selectedDeck?.name}</Typography>
-              <Typography variant='h5'>
-                {selectedDeck?.owner?.username}
+              <Typography className='biggerText'>
+                {selectedDeck?.name}
+              </Typography>
+              <Typography className='normalText'>
+                by {selectedDeck?.owner?.username}
               </Typography>
             </Box>
             <Box className='flexRow'>
@@ -206,7 +208,7 @@ export default function StartGameDrawer({
             </Box>
           </Box>
 
-          <Box id='gridSize'>
+          {/* <Box id='gridSize'>
             <Typography>Grid Size</Typography>
             <Box sx={{ gap: '10px', alignItems: 'center' }} className='flexRow'>
               <Select
@@ -235,7 +237,7 @@ export default function StartGameDrawer({
                 <MenuItem value={7}>7</MenuItem>
               </Select>
             </Box>
-          </Box>
+          </Box> */}
 
           <Box id='roundLimit'>
             <Typography>Round Limit</Typography>

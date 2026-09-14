@@ -80,11 +80,10 @@ function JoinGameDialogue({ open, setOpen }) {
       }}
     >
       <DialogTitle
-        variant='h3'
+        className='normalText'
         sx={{
+          '&&': { fontSize: '3rem' },
           textAlign: 'center',
-          color: '#3A1605',
-          fontWeight: 'bold',
           padding: '0 0 3.5rem 0',
         }}
       >

@@ -2,7 +2,7 @@ import { gql } from '@apollo/client'
 import { useMutation, useQuery } from '@apollo/client/react'
 import '@fontsource/suwannaphum'
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined'
-import { Box, Button, Typography } from '@mui/material'
+import { Box, Button, Divider, Typography } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { GET_MY_DECKS, MAKE_DECK } from '../queries'
 import NotificationPopup from './Popups/NotificationPopup'
@@ -100,13 +100,13 @@ const MyDecks = () => {
   }
 
   return (
-    <Box className='content'>
-      <Typography
-        sx={{ fontSize: '2rem', margin: '10px 0px', fontWeight: 'bold' }}
-      >
-        My Decks
-      </Typography>
-
+    <Box className='content flexColumn' sx={{ gap: '20px' }}>
+      <Typography className='mainHeader'>My Decks</Typography>
+      <Divider
+        sx={{
+          margin: '2rem 0',
+        }}
+      />
       <Box sx={boxSX}>
         <Button sx={buttonSX} onClick={tryMakeDeck}>
           <Box sx={innerboxSX}>

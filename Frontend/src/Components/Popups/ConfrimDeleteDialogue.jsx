@@ -7,9 +7,9 @@ import TextField from '@mui/material/TextField'
 import WarningAmberIcon from '@mui/icons-material/WarningAmber'
 import { Typography } from '@mui/material'
 
-function ConfirmDeleteDialogue({ open, setDeckToDelete, onConfirm }) {
+function ConfirmDeleteDialogue({ open, setTracker, onConfirm }) {
   const handleClose = () => {
-    setDeckToDelete(null)
+    setTracker(null)
   }
 
   const dialogueSX = {

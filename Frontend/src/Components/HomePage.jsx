@@ -8,6 +8,7 @@ import fullScreenImageBig from '../../images/Full Screen Big.png'
 import gameplayGuess from '../../images/GameplayGuess.png'
 import gameplayHint from '../../images/GameplayHint.png'
 import makeDeck from '../../images/MakeDeck.png'
+import '@fontsource/luckiest-guy'
 
 const boxStyle = {
   display: 'flex',
@@ -49,10 +50,10 @@ const tutorialSectionUI = () => {
         ]}
       >
         <Box className='flexColumn' sx={tutorialTextContainerSX}>
-          <Typography variant='h4' sx={tutorialTextHeaderSX}>
+          <Typography className='biggerText' sx={tutorialTextHeaderSX}>
             Create your deck, or use a community deck
           </Typography>
-          <Typography variant='h6' sx={tutorialTextContentSX}>
+          <Typography className='normalText' sx={tutorialTextContentSX}>
             Defuser allows you to play with any collection of words you want.{' '}
             <strong>Log in</strong> to create your own decks, or borrow a deck
             from the community. Once you start the game, cards from your deck
@@ -65,10 +66,10 @@ const tutorialSectionUI = () => {
 
       <Box className='flexRow' sx={tutorialSectionSX}>
         <Box className='flexColumn' sx={tutorialTextContainerSX}>
-          <Typography variant='h4' sx={tutorialTextHeaderSX}>
+          <Typography className='biggerText' sx={tutorialTextHeaderSX}>
             Associate as many words as you can
           </Typography>
-          <Typography variant='h6' sx={tutorialTextContentSX}>
+          <Typography className='normalText' sx={tutorialTextContentSX}>
             Players take turns; on your turn, check the{' '}
             <span style={{ color: '#286B1F' }}>green</span> cards on your{' '}
             <strong>key card.</strong> Those are your{' '}
@@ -90,10 +91,10 @@ const tutorialSectionUI = () => {
         ]}
       >
         <Box className='flexColumn' sx={tutorialTextContainerSX}>
-          <Typography variant='h4' sx={tutorialTextHeaderSX}>
+          <Typography className='biggerText' sx={tutorialTextHeaderSX}>
             Defuse by guessing your partner’s cards
           </Typography>
-          <Typography variant='h6' sx={tutorialTextContentSX}>
+          <Typography className='normalText' sx={tutorialTextContentSX}>
             Once you receive a hint from your partner, it’s up to you to{' '}
             <strong>defuse</strong> by guessing which cards they mean. A
             <strong>successful defusal</strong> means you can either defuse
@@ -109,10 +110,10 @@ const tutorialSectionUI = () => {
 
       <Box className='flexRow' sx={tutorialSectionSX}>
         <Box className='flexColumn' sx={tutorialTextContainerSX}>
-          <Typography variant='h4' sx={tutorialTextHeaderSX}>
+          <Typography className='biggerText' sx={tutorialTextHeaderSX}>
             Race the clock to defuse—but don’t blow up!
           </Typography>
-          <Typography variant='h6' sx={tutorialTextContentSX}>
+          <Typography className='normalText' sx={tutorialTextContentSX}>
             If you manage to defuse all your cards within the round limit,{' '}
             <strong>you win!</strong> But be careful—if your partner guesses one
             of your <strong>black</strong> cards with{' '}
@@ -131,12 +132,15 @@ const tutorialSectionUI = () => {
 }
 
 const tutorialTextHeaderSX = {
-  fontWeight: 'bold',
-  color: '#834724',
+  '&&': {
+    color: '#834724',
+  },
 }
 
 const tutorialTextContentSX = {
-  color: '#3A1605',
+  '&&': {
+    fontWeight: 'normal',
+  },
 }
 
 const HomePage = () => {
@@ -162,7 +166,7 @@ const HomePage = () => {
       <Box className='content'>
         <Box
           className='mainContent flexColumn'
-          sx={{ height: 'calc(93vh - 32.6vw)' }}
+          sx={{ minHeight: 'calc(93vh - 32.6vw)' }}
         >
           <div
             className={'background'}
@@ -187,12 +191,14 @@ const HomePage = () => {
               </Button>
             </Box>
           </Container>
-          <Box
-            className='flexColumn'
-            sx={{ alignItems: 'center', marginTop: 'auto' }}
-          >
+          <Box className='flexColumn' sx={{ alignItems: 'center' }}>
             <Typography
-              sx={{ fontSize: '2rem', color: '#834724', fontWeight: 'bold' }}
+              sx={{
+                fontSize: '3rem',
+                color: '#834724',
+                fontFamily: '"Luckiest Guy", serif',
+                marginTop: '20px',
+              }}
             >
               HOW TO PLAY
             </Typography>

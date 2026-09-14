@@ -141,16 +141,7 @@ export default function DeckView() {
   const headerUI = () => {
     return (
       <Box className='flexColumn' sx={{ gap: '15px' }}>
-        <Typography
-          variant='h2'
-          sx={{
-            fontFamily: '"Suwannaphum", serif',
-            fontWeight: 'bold',
-            color: '#3A1605',
-          }}
-        >
-          {deck.name}
-        </Typography>
+        <Typography className='mainHeader'>{deck.name}</Typography>
         <Box className='flexRow' sx={{ gap: '10px' }}>
           <Typography sx={{ color: '#737373' }}>
             by {deck.owner.username}
