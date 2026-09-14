@@ -1,21 +1,11 @@
 import { Box, Button, Typography } from '@mui/material'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import BasicMenu from './AccountMenu'
 import bomb from '../../images/Bomb No Text.png'
 import { DELETE_USER, ME } from '../queries'
 import { useMutation, useQuery, useApolloClient } from '@apollo/client/react'
 import { useAuth0 } from '@auth0/auth0-react'
 import AccountMenu from './AccountMenu'
-
-const navBarStyle = {
-  position: 'sticky',
-  top: '0px',
-  width: 'calc(100vw - 7rem)',
-  zIndex: '100',
-  backgroundColor: '#FFF8E9',
-  height: '7vh',
-  alignItems: 'center',
-}
 
 const buttonSX = {
   color: '#3A1605',
@@ -24,51 +14,24 @@ const buttonSX = {
 }
 
 const NavigationBar = () => {
-  const client = useApolloClient()
+  const { pathname } = useLocation()
   const result = useQuery(ME, {})
   const loggedIn = result.data?.me !== null && !result.data.me.isGuest
 
-  const { loginWithRedirect, logout } = useAuth0()
-
-  const handleLogout = () => {
-    logout({
-      logoutParams: {
-        returnTo: window.location.origin,
-      },
-    })
+  const navBarStyle = {
+    position: 'sticky',
+    top: '0px',
+    // width: 'calc(100vw - 7rem)',
+    zIndex: '100',
+    backgroundColor: pathname === '/' ? '#7FBF51' : '#F4F0E8',
+    height: '7vh',
+    alignItems: 'center',
   }
+
+  const { loginWithRedirect } = useAuth0()
 
   const handleLogin = () => {
     loginWithRedirect()
-  }
-
-  const [deleteUser] = useMutation(DELETE_USER, {
-    update(cache, { data }) {
-      console.log('done with delete user')
-    },
-  })
-
-  const tryDeleteUser = async () => {
-    console.log('try delete')
-    // await deleteUser()
-    // await client.clearStore()
-    // await logout()
-
-    console.log('finished deleting')
-  }
-
-  const loggedInButtns = () => {
-    return (
-      <>
-        <Button sx={buttonSX} onClick={handleLogout}>
-          Log out
-        </Button>
-        <Typography sx={{ color: '#3A1605' }}>•</Typography>
-        <Button sx={buttonSX} onClick={tryDeleteUser}>
-          Delete Account
-        </Button>
-      </>
-    )
   }
 
   return (

@@ -8,6 +8,7 @@ import fullScreenImageBig from '../../images/Full Screen Big.png'
 import gameplayGuess from '../../images/GameplayGuess.png'
 import gameplayHint from '../../images/GameplayHint.png'
 import makeDeck from '../../images/MakeDeck.png'
+import '@fontsource/luckiest-guy'
 
 const boxStyle = {
   display: 'flex',
@@ -165,7 +166,7 @@ const HomePage = () => {
       <Box className='content'>
         <Box
           className='mainContent flexColumn'
-          sx={{ height: 'calc(93vh - 32.6vw)' }}
+          sx={{ minHeight: 'calc(93vh - 32.6vw)' }}
         >
           <div
             className={'background'}
@@ -190,12 +191,14 @@ const HomePage = () => {
               </Button>
             </Box>
           </Container>
-          <Box
-            className='flexColumn'
-            sx={{ alignItems: 'center', marginTop: 'auto' }}
-          >
+          <Box className='flexColumn' sx={{ alignItems: 'center' }}>
             <Typography
-              sx={{ fontSize: '2rem', color: '#834724', fontWeight: 'bold' }}
+              sx={{
+                fontSize: '3rem',
+                color: '#834724',
+                fontFamily: '"Luckiest Guy", serif',
+                marginTop: '20px',
+              }}
             >
               HOW TO PLAY
             </Typography>
