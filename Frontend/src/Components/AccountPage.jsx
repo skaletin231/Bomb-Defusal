@@ -13,19 +13,13 @@ const AccountPage = () => {
   const client = useApolloClient()
   const { logout } = useAuth0()
 
-  const [deleteUser] = useMutation(DELETE_USER, {
-    update(cache, { data }) {
-      console.log('done with delete user')
-    },
-  })
+  const [deleteUser] = useMutation(DELETE_USER)
 
   const tryDeleteUser = async () => {
-    console.log('try delete')
     await deleteUser()
     await client.clearStore()
     await logout()
 
-    console.log('finished deleting')
     setOpenDeletePrompt(null)
   }
 

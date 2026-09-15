@@ -60,8 +60,6 @@ function GameOverScreen({ open, setOpen, game }) {
   const handleSubmit = async (event) => {
     event.preventDefault()
 
-    console.log('not done yet')
-
     const result = await startGame({
       variables: {
         deckID: game.deckID,

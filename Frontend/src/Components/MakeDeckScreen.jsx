@@ -153,7 +153,6 @@ const MakeDeckScreen = () => {
 
   const [updateDeck] = useMutation(UPDATE_DECK, {
     update(cache, { data }) {
-      console.log('try run update')
       cache.modify({
         id: cache.identify({
           __typename: 'Deck',
@@ -211,13 +210,6 @@ const MakeDeckScreen = () => {
 
   const tryVerifyDeckChanges = async (event) => {
     event.preventDefault()
-    console.log('updateDeck: ', {
-      deckID: deckResults.data?.getMyDeck.id,
-      name: deckName,
-      public: isPublicDeck,
-      cards: allCards,
-      notes: notes,
-    })
     await updateDeck({
       variables: {
         deckID: deckResults.data?.getMyDeck.id,

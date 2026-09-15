@@ -120,7 +120,7 @@ export default function ListOfMyDecks({ setSelectedDeck }) {
       <ConfirmDeleteDialogue
         open={deckToDelete !== null}
         onConfirm={tryRemoveDeck}
-        setDeckToDelete={setDeckToDelete}
+        setTracker={setDeckToDelete}
       />
 
       <NotificationPopup

@@ -20,21 +20,15 @@ const { useServer } = require('graphql-ws/use/ws')
 const cookieParser = require('cookie-parser')
 
 const checkJwtOptional = (req, res, next) => {
-  //console.log('token', req.headers.authorization)
-  //console.log('token', req.headers.authorization?.split(' '))
   const token = req.headers.authorization?.split(' ')[1]
-  //console.log('token', token)
 
   if (!token) {
-    //console.log('null')
     req.user = null
     return next()
   }
 
   return checkJwt(req, res, (err) => {
-    //console.log(err)
     if (err) {
-      //console.log('null 2')
       req.user = null
       return next()
     }
@@ -98,9 +92,7 @@ const startServer = async (port) => {
     checkJwtOptional,
     expressMiddleware(server, {
       context: async ({ req, res }) => {
-        console.log('made it to server')
         if (!req.auth) {
-          console.log('people without any authentication, so guests i guess')
           return {
             auth: null,
             user: null,
@@ -111,11 +103,8 @@ const startServer = async (port) => {
         const auth = req.auth.payload
         const id = auth?.sub
 
-        console.log('made it to 114')
-
         if (!id) {
           //this would be a valid request by a guest i think?
-          console.log('random authentication')
           return {
             auth: null,
             user: null,
@@ -125,7 +114,6 @@ const startServer = async (port) => {
         }
 
         let user = await User.findOne({ auth0_ID: id })
-        console.log('made it to 128:', id)
 
         if (!user) {
           const token = req.auth.token
@@ -148,9 +136,6 @@ const startServer = async (port) => {
 
           //return newUser
         }
-        console.log('made it to 151')
-
-        //console.log('final context', user, req.signedCookies)
 
         return { auth, user, res, req }
       },

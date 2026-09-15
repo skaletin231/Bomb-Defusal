@@ -81,7 +81,6 @@ const DecksScreen = () => {
     Math.trunc(publicDecks.length / decksPerPage) + 1
 
   const handleDeckTab = (event, newAlignment) => {
-    console.log(newAlignment)
     if (newAlignment !== null) {
       setCurrentDeckTab(newAlignment)
     }

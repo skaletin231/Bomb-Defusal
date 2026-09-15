@@ -46,7 +46,6 @@ const resolvers = {
 
       const game = await Game.findById(args.id).populate('players.officialUser')
       if (!game || !includesPlayer(game, context)) notAPlayerError()
-      console.log('get game:', game)
       const returnVal = returnInfo(game, context)
 
       return returnVal
@@ -886,8 +885,6 @@ const returnInfo = (game, context) => {
         ? convertGamePlayer(game.players[0])
         : convertGamePlayer(game.players[1])
   }
-
-  console.log(game)
 
   return {
     id: game.id,

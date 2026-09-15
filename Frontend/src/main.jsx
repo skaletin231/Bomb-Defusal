@@ -26,8 +26,7 @@ const theme = createTheme({
       MuiOutlinedInput: {
         styleOverrides: {
           notchedOutline: {
-            borderWidth: '0rem',
-            borderRadius: '10px',
+            borderStyle: 'none',
           },
         },
       },

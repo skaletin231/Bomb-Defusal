@@ -58,7 +58,6 @@ export default function DeckView() {
   })
   const deck = deckResults.data?.getOneDeck
   const myDeck = me?.id === deck?.owner?.id
-  console.log(myDeck, deck)
 
   const from = location.state?.from
   const [removeDeck] = useMutation(REMOVE_DECK, {

@@ -46,14 +46,12 @@ function JoinGameDialogue({ open, setOpen }) {
     const formData = new FormData(event.currentTarget)
     const formJson = Object.fromEntries(formData.entries())
     const formatedString = formJson.gameID.trim()
-    console.log(formatedString)
     try {
       const result = await joinGame({
         variables: {
           gameID: formatedString,
         },
       })
-      console.log('results:', result)
 
       if (result.data === null || result.data.joinGame === null) return
 

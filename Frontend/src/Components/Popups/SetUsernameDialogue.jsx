@@ -44,7 +44,6 @@ const SetUsernameDialogue = ({ open }) => {
     const formData = new FormData(event.currentTarget)
     const formJson = Object.fromEntries(formData.entries())
     const formatedString = formJson.newUsername.trim()
-    console.log(formatedString)
 
     try {
       const result = await updateUsername({
@@ -52,7 +51,6 @@ const SetUsernameDialogue = ({ open }) => {
           username: formatedString,
         },
       })
-      console.log('results:', result)
 
       if (result.data === null || result.data.updateUserInfo === null) return
     } catch (error) {
