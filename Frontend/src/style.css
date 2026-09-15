@@ -28,6 +28,12 @@ hr.MuiDivider-root {
   font-weight: bold;
 }
 
+.MuiTypography-root.grayText {
+  font-size: 1rem;
+  color: #737373;
+  line-height: 1;
+}
+
 .MuiTypography-root.bigText,
 span.bigText {
   font-size: 1.5rem;
@@ -149,6 +155,14 @@ div.textFieldStyle3D {
   height: 50px;
   border: 0.15rem solid #84582e;
   flex-grow: 1;
+}
+
+div.textFieldStyle3D .MuiOutlinedInput-notchedOutline {
+  border-style: none;
+}
+
+div.textFieldStyle3D .Mui-focused fieldset {
+  border-color: #84582e;
 }
 
 div.textFieldStyle3D input::placeholder {

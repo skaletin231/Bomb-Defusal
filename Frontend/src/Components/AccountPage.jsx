@@ -10,8 +10,8 @@ const AccountPage = () => {
   const result = useQuery(ME, {})
   const [openDeletePrompt, setOpenDeletePrompt] = useState(null)
 
-  //const client = useApolloClient()
-  const { loginWithRedirect, logout } = useAuth0()
+  const client = useApolloClient()
+  const { logout } = useAuth0()
 
   const [deleteUser] = useMutation(DELETE_USER, {
     update(cache, { data }) {
@@ -19,15 +19,11 @@ const AccountPage = () => {
     },
   })
 
-  const handleLogin = () => {
-    loginWithRedirect()
-  }
-
   const tryDeleteUser = async () => {
     console.log('try delete')
-    // await deleteUser()
-    // await client.clearStore()
-    // await logout()
+    await deleteUser()
+    await client.clearStore()
+    await logout()
 
     console.log('finished deleting')
     setOpenDeletePrompt(null)
@@ -73,6 +69,7 @@ const AccountPage = () => {
             variant='contained'
             className='brown buttonStyle3D'
             sx={{ '&&': { height: '2.5rem' } }}
+            onClick={handleLogout}
           >
             Log Out
           </Button>
@@ -88,7 +85,7 @@ const AccountPage = () => {
 
       <Divider />
       <Box className='flexColumn' sx={{ gap: '15px' }}>
-        <Typography className='secondaryHeader'>Delete Account</Typography>
+        <Typography className='biggerText'>Delete Account</Typography>
         <Typography className='warning' sx={{ fontStyle: 'italic' }}>
           This will permanently remove all of your decks and data.
         </Typography>

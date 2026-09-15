@@ -23,6 +23,19 @@ const theme = createTheme({
           textTransform: 'none',
         },
       },
+      MuiOutlinedInput: {
+        styleOverrides: {
+          notchedOutline: {
+            borderWidth: '0rem',
+            borderRadius: '10px',
+          },
+        },
+      },
+    },
+  },
+  palette: {
+    primary: {
+      main: '#84582e',
     },
   },
 })

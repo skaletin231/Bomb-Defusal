@@ -190,8 +190,16 @@ export default function StartGameDrawer({
               <Typography className='biggerText'>
                 {selectedDeck?.name}
               </Typography>
-              <Typography className='normalText'>
-                by {selectedDeck?.owner?.username}
+              <Typography className='grayText' sx={{ whiteSpace: 'pre' }}>
+                by{' '}
+                <span style={{ color: '#3A1605' }}>
+                  {selectedDeck?.owner?.username}
+                </span>
+                {'   •   '}
+                <span style={{ color: '#3A1605' }}>
+                  {selectedDeck?.cards.length}
+                </span>{' '}
+                cards
               </Typography>
             </Box>
             <Box className='flexRow'>

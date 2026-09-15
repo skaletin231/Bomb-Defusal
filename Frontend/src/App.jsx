@@ -14,21 +14,22 @@ import AccountPage from './Components/AccountPage'
 import FooterBar from './Components/FooterBar'
 import TermsOfService from './Components/TermsOfService'
 import PrivacyPolicy from './Components/PrivacyPolicy'
+import SetUsernameDialogue from './Components/Popups/SetUsernameDialogue'
 
 function App() {
   const result = useQuery(ME, {})
 
-  if (!result.loading) {
-    //data is null in an error, may need to check for that
-    if (
-      result.data?.me !== null &&
-      result.data?.me.username === null
-    ) //found a person
-    {
-      console.log('need initial setup')
-      return <AccountSetup />
-    }
-  }
+  // if (!result.loading) {
+  //   //data is null in an error, may need to check for that
+  //   if (
+  //     result.data?.me !== null &&
+  //     result.data?.me.username === null
+  //   ) //found a person
+  //   {
+  //     console.log('need initial setup')
+  //     return <AccountSetup />
+  //   }
+  // }
 
   const noPageError = () => {
     return <h1>Error 404: Page Not Found</h1>
@@ -37,6 +38,9 @@ function App() {
   if (result.loading) {
     return <p>loading...</p>
   }
+
+  const needToSetUsername =
+    result.data?.me !== null && result.data?.me.username === null
 
   return (
     <Box className='EntirePage flexColumn' sx={{ minHeight: '100vh' }}>
@@ -60,6 +64,7 @@ function App() {
       <Box sx={{ flexGrow: '1', alignContent: 'end' }}>
         <FooterBar />
       </Box>
+      <SetUsernameDialogue open={needToSetUsername} />
     </Box>
   )
 }

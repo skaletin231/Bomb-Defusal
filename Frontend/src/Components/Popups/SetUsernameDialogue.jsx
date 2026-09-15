@@ -1,23 +1,21 @@
-import Button from '@mui/material/Button'
-import Dialog from '@mui/material/Dialog'
-import DialogContent from '@mui/material/DialogContent'
-import DialogTitle from '@mui/material/DialogTitle'
-import TextField from '@mui/material/TextField'
-import { IconButton, Typography } from '@mui/material'
 import { useMutation } from '@apollo/client/react'
-import { JOIN_GAME, ME } from '../../queries'
-import { useNavigate } from 'react-router-dom'
-import CloseIcon from '@mui/icons-material/Close'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  TextField,
+} from '@mui/material'
+import { ME, UPDATE_USER_INFO } from '../../queries'
 
-function JoinGameDialogue({ open, setOpen }) {
+const SetUsernameDialogue = ({ open }) => {
   const handleClose = () => {
-    setOpen(false)
+    //setOpen(false)
   }
 
-  const [joinGame] = useMutation(JOIN_GAME, {
+  const [updateUsername] = useMutation(UPDATE_USER_INFO, {
     refetchQueries: [ME],
   })
-  const navigate = useNavigate()
 
   const dialogueSX = {
     borderColor: '#834724',
@@ -45,22 +43,21 @@ function JoinGameDialogue({ open, setOpen }) {
     event.preventDefault()
     const formData = new FormData(event.currentTarget)
     const formJson = Object.fromEntries(formData.entries())
-    const formatedString = formJson.gameID.trim()
+    const formatedString = formJson.newUsername.trim()
     console.log(formatedString)
+
     try {
-      const result = await joinGame({
+      const result = await updateUsername({
         variables: {
-          gameID: formatedString,
+          username: formatedString,
         },
       })
       console.log('results:', result)
 
-      if (result.data === null || result.data.joinGame === null) return
-
-      navigate(`/playing/${result.data.joinGame.id}`)
+      if (result.data === null || result.data.updateUserInfo === null) return
     } catch (error) {
       if (error?.errors?.[0]?.extensions?.code === 'INTERNAL_SERVER_ERROR') {
-        console.error(`Invalid ID recieved: ${formJson.gameID}`)
+        console.error(`error processing request: ${formJson.newUsername}`)
       } else {
         console.error(error)
       }
@@ -69,13 +66,13 @@ function JoinGameDialogue({ open, setOpen }) {
 
   return (
     <Dialog
-      className='confirmJoin'
+      className='setUsername'
       open={open}
       onClose={handleClose}
       slotProps={{
         paper: {
           sx: dialogueSX,
-          className: 'dialogDisplay',
+          className: 'dialogDisplayTest',
         },
       }}
     >
@@ -87,28 +84,13 @@ function JoinGameDialogue({ open, setOpen }) {
           padding: '0 0 3.5rem 0',
         }}
       >
-        Join Game
-        <IconButton
-          aria-label='close'
-          onClick={handleClose}
-          sx={{
-            position: 'absolute',
-            right: 8,
-            top: 8,
-          }}
-        >
-          <CloseIcon
-            sx={{
-              fontSize: '3rem',
-            }}
-          />
-        </IconButton>
+        New User
       </DialogTitle>
       <DialogContent sx={contentSX}>
         <form
           className='flexRow'
           onSubmit={handleSubmit}
-          id='join-game-form'
+          id='set-username-form'
           style={{ gap: '20px' }}
         >
           <TextField
@@ -116,9 +98,9 @@ function JoinGameDialogue({ open, setOpen }) {
             variant='outlined'
             autoFocus
             required
-            id='gameID'
-            name='gameID'
-            placeholder='Enter Invite Code'
+            id='newUsername'
+            name='newUsername'
+            placeholder='Enter Username'
             className='textFieldStyle3D'
             sx={{
               '& input::placeholder': {
@@ -133,7 +115,7 @@ function JoinGameDialogue({ open, setOpen }) {
             variant='contained'
             type='submit'
           >
-            Join
+            Accept
           </Button>
         </form>
       </DialogContent>
@@ -141,4 +123,4 @@ function JoinGameDialogue({ open, setOpen }) {
   )
 }
 
-export default JoinGameDialogue
+export default SetUsernameDialogue

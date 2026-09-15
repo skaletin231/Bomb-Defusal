@@ -100,7 +100,6 @@ const TermsOfService = () => {
           </li>
         </ul>
       </Box>
-
       <Box>
         <Typography className='bigText'>6. Acceptable Use</Typography>
         <Typography className='normalText'>You agree not to:</Typography>
@@ -171,8 +170,8 @@ const TermsOfService = () => {
         <Typography className='bigText'>12. Contact</Typography>
         <Typography className='normalText'>
           For questions regarding these Terms, please contact us at:
-          [example@email.com]
         </Typography>
+        <Typography className='normalText'> [example@email.com] </Typography>
       </Box>
     </Box>
   )

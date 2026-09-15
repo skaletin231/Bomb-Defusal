@@ -9,6 +9,9 @@ import gameplayGuess from '../../images/GameplayGuess.png'
 import gameplayHint from '../../images/GameplayHint.png'
 import makeDeck from '../../images/MakeDeck.png'
 import '@fontsource/luckiest-guy'
+import { useQuery } from '@apollo/client/react'
+import { ME } from '../queries'
+import SetUsernameDialogue from './Popups/SetUsernameDialogue'
 
 const boxStyle = {
   display: 'flex',
@@ -145,6 +148,10 @@ const tutorialTextContentSX = {
 
 const HomePage = () => {
   const [open, setOpen] = useState(false)
+  //const result = useQuery(ME, {})
+
+  // const needToSetUsername =
+  //   result.data?.me !== null && result.data?.me.username === null
 
   return (
     <>
@@ -209,6 +216,7 @@ const HomePage = () => {
         </Box>
 
         <JoinGameDialogue open={open} setOpen={setOpen} />
+        {/* <SetUsernameDialogue open={needToSetUsername} /> */}
       </Box>
 
       {tutorialSectionUI()}
