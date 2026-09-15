@@ -48,10 +48,12 @@ const DecksScreen = () => {
   const publicDecks = deckResults.data.getAllDecks.publicDecks
 
   const deckURL = searchParams.get('deck')
-  const deckToDisplay =
-    myDecks.find((x) => x.id === deckURL) ??
-    publicDecks.find((x) => x.id === deckURL) ??
-    null
+
+  let canEdit = false
+  let deckToDisplay = myDecks.find((x) => x.id === deckURL)
+  if (deckToDisplay === undefined) {
+    deckToDisplay = publicDecks.find((x) => x.id === deckURL) ?? null
+  } else canEdit = true
 
   const boxSX = {
     gridTemplateColumns: 'repeat(auto-fill, 266px)',
@@ -167,6 +169,7 @@ const DecksScreen = () => {
         open={deckToDisplay !== null}
         setSelectedDeck={openRightPanel}
         selectedDeck={deckToDisplay}
+        canEdit={canEdit}
       />
     </Box>
   )

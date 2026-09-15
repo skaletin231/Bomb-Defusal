@@ -7,7 +7,7 @@ import {
   Typography,
 } from '@mui/material'
 import { useMutation, useQuery } from '@apollo/client/react'
-import { REMOVE_DECK } from '../queries'
+import { COPY_DECK, REMOVE_DECK } from '../queries'
 import '@fontsource/suwannaphum'
 
 import { Link, useLocation, useNavigate } from 'react-router-dom'
@@ -19,6 +19,9 @@ import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
 import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
 import Divider from '@mui/material/Divider'
+import { gql } from '@apollo/client'
+import NotificationPopup from './Popups/NotificationPopup'
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded'
 
 const deckCardsx = {
   height: '6rem',
@@ -42,6 +45,7 @@ const myButtonsSX = {
 }
 
 export default function DeckView() {
+  const [openCreatePopup, setOpenCreatePopup] = useState(false)
   const { data: meData } = useQuery(ME, {})
   const me = meData.me
 
@@ -97,6 +101,50 @@ export default function DeckView() {
       },
     })
     setDeletePanelOpen(false)
+  }
+
+  const [copyDeck] = useMutation(COPY_DECK, {
+    update(cache, { data }) {
+      const newRef = cache.writeFragment({
+        data: data.copyDeck,
+        fragment: gql`
+          fragment Deck on Deck {
+            id
+            owner {
+              __typename
+              username
+              id
+            }
+            name
+            public
+            cards
+          }
+        `,
+      })
+
+      //if i ever add pagination, this may not be a good thing to do anymore
+      cache.modify({
+        fields: {
+          getMyDecks(existing = []) {
+            return [...existing, newRef]
+          },
+          getAllDecks(existing) {
+            if (!existing) return existing
+            return { ...existing, myDecks: [existing.myDecks, newRef] }
+          },
+        },
+      })
+
+      setOpenCreatePopup(true)
+    },
+  })
+
+  const tryMakeCopy = async () => {
+    await copyDeck({
+      variables: {
+        deckID: deckID,
+      },
+    })
   }
 
   const sortedCards = useMemo(() => {
@@ -242,6 +290,21 @@ export default function DeckView() {
     setDeletePanelOpen(false)
   }
 
+  const buttonsUINotMine = () => {
+    return (
+      <Box className='flexRow deckViewButtons'>
+        <Button
+          onClick={tryMakeCopy}
+          className='buttonStyle3D'
+          variant='contained'
+          sx={myButtonsSX}
+        >
+          <ContentCopyRoundedIcon /> Copy Deck
+        </Button>
+      </Box>
+    )
+  }
+
   return (
     <Box
       className='flexColumn'
@@ -250,6 +313,7 @@ export default function DeckView() {
       <Box className='flexColumn' sx={{ gap: '30px', padding: '0 1rem' }}>
         {headerUI()}
         {myDeck && buttonsUIMine()}
+        {!myDeck && me !== null && buttonsUINotMine()}
       </Box>
 
       <Divider
@@ -296,6 +360,13 @@ export default function DeckView() {
         open={deletePanelOpen}
         onConfirm={tryRemoveDeck}
         setDeckToDelete={closePopup}
+      />
+
+      <NotificationPopup
+        message={'Deck Created'}
+        color={'success'}
+        open={openCreatePopup}
+        setOpen={setOpenCreatePopup}
       />
     </Box>
   )

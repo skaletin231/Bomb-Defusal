@@ -34,6 +34,18 @@ const NavigationBar = () => {
     loginWithRedirect()
   }
 
+  const loggedInUI = () => {
+    return (
+      <>
+        <Button sx={buttonSX} component={Link} to={'/mydecks'}>
+          Decks
+        </Button>
+        <Typography sx={{ color: '#3A1605' }}>•</Typography>
+        <AccountMenu />
+      </>
+    )
+  }
+
   return (
     <Box sx={navBarStyle} className='navigationBar flexRow'>
       <Button
@@ -58,19 +70,14 @@ const NavigationBar = () => {
           Home
         </Button>
         <Typography sx={{ color: '#3A1605' }}>•</Typography>
-        <Button sx={buttonSX} component={Link} to={'/mydecks'}>
-          Decks
-        </Button>
-        <Typography sx={{ color: '#3A1605' }}>•</Typography>
+
         {!loggedIn && (
           <Button sx={buttonSX} onClick={handleLogin}>
             Log In
           </Button>
         )}
-        {/* {loggedIn && loggedInButtns()} */}
-        {loggedIn && <AccountMenu />}
+        {loggedIn && loggedInUI()}
       </Box>
-      {/* <BasicMenu /> */}
     </Box>
   )
 }

@@ -74,6 +74,7 @@ export default function StartGameDrawer({
   open,
   setSelectedDeck,
   selectedDeck,
+  canEdit,
 }) {
   const location = useLocation()
   // const [gridSizeX, setGridSizeX] = useState(5)
@@ -202,7 +203,10 @@ export default function StartGameDrawer({
                 cards
               </Typography>
             </Box>
-            <Box className='flexRow'>
+            <Box
+              className='flexRow'
+              sx={{ flexGrow: '1', justifyContent: 'center' }}
+            >
               <Button
                 component={Link}
                 to={`/decks/${selectedDeck?.id}`}
@@ -210,9 +214,11 @@ export default function StartGameDrawer({
               >
                 <VisibilityIcon sx={{ color: '#84582E' }} />
               </Button>
-              <Button component={Link} to={`/mydecks/${selectedDeck?.id}`}>
-                <EditIcon sx={{ color: '#84582E' }} />
-              </Button>
+              {canEdit && (
+                <Button component={Link} to={`/mydecks/${selectedDeck?.id}`}>
+                  <EditIcon sx={{ color: '#84582E' }} />
+                </Button>
+              )}
             </Box>
           </Box>
 

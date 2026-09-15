@@ -197,11 +197,9 @@ const resolvers = {
       }
     },
     getOneDeck: async (root, args, context) => {
-      checkIsLoggedIn(context)
-
       const deck = await Deck.findById(args.deckID).populate('owner')
 
-      if (!deck || !(deck.owner._id.equals(context.user._id) || deck.public))
+      if (!deck || !(deck.owner._id.equals(context.user?._id) || deck.public))
         deckNotFoundError()
 
       return {
@@ -667,7 +665,8 @@ const resolvers = {
       checkIsLoggedIn(context)
 
       const deck = await Deck.findById(args.deckID)
-      if (!deck || !deck.owner.equals(context.user._id)) cantAccessDeckError()
+      const isOwnedOrPublic = deck.owner.equals(context.user._id) || deck.public
+      if (!deck || !isOwnedOrPublic) cantAccessDeckError()
 
       const newDeck = new Deck({
         owner: context.user._id,
