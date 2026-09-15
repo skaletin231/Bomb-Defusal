@@ -61,7 +61,7 @@ function App() {
           <Route path='*' element={noPageError()} />
         </Routes>
       </Box>
-      <Box sx={{ flexGrow: '1', alignContent: 'end' }}>
+      <Box sx={{ flexGrow: '1', alignContent: 'end', marginTop: '20px' }}>
         <FooterBar />
       </Box>
       <SetUsernameDialogue open={needToSetUsername} />

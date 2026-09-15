@@ -5,6 +5,8 @@ import JoinGameDialogue from './Popups/JoinGameDialogue'
 import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown'
 
 import fullScreenImageBig from '../../images/Full Screen Big.png'
+
+import gameplayGameOver from '../../images/GameplayGameOver.png'
 import gameplayGuess from '../../images/GameplayGuess.png'
 import gameplayHint from '../../images/GameplayHint.png'
 import makeDeck from '../../images/MakeDeck.png'
@@ -33,7 +35,8 @@ const tutorialSectionSX = {
 const tutorialImageSX = {
   flex: '1',
   minWidth: '0',
-  height: '600px',
+  height: 'fit-content',
+  alignSelf: 'center',
 }
 
 const tutorialTextContainerSX = {
@@ -128,7 +131,7 @@ const tutorialSectionUI = () => {
           </Typography>
         </Box>
 
-        <img src={gameplayHint} style={tutorialImageSX} />
+        <img src={gameplayGameOver} style={tutorialImageSX} />
       </Box>
     </Box>
   )
