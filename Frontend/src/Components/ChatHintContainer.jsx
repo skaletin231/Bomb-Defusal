@@ -22,7 +22,7 @@ const paperSX = {
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
-  borderRadius: '15% 15% 0px 0px',
+  borderRadius: '15px 15px 0px 0px',
   overflow: 'hidden',
   borderStyle: 'solid',
   borderWidth: '1px',
@@ -35,6 +35,7 @@ const collapseContainerSX = {
   borderWidth: '0px 3px',
   borderColor: '#84582E',
   backgroundColor: '#ececec',
+  paddingTop: '8px',
 }
 
 const ChatHintContainer = ({ gameID }) => {

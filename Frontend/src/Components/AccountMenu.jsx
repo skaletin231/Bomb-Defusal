@@ -1,24 +1,22 @@
-import { useQuery } from '@apollo/client/react'
 import { useAuth0 } from '@auth0/auth0-react'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import { useNavigate } from 'react-router-dom'
-import { ME } from '../queries'
 import { useState, useId } from 'react'
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined'
-import { Box } from '@mui/material'
+import { Box, Divider } from '@mui/material'
 
-const divStyle = {
-  //position: 'fixed',
-  //top: 'calc(3.5vh - 16px)',
-  //right: '3rem',
+const menuSX = {
+  '& .MuiPaper-root': {
+    backgroundColor: '#F4F0E8',
+    boxShadow: 'none',
+    left: 'auto',
+    borderRadius: '0px 0px 10px 10px',
+  },
 }
 
 export default function AccountMenu() {
-  const result = useQuery(ME, {})
-  const loggedIn = result.data?.me !== null && !result.data.me.isGuest
-
   const { logout } = useAuth0()
   const navigate = useNavigate()
 
@@ -52,13 +50,14 @@ export default function AccountMenu() {
     return (
       <>
         <MenuItem onClick={handleAccountTransition}>My Account</MenuItem>
+        <Divider sx={{ '&&': { margin: '0px' } }} />
         <MenuItem onClick={handleLogout}>Logout</MenuItem>
       </>
     )
   }
 
   return (
-    <Box sx={divStyle}>
+    <Box>
       <IconButton
         onClick={handleClick}
         size='small'
@@ -71,10 +70,21 @@ export default function AccountMenu() {
         />
       </IconButton>
       <Menu
+        className='accountMenu'
+        disableScrollLock
+        sx={menuSX}
         id={menuId}
         anchorEl={anchorEl}
         open={open}
         onClose={handleClose}
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'center',
+        }}
+        transformOrigin={{
+          vertical: 'top',
+          horizontal: 'center',
+        }}
         slotProps={{
           list: {
             'aria-labelledby': buttonId,

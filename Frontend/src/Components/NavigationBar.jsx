@@ -31,6 +31,7 @@ const NavigationBar = () => {
     backgroundColor: isActive() ? '#7FBF51' : '#F4F0E8',
     height: '7vh',
     alignItems: 'center',
+    boxSizing: 'border-box',
   }
 
   const { loginWithRedirect } = useAuth0()

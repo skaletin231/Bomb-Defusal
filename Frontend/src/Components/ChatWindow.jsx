@@ -16,6 +16,7 @@ const textSX = {
   maxWidth: '50%',
   borderRadius: '5px',
   padding: '.4rem',
+  overflowWrap: 'break-word',
 }
 
 const formStyle = {
@@ -105,6 +106,8 @@ const ChatWindow = ({ gameID, chatView }) => {
   const trySendMessage = async (event) => {
     event?.preventDefault()
 
+    if (messageToSend === '') return
+
     await sendMessage({
       variables: {
         gameID: gameID,
@@ -127,7 +130,7 @@ const ChatWindow = ({ gameID, chatView }) => {
             {message.text}
           </Typography>
         ))}
-        <div ref={bottomRef} />
+        <Box ref={bottomRef} />
       </Stack>
       <Box
         sx={{
@@ -149,7 +152,7 @@ const ChatWindow = ({ gameID, chatView }) => {
                 boxSizing: 'border-box',
               },
               '& .MuiInputLabel-root': {
-                transform: 'translate(14px, 20px) scale(1)',
+                transform: 'translate(14px, 100%) scale(1)',
               },
               '& .MuiInputLabel-shrink': {
                 transform: 'translate(14px, -9px) scale(0.75)',
@@ -168,6 +171,13 @@ const ChatWindow = ({ gameID, chatView }) => {
                 borderColor: '#84582E',
                 borderWidth: '3px 0 0 0',
                 borderRadius: '0px',
+              },
+              '& .MuiInputBase-input': {
+                scrollbarWidth: 'none',
+
+                '&::-webkit-scrollbar': {
+                  display: 'none',
+                },
               },
             }}
             value={messageToSend}

@@ -22,6 +22,11 @@ hr.MuiDivider-root {
   font-size: 1.25rem;
 }
 
+.accountMenu ul,
+.sortMenu ul {
+  padding-bottom: 0px;
+}
+
 .MuiTypography-root.smallText,
 .MuiButtonBase-root.smallText {
   font-size: 1rem;

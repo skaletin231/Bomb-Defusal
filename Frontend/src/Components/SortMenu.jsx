@@ -1,10 +1,17 @@
-import { Button } from '@mui/material'
+import { Box, Button, Divider } from '@mui/material'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 import { useState, useId } from 'react'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 
-const divStyle = {}
+const menuSX = {
+  '& .MuiPaper-root': {
+    backgroundColor: '#F4F0E8',
+    boxShadow: 'none',
+    left: 'auto',
+    borderRadius: '0px 0px 10px 10px',
+  },
+}
 
 export default function SortMenu({ sortBy, setSortBy }) {
   const id = useId()
@@ -32,12 +39,17 @@ export default function SortMenu({ sortBy, setSortBy }) {
         <MenuItem onClick={() => handleSelection('Name (a-z)')}>
           Name (a-z)
         </MenuItem>
+        <Divider sx={{ '&&': { margin: '0px' } }} />
         <MenuItem onClick={() => handleSelection('Name (z-a)')}>
           Name (z-a)
         </MenuItem>
+        <Divider sx={{ '&&': { margin: '0px' } }} />
+
         <MenuItem onClick={() => handleSelection('Date Added (Oldest First)')}>
           Date Added (Oldest First)
         </MenuItem>
+        <Divider sx={{ '&&': { margin: '0px' } }} />
+
         <MenuItem onClick={() => handleSelection('Date Added (Newest First)')}>
           Date Added (Newest First)
         </MenuItem>
@@ -46,7 +58,7 @@ export default function SortMenu({ sortBy, setSortBy }) {
   }
 
   return (
-    <div style={divStyle}>
+    <Box>
       <Button
         className='normalText'
         onClick={handleClick}
@@ -58,6 +70,9 @@ export default function SortMenu({ sortBy, setSortBy }) {
         <SwapHorizIcon sx={{ width: 32, height: 32 }} />
       </Button>
       <Menu
+        className='sortMenu'
+        disableScrollLock
+        sx={menuSX}
         id={menuId}
         anchorEl={anchorEl}
         open={open}
@@ -70,6 +85,6 @@ export default function SortMenu({ sortBy, setSortBy }) {
       >
         {menu()}
       </Menu>
-    </div>
+    </Box>
   )
 }
