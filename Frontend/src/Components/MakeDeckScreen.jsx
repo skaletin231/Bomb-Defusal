@@ -582,7 +582,7 @@ const MakeDeckScreen = () => {
             //   height: '33.13rem',
             // },
           }}
-          placeholder='Appble, Banana, Cherry, ...'
+          placeholder='Apple, Banana, Cherry, ...'
           rows={20}
         ></TextField>
         <Box sx={{ gap: '40px', alignItems: 'center' }} className='flexRow'>

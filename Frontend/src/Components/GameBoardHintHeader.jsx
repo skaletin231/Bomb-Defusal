@@ -150,7 +150,12 @@ const GameBoardHintHeader = () => {
   return (
     <Box
       className='GiveHintSection'
-      sx={{ display: 'flex', flexDirection: 'row', gap: '40px' }}
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        gap: '40px',
+        marginBlock: '10px',
+      }}
     >
       <Box className='HintInput'>
         <TextField

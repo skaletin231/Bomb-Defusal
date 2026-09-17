@@ -44,6 +44,8 @@ const myButtonsSX = {
   },
 }
 
+const sortSX = { alignContent: 'center', marginTop: '4px', marginLeft: 'auto' }
+
 export default function DeckView() {
   const [openCreatePopup, setOpenCreatePopup] = useState(false)
   const { data: meData } = useQuery(ME, {})
@@ -208,10 +210,7 @@ export default function DeckView() {
 
   const buttonsUIMine = () => {
     return (
-      <Box
-        className='flexRow deckViewButtons'
-        sx={{ justifyContent: 'space-between' }}
-      >
+      <Box className='flexRow deckViewButtons'>
         <Box className='flexRow deckViewButtons' sx={{ gap: '10px' }}>
           <Button
             className='buttonStyle3D'
@@ -233,7 +232,7 @@ export default function DeckView() {
           </Button>
         </Box>
 
-        <Box>
+        <Box sx={sortSX}>
           <SortMenu sortBy={sortBy} setSortBy={setSortBy} />
         </Box>
       </Box>
@@ -293,14 +292,22 @@ export default function DeckView() {
   const buttonsUINotMine = () => {
     return (
       <Box className='flexRow deckViewButtons'>
-        <Button
-          onClick={tryMakeCopy}
-          className='buttonStyle3D'
-          variant='contained'
-          sx={myButtonsSX}
-        >
-          <ContentCopyRoundedIcon /> Copy Deck
-        </Button>
+        {me !== null && (
+          <Box className='flexRow deckViewButtons' sx={{ gap: '10px' }}>
+            <Button
+              onClick={tryMakeCopy}
+              className='buttonStyle3D'
+              variant='contained'
+              sx={myButtonsSX}
+            >
+              <ContentCopyRoundedIcon /> Copy Deck
+            </Button>
+          </Box>
+        )}
+
+        <Box sx={sortSX}>
+          <SortMenu sortBy={sortBy} setSortBy={setSortBy} />
+        </Box>
       </Box>
     )
   }
@@ -308,12 +315,17 @@ export default function DeckView() {
   return (
     <Box
       className='flexColumn'
-      sx={{ gap: '10px', marginInline: 'auto', maxWidth: '80rem' }}
+      sx={{
+        gap: '10px',
+        marginInline: 'auto',
+        maxWidth: '80rem',
+        marginTop: '2vh',
+      }}
     >
       <Box className='flexColumn' sx={{ gap: '30px', padding: '0 1rem' }}>
         {headerUI()}
         {myDeck && buttonsUIMine()}
-        {!myDeck && me !== null && buttonsUINotMine()}
+        {!myDeck && buttonsUINotMine()}
       </Box>
 
       <Divider

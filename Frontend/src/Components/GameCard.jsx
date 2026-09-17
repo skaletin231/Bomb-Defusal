@@ -2,6 +2,7 @@ import { Button, Card, CardContent, Typography } from '@mui/material'
 
 const style = {
   height: '100%',
+  width: '100%',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
@@ -18,7 +19,7 @@ const classesForColors = {
   null: 'notRevealedColor',
 }
 
-const GameCard = ({ spot, selectedCard, setSelectedCard }) => {
+const GameCard = ({ spot, selectedCard, setSelectedCard, sx }) => {
   const buttonStyle = {
     width: '100%',
     height: '100%',
@@ -44,7 +45,7 @@ const GameCard = ({ spot, selectedCard, setSelectedCard }) => {
       : classesForColors[spot.typeRevealed.myType]
 
   return (
-    <Card className={`parentStyle ${classToUse}`} variant='outlined'>
+    <Card className={`parentStyle ${classToUse}`} variant='outlined' sx={sx}>
       <Button sx={buttonStyle} onClick={() => makeMove()}>
         <CardContent sx={style}>
           <Typography className='cardText'>{spot.word}</Typography>

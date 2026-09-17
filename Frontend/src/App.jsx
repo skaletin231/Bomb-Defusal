@@ -15,21 +15,10 @@ import FooterBar from './Components/FooterBar'
 import TermsOfService from './Components/TermsOfService'
 import PrivacyPolicy from './Components/PrivacyPolicy'
 import SetUsernameDialogue from './Components/Popups/SetUsernameDialogue'
+import ScrollToTop from './Components/ScrollToTop'
 
 function App() {
   const result = useQuery(ME, {})
-
-  // if (!result.loading) {
-  //   //data is null in an error, may need to check for that
-  //   if (
-  //     result.data?.me !== null &&
-  //     result.data?.me.username === null
-  //   ) //found a person
-  //   {
-  //     console.log('need initial setup')
-  //     return <AccountSetup />
-  //   }
-  // }
 
   const noPageError = () => {
     return <h1>Error 404: Page Not Found</h1>
@@ -47,6 +36,7 @@ function App() {
       <NavigationBar />
       <div className='background'></div>
       <Box className='mainContainer'>
+        <ScrollToTop />
         <Routes>
           <Route path='/' element={<HomePage />} />
           <Route path='/startgame' element={<DecksScreen />} />

@@ -2,7 +2,7 @@ import { Box, Divider, Typography } from '@mui/material'
 
 const TermsSX = {
   gap: '10px',
-  my: '20px',
+  marginTop: '2vh',
   '& p.bigText': {
     color: 'black',
   },

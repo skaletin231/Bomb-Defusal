@@ -43,7 +43,7 @@ const AccountPage = () => {
   return (
     <Box
       className='accountPage content flexColumn'
-      sx={{ gap: '40px', marginTop: '40px' }}
+      sx={{ gap: '40px', marginTop: '2vh' }}
     >
       <Typography className='mainHeader'>My Account</Typography>
       <Divider />

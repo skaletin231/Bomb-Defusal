@@ -1,16 +1,17 @@
 import { Box, Button, Typography } from '@mui/material'
 import { Link, useLocation } from 'react-router-dom'
-import BasicMenu from './AccountMenu'
 import bomb from '../../images/Bomb No Text.png'
-import { DELETE_USER, ME } from '../queries'
-import { useMutation, useQuery, useApolloClient } from '@apollo/client/react'
+import { ME } from '../queries'
+import { useQuery } from '@apollo/client/react'
 import { useAuth0 } from '@auth0/auth0-react'
 import AccountMenu from './AccountMenu'
+import '@fontsource/madimi-one'
 
 const buttonSX = {
   color: '#3A1605',
   fontSize: '1.3rem',
   fontWeight: 'bold',
+  textUnderlineOffset: '7px',
 }
 
 const NavigationBar = () => {
@@ -18,12 +19,16 @@ const NavigationBar = () => {
   const result = useQuery(ME, {})
   const loggedIn = result.data?.me !== null && !result.data.me.isGuest
 
+  const isActive = (path = 'home') => {
+    if (path === 'home') return pathname === '/'
+    return pathname.includes(path)
+  }
+
   const navBarStyle = {
     position: 'sticky',
     top: '0px',
-    // width: 'calc(100vw - 7rem)',
     zIndex: '100',
-    backgroundColor: pathname === '/' ? '#7FBF51' : '#F4F0E8',
+    backgroundColor: isActive() ? '#7FBF51' : '#F4F0E8',
     height: '7vh',
     alignItems: 'center',
   }
@@ -37,7 +42,12 @@ const NavigationBar = () => {
   const loggedInUI = () => {
     return (
       <>
-        <Button sx={buttonSX} component={Link} to={'/mydecks'}>
+        <Button
+          className={isActive('deck') ? 'active' : ''}
+          sx={buttonSX}
+          component={Link}
+          to={'/mydecks'}
+        >
           Decks
         </Button>
         <Typography sx={{ color: '#3A1605' }}>•</Typography>
@@ -53,21 +63,26 @@ const NavigationBar = () => {
           color: 'black',
           padding: '5px 0px',
           fontSize: '1.5rem',
-          fontWeight: 'bold',
+          fontFamily: '"madimi one", serif',
         }}
         component={Link}
         to='/'
-        startIcon={<img src={bomb} alt='Logo' style={{ height: '6.5vh' }} />}
+        startIcon={<img src={bomb} alt='Logo' style={{ height: '5vh' }} />}
       >
-        Defuser
+        defuser
       </Button>
 
       <Box
         className='flexRow'
         sx={{ gap: '10px', marginLeft: 'auto', alignItems: 'center' }}
       >
-        <Button sx={buttonSX} component={Link} to={'/'}>
-          Home
+        <Button
+          className={isActive('startgame') ? 'active' : ''}
+          sx={buttonSX}
+          component={Link}
+          to={'/startgame'}
+        >
+          Play
         </Button>
         <Typography sx={{ color: '#3A1605' }}>•</Typography>
 

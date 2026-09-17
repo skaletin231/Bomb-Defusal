@@ -5,6 +5,7 @@ const footerSX = {
   textAlign: 'center',
   backgroundColor: '#7FBF51',
   padding: '20px 0px',
+  marginTop: '20px',
 }
 
 const footerTextSX = {

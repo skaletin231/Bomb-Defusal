@@ -37,9 +37,10 @@ const boardStyle = {
   gridTemplateColumns: 'repeat(5, 1fr)',
   gap: '16px',
   marginInline: 'auto',
-  marginTop: '10px',
   position: 'relative',
-  aspectRatio: '2/1.4',
+  aspectRatio: '2/1.48',
+  // width: 'auto',
+  // height: '66vh',
 }
 
 const gameBoardHeader = {
@@ -49,20 +50,10 @@ const gameBoardHeader = {
 
 const changeBoardStyle = {
   position: 'absolute',
-  right: 0,
-  bottom: '100%',
-  marginBottom: '10px',
+  left: '100%',
+  top: 0,
+  bottom: 0,
   color: '#3A1605',
-}
-
-const turnText = {
-  margin: '20px 0',
-}
-
-const inviteSX = {
-  color: '#3A1605',
-  fontSize: '2rem',
-  fontFamily: '"Suwannaphum", serif',
 }
 
 const gameStates = {
@@ -74,7 +65,7 @@ const gameStates = {
 }
 
 const GameBoard = () => {
-  const [yourBoard, setYourBord] = useState(true)
+  const [isGameBoard, setGameBoard] = useState(true)
   const [open, setOpen] = useState(false)
   const [copied, setCopied] = useState(false)
 
@@ -278,9 +269,7 @@ const GameBoard = () => {
     if (game.currentPlayer.id === me.id) {
       return (
         <>
-          <Typography className='secondaryHeader' style={turnText}>
-            It's your turn!
-          </Typography>
+          <Typography className='secondaryHeader'>It's your turn!</Typography>
 
           {isPlaying && (
             <>
@@ -326,15 +315,15 @@ const GameBoard = () => {
     } else {
       if (isPlaying) {
         return (
-          <Typography className='secondaryHeader' style={turnText}>
-            It is the other player's turn!
+          <Typography className='secondaryHeader'>
+            It's {game.currentPlayer.username}'s turn!
           </Typography>
         )
       } else {
         return (
           <>
-            <Typography className='secondaryHeader' style={turnText}>
-              It is the other player's turn!
+            <Typography className='secondaryHeader'>
+              It's {game.currentPlayer.username}'s turn!
             </Typography>
 
             <Typography className='hintText waitingForHint bigText'>
@@ -345,6 +334,8 @@ const GameBoard = () => {
       }
     }
   }
+
+  console.log(game)
 
   const showHintHeader =
     game.gameState === gameStates.hint && game.currentPlayer?.id === me.id
@@ -360,22 +351,35 @@ const GameBoard = () => {
     dud: 'dudRevealedColor',
   }
 
+  const testSX = {
+    '&&': {
+      padding: '5px',
+    },
+  }
+
   //TODO: this entire thing should maybe be it's own jsx
   const playBoard = () => {
     return (
       <>
-        <Box sx={{ position: 'relative' }}>
-          <Typography className='biggerText' sx={{ textAlign: 'center' }}>
-            Their Board
+        <Box sx={{ position: 'relative', alignSelf: 'center' }}>
+          <Typography
+            className='biggerText'
+            sx={{ textAlign: 'center', width: 'fit-content' }}
+          >
+            Game Board
           </Typography>
-        </Box>
-
-        <div style={boardStyle} className='MyBoard'>
-          <Button sx={changeBoardStyle} onClick={() => setYourBord(!yourBoard)}>
+          <Button
+            sx={changeBoardStyle}
+            onClick={() => setGameBoard(!isGameBoard)}
+          >
             <SwapHorizIcon />
           </Button>
+        </Box>
+
+        <div style={boardStyle} className='GameBoard'>
           {boardSpots.map((spot) => (
             <GameCard
+              sx={testSX}
               key={spot.word}
               spot={spot}
               selectedCard={selectedCard}
@@ -391,6 +395,7 @@ const GameBoard = () => {
   const hintBoard = () => {
     const theirCardStyle = {
       height: '100%',
+      width: '100%',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -401,18 +406,25 @@ const GameBoard = () => {
     }
     return (
       <>
-        <Box sx={{ position: 'relative' }}>
-          <Typography className='biggerText' sx={{ textAlign: 'center' }}>
+        <Box sx={{ position: 'relative', alignSelf: 'center' }}>
+          <Typography
+            className='biggerText'
+            sx={{ textAlign: 'center', width: 'fit-content' }}
+          >
             Key Card
           </Typography>
+          <Button
+            sx={changeBoardStyle}
+            onClick={() => setGameBoard(!isGameBoard)}
+          >
+            <SwapHorizIcon />
+          </Button>
         </Box>
 
         <div style={boardStyle} className='MyKeyCard'>
-          <Button sx={changeBoardStyle} onClick={() => setYourBord(!yourBoard)}>
-            <SwapHorizIcon />
-          </Button>
           {boardSpots.map((spot) => (
             <Card
+              sx={testSX}
               className={`parentStyle ${classesForColors[spot.myType]} ${classesForReveals[spot.typeRevealed.theirType]}`}
               key={spot.word}
               variant='outlined'
@@ -457,64 +469,71 @@ const GameBoard = () => {
   //TODO: seperate this out into it's own component as well to reduce this file's size
   if (game.gameState === gameStates.waiting) {
     return (
-      <div className='gameBoard'>
-        <Typography sx={turnText}>Waiting for player to join...</Typography>
-        <Typography sx={inviteSX}>Your invite code:</Typography>
-        <Box className='flexRow' sx={{ gap: '40px' }}>
-          <TextField
-            className='textFieldStyle3D'
-            sx={{ '&&': { flexGrow: '0' }, width: '35rem' }}
-            value={game.id}
-            slotProps={{
-              input: {
-                readOnly: true,
-              },
-            }}
-          />
-          <Button
-            className='buttonStyle3D'
-            variant='contained'
-            sx={{
-              '&&': {
-                display: 'flex',
-                width: 'fit-content',
-                height: '50px',
-                flexShrink: '0',
-                gap: '10px',
-              },
-            }}
-            onClick={() => handleCopy(game.id)}
-          >
-            {!copied && (
-              <>
-                <ContentCopyRoundedIcon /> Copy Code
-              </>
-            )}
-            {copied && (
-              <>
-                <CheckIcon /> Copied!
-              </>
-            )}
-          </Button>
+      <Box className='gameBoard flexColumn content' sx={{ gap: '30px' }}>
+        <Typography className='secondaryHeader'>
+          Waiting for player to join...
+        </Typography>
+        <Box className='flexColumn' sx={{ gap: '10px' }}>
+          <Typography className='normalText'>Your invite code:</Typography>
+          <Box className='flexRow' sx={{ gap: '40px' }}>
+            <TextField
+              className='textFieldStyle3D'
+              sx={{ '&&': { flexGrow: '0' }, width: '35rem' }}
+              value={game.id}
+              slotProps={{
+                input: {
+                  readOnly: true,
+                },
+              }}
+            />
+            <Button
+              className='buttonStyle3D'
+              variant='contained'
+              sx={{
+                '&&': {
+                  display: 'flex',
+                  width: 'fit-content',
+                  height: '50px',
+                  flexShrink: '0',
+                  gap: '10px',
+                },
+              }}
+              onClick={() => handleCopy(game.id)}
+            >
+              {!copied && (
+                <>
+                  <ContentCopyRoundedIcon /> Copy Code
+                </>
+              )}
+              {copied && (
+                <>
+                  <CheckIcon /> Copied!
+                </>
+              )}
+            </Button>
+          </Box>
         </Box>
-      </div>
+      </Box>
     )
   }
 
   return (
-    <div className='gameBoard'>
+    <Box
+      className='gameBoard flexColumn content'
+      sx={{ marginTop: '2vh', gap: '15px' }}
+    >
       <Box className='headerContainer'>
         {gameInfo()}
         {header()}
         {showHintHeader && <GameBoardHintHeader />}
       </Box>
 
-      {yourBoard && playBoard()}
-      {!yourBoard && hintBoard()}
+      {isGameBoard && playBoard()}
+      {!isGameBoard && hintBoard()}
 
       <ChatHintContainer gameID={gameID} />
       <GameOverScreen open={open} setOpen={setOpen} game={game} />
-    </div>
+    </Box>
   )
 }
 

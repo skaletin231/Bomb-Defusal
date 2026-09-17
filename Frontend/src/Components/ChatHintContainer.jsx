@@ -14,6 +14,7 @@ const containerSX = {
   right: '0px',
   bottom: '0px',
   width: '21rem',
+  zIndex: '10',
 }
 
 const paperSX = {

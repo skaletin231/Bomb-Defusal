@@ -38,6 +38,7 @@ function JoinGameDialogue({ open, setOpen }) {
       alignSelf: 'center',
       height: '50px',
       flexShrink: '0',
+      fontSize: '1.5rem',
     },
   }
 

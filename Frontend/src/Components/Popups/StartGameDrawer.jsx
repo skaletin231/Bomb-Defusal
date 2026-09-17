@@ -338,7 +338,7 @@ export default function StartGameDrawer({
 
           <Button
             variant='contained'
-            sx={{ '&&': { width: '250px' } }}
+            sx={{ '&&': { width: '250px', fontSize: '1.5rem' } }}
             className='buttonStyle3D'
             onClick={handleSubmit}
           >

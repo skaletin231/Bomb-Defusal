@@ -150,7 +150,7 @@ const DecksScreen = () => {
   }
 
   return (
-    <Box className='flexColumn content' sx={{ gap: '20px' }}>
+    <Box className='flexColumn content' sx={{ gap: '20px', marginTop: '2vh' }}>
       <Typography className='mainHeader'>Choose a Deck</Typography>
 
       {screenToggle()}

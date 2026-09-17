@@ -22,7 +22,15 @@ hr.MuiDivider-root {
   font-size: 1.25rem;
 }
 
-.MuiTypography-root.normalText {
+.MuiTypography-root.smallText,
+.MuiButtonBase-root.smallText {
+  font-size: 1rem;
+  color: #3a1605;
+  font-weight: bold;
+}
+
+.MuiTypography-root.normalText,
+.MuiButtonBase-root.normalText {
   font-size: 1.2rem;
   color: #3a1605;
   font-weight: bold;
@@ -135,8 +143,15 @@ div.cardSelected {
   z-index: -2;
 }
 
+Button.buttonStyle3D.Mui-disabled {
+  color: white;
+  background-color: #808080;
+  border-color: #5d5d5d;
+}
+
 Button.buttonStyle3D,
 a.buttonStyle3D {
+  color: white;
   transition: none;
   box-sizing: content-box;
   display: block;
@@ -146,7 +161,12 @@ a.buttonStyle3D {
   height: 44px;
   border-radius: 10px;
   padding: 0px 10px;
-  font-size: 17px;
+  font-size: 1.2rem;
+}
+
+a.active {
+  text-decoration: underline;
+  color: #9f4b24;
 }
 
 div.textFieldStyle3D {
@@ -303,8 +323,9 @@ div.parentStyle {
 }
 
 .gameBoard {
-  width: min(calc(70vh * (2 / 1.43)), calc(100% - 20px));
+  /* width: min(calc(65vh * (2 / 1.48)), calc(100% - 20px)); */
   margin-inline: auto;
+  justify-self: center;
 }
 
 .headerContainer {
@@ -334,4 +355,7 @@ p.waitingForHint {
 p.cardText {
   font-size: 1.5rem;
   font-weight: bold;
+  width: 100%;
+  overflow-wrap: break-word;
+  text-align: center;
 }

@@ -48,7 +48,7 @@ export default function SortMenu({ sortBy, setSortBy }) {
   return (
     <div style={divStyle}>
       <Button
-        sx={{ color: '#3A1605' }}
+        className='normalText'
         onClick={handleClick}
         aria-controls={open ? 'account-menu' : undefined}
         aria-haspopup='true'
