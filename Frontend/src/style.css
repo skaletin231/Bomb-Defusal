@@ -25,6 +25,12 @@ hr.MuiDivider-root {
 .accountMenu ul,
 .sortMenu ul {
   padding-bottom: 0px;
+  padding-top: 0px;
+}
+
+.accountMenu li,
+.sortMenu li {
+  justify-self: center;
 }
 
 .MuiTypography-root.smallText,

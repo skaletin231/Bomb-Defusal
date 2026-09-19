@@ -30,14 +30,6 @@ const paperSX = {
   borderColor: '#84582E',
 }
 
-const collapseContainerSX = {
-  borderStyle: 'solid',
-  borderWidth: '0px 3px',
-  borderColor: '#84582E',
-  backgroundColor: '#ececec',
-  paddingTop: '8px',
-}
-
 const ChatHintContainer = ({ gameID }) => {
   const [chatView, setChatView] = useState('Chat')
   const [open, setOpen] = useState(true)
@@ -45,6 +37,14 @@ const ChatHintContainer = ({ gameID }) => {
   const changeView = (event, newView) => {
     if (newView === null) return
     setChatView(newView)
+  }
+
+  const collapseContainerSX = {
+    borderStyle: 'solid',
+    borderWidth: '0px 3px',
+    borderColor: '#84582E',
+    backgroundColor: '#ececec',
+    paddingTop: open ? '8px' : '0px',
   }
 
   const chatContainer = () => {

@@ -162,6 +162,11 @@ const ChatWindow = ({ gameID, chatView }) => {
                 borderWidth: '3px 0 0 0',
                 borderRadius: '0px',
               },
+              '& .MuiOutlinedInput-notchedOutline:hover': {
+                borderColor: '#84582E',
+                borderWidth: '3px 0 0 0',
+                borderRadius: '0px',
+              },
               '&:hover .MuiOutlinedInput-notchedOutline': {
                 borderColor: '#84582E',
                 borderWidth: '3px 0 0 0',

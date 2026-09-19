@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState, useId } from 'react'
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined'
 import { Box, Divider } from '@mui/material'
+import { useLocation } from 'react-router-dom'
 
 const menuSX = {
   '& .MuiPaper-root': {
@@ -17,6 +18,8 @@ const menuSX = {
 }
 
 export default function AccountMenu() {
+  const { pathname } = useLocation()
+
   const { logout } = useAuth0()
   const navigate = useNavigate()
 
@@ -51,7 +54,9 @@ export default function AccountMenu() {
       <>
         <MenuItem onClick={handleAccountTransition}>My Account</MenuItem>
         <Divider sx={{ '&&': { margin: '0px' } }} />
-        <MenuItem onClick={handleLogout}>Logout</MenuItem>
+        <MenuItem sx={{ color: '#B43131' }} onClick={handleLogout}>
+          Logout
+        </MenuItem>
       </>
     )
   }
@@ -66,7 +71,10 @@ export default function AccountMenu() {
         aria-expanded={open}
       >
         <AccountCircleOutlinedIcon
-          sx={{ fontSize: '2.5rem', color: '#9F4B24' }}
+          sx={{
+            fontSize: '2.5rem',
+            color: pathname.includes('account') ? '#9F4B24' : '#3A1605',
+          }}
         />
       </IconButton>
       <Menu
