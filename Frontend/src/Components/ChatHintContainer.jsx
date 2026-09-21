@@ -14,6 +14,7 @@ const containerSX = {
   right: '0px',
   bottom: '0px',
   width: '21rem',
+  zIndex: '10',
 }
 
 const paperSX = {
@@ -21,23 +22,12 @@ const paperSX = {
   display: 'flex',
   flexDirection: 'row',
   justifyContent: 'space-between',
-  borderRadius: '15% 15% 0px 0px',
+  borderRadius: '15px 15px 0px 0px',
   overflow: 'hidden',
   borderStyle: 'solid',
   borderWidth: '1px',
   backgroundColor: '#84582E',
   borderColor: '#84582E',
-}
-
-const collapseContainerSX = {
-  borderStyle: 'solid',
-  borderWidth: '0px 3px',
-  borderColor: '#84582E',
-  backgroundColor: '#ececec',
-}
-
-const selectedButton = {
-  backgroundColor: '#f3f0f0d5',
 }
 
 const ChatHintContainer = ({ gameID }) => {
@@ -47,6 +37,14 @@ const ChatHintContainer = ({ gameID }) => {
   const changeView = (event, newView) => {
     if (newView === null) return
     setChatView(newView)
+  }
+
+  const collapseContainerSX = {
+    borderStyle: 'solid',
+    borderWidth: '0px 3px',
+    borderColor: '#84582E',
+    backgroundColor: '#ececec',
+    paddingTop: open ? '8px' : '0px',
   }
 
   const chatContainer = () => {

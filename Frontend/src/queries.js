@@ -26,6 +26,8 @@ const GAME_DETAILS = gql`
     mistakes
     mistakeLimit
     remainingWires
+    id
+    deckID
   }
 `
 
@@ -75,6 +77,12 @@ export const SEND_MESSAGE = gql`
       text
       createdAt
     }
+  }
+`
+
+export const DELETE_USER = gql`
+  mutation {
+    deleteUser
   }
 `
 
@@ -140,6 +148,7 @@ export const ME = gql`
       id
       username
       email
+      isGuest
     }
   }
 `
@@ -230,7 +239,7 @@ export const HINT_UPDATE = gql`
     }
   }
 `
-//newPlayerJoined: GameUser!
+
 export const NEW_PLAYER_JOINED = gql`
   subscription {
     newPlayerJoined {
@@ -240,6 +249,13 @@ export const NEW_PLAYER_JOINED = gql`
       gameUser {
         username
         id
+      }
+      gameStateChange
+      turnChange {
+        turnUpdate {
+          username
+          id
+        }
       }
     }
   }
@@ -258,6 +274,7 @@ export const GET_MY_DECKS = gql`
       name
       public
       cards
+      notes
     }
   }
 `
@@ -273,6 +290,23 @@ export const GET_MY_DECK = gql`
       name
       public
       cards
+      notes
+    }
+  }
+`
+
+export const GET_ONE_DECK = gql`
+  query getOneDeck($deckID: ID!) {
+    getOneDeck(deckID: $deckID) {
+      id
+      owner {
+        username
+        id
+      }
+      name
+      public
+      cards
+      notes
     }
   }
 `
@@ -280,21 +314,35 @@ export const GET_MY_DECK = gql`
 export const GET_ALL_DECKS = gql`
   query {
     getAllDecks {
-      id
-      owner {
-        username
+      myDecks {
         id
+        owner {
+          username
+          id
+        }
+        name
+        public
+        cards
+        notes
       }
-      name
-      public
-      cards
+      publicDecks {
+        id
+        owner {
+          username
+          id
+        }
+        name
+        public
+        cards
+        notes
+      }
     }
   }
 `
 
 export const MAKE_DECK = gql`
-  mutation makeDeck($name: String!, $public: Boolean!, $cards: [String!]!) {
-    makeDeck(name: $name, public: $public, cards: $cards) {
+  mutation {
+    makeDeck {
       id
       owner {
         username
@@ -303,6 +351,7 @@ export const MAKE_DECK = gql`
       name
       public
       cards
+      notes
     }
   }
 `
@@ -318,6 +367,7 @@ export const COPY_DECK = gql`
       name
       public
       cards
+      notes
     }
   }
 `
@@ -334,8 +384,15 @@ export const UPDATE_DECK = gql`
     $name: String!
     $public: Boolean!
     $cards: [String!]!
+    $notes: String!
   ) {
-    updateDeck(deckID: $deckID, name: $name, public: $public, cards: $cards) {
+    updateDeck(
+      deckID: $deckID
+      name: $name
+      public: $public
+      cards: $cards
+      notes: $notes
+    ) {
       id
       owner {
         username
@@ -344,6 +401,7 @@ export const UPDATE_DECK = gql`
       name
       public
       cards
+      notes
     }
   }
 `

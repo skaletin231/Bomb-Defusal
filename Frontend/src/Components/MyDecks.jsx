@@ -1,20 +1,24 @@
-import { useMutation, useQuery } from '@apollo/client/react'
-import { Button, Card, CardContent, Box, Typography } from '@mui/material'
-import { Link } from 'react-router-dom'
-import { GET_ALL_DECKS, GET_MY_DECKS, COPY_DECK } from '../queries'
-import DeckObject from './DeckObject'
-import AddOutlinedIcon from '@mui/icons-material/AddOutlined'
-import IconButton from '@mui/material/IconButton'
 import { gql } from '@apollo/client'
+import { useMutation, useQuery } from '@apollo/client/react'
+import '@fontsource/suwannaphum'
+import AddOutlinedIcon from '@mui/icons-material/AddOutlined'
+import { Box, Button, Divider, Typography } from '@mui/material'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { GET_MY_DECKS, MAKE_DECK } from '../queries'
+import NotificationPopup from './Popups/NotificationPopup'
+import ListOfMyDecks from './ListOfMyDecks'
 
 const MyDecks = () => {
+  const navigate = useNavigate()
+  const location = useLocation()
+
   const deckResults = useQuery(GET_MY_DECKS)
 
-  const [copyDeck] = useMutation(COPY_DECK, {
+  const [makeDeck] = useMutation(MAKE_DECK, {
+    refetchQueries: [GET_MY_DECKS],
     update(cache, { data }) {
-      console.log(data.copyDeck)
       const newRef = cache.writeFragment({
-        data: data.copyDeck,
+        data: data.makeDeck,
         fragment: gql`
           fragment Deck on Deck {
             id
@@ -30,7 +34,6 @@ const MyDecks = () => {
         `,
       })
 
-      //if i ever add pagination, this may not be a good thing to do anymore
       cache.modify({
         fields: {
           getMyDecks(existing = []) {
@@ -41,12 +44,12 @@ const MyDecks = () => {
           },
         },
       })
+
+      navigate(`/mydecks/${data.makeDeck.id}`)
     },
   })
 
   if (deckResults.loading) return <div>LOADING...</div>
-
-  const decks = deckResults.data.getMyDecks
 
   const boxSX = {
     display: 'flex',
@@ -84,34 +87,35 @@ const MyDecks = () => {
     fontSize: '1.3rem',
   }
 
-  const tryMakeDeck = async (deckID) => {
-    await copyDeck({
-      variables: {
-        deckID: deckID,
+  const tryMakeDeck = async () => {
+    await makeDeck()
+  }
+
+  const goToDeckPage = (deck) => {
+    navigate(`/decks/${deck.id}`, {
+      state: {
+        from: location.pathname,
       },
     })
   }
 
   return (
-    <Box>
-      <h1>My Decks</h1>
-
+    <Box className='content flexColumn' sx={{ gap: '20px' }}>
+      <Typography className='mainHeader'>My Decks</Typography>
+      <Divider
+        sx={{
+          margin: '2rem 0',
+        }}
+      />
       <Box sx={boxSX}>
-        <Button sx={buttonSX} component={Link} to={'/mydecks/new'}>
+        <Button sx={buttonSX} onClick={tryMakeDeck}>
           <Box sx={innerboxSX}>
             <AddOutlinedIcon sx={{ fontSize: '2.5rem' }} />
             <Typography sx={textSX}>Add New Deck</Typography>
           </Box>
         </Button>
 
-        {decks.map((deck, i) => (
-          <DeckObject
-            key={i}
-            deck={deck}
-            type={'mine'}
-            tryMakeDeck={tryMakeDeck}
-          />
-        ))}
+        <ListOfMyDecks setSelectedDeck={goToDeckPage} />
       </Box>
     </Box>
   )

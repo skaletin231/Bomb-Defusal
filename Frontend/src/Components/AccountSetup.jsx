@@ -6,11 +6,7 @@ import { UPDATE_USER_INFO } from '../queries'
 const AccountSetup = () => {
   const [username, setUsername] = useState('')
 
-  const [updateUserInfo] = useMutation(UPDATE_USER_INFO, {
-    update: (cache, response) => {
-      console.log('need to update user info', response)
-    },
-  })
+  const [updateUserInfo] = useMutation(UPDATE_USER_INFO)
 
   const updateAccount = (event) => {
     event.preventDefault()

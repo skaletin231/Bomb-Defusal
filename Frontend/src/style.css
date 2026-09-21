@@ -2,11 +2,101 @@ body {
   margin: 0px;
 }
 
+hr.MuiDivider-root {
+  border-bottom-width: 0.15rem;
+  border-color: #84582e;
+}
+
+.flexRow {
+  display: flex;
+  flex-direction: row;
+}
+
+.flexColumn {
+  display: flex;
+  flex-direction: column;
+}
+
+.warning {
+  color: #b43131;
+  font-size: 1.25rem;
+}
+
+.accountMenu ul,
+.sortMenu ul {
+  padding-bottom: 0px;
+  padding-top: 0px;
+}
+
+.accountMenu li,
+.sortMenu li {
+  justify-self: center;
+}
+
+.MuiTypography-root.smallText,
+.MuiButtonBase-root.smallText {
+  font-size: 1rem;
+  color: #3a1605;
+  font-weight: bold;
+}
+
+.MuiTypography-root.normalText,
+.MuiButtonBase-root.normalText {
+  font-size: 1.2rem;
+  color: #3a1605;
+  font-weight: bold;
+}
+
+.MuiTypography-root.grayText {
+  font-size: 1rem;
+  color: #737373;
+  line-height: 1;
+}
+
+.MuiTypography-root.bigText,
+span.bigText {
+  font-size: 1.5rem;
+  color: #3a1605;
+  font-weight: bold;
+}
+
+.MuiTypography-root.biggerText {
+  font-size: 2rem;
+  color: #3a1605;
+  font-weight: bold;
+}
+
+.MuiTypography-root.mainHeader {
+  font-size: 3.5rem;
+  color: #3a1605;
+  font-family: 'Suwannaphum', serif;
+  font-weight: bold;
+}
+
+.MuiTypography-root.secondaryHeader {
+  font-size: 3rem;
+  color: #3a1605;
+  font-family: 'Suwannaphum', serif;
+  font-weight: bold;
+}
+
+.MuiTypography-root.Header {
+  font-size: 3rem;
+  color: #3a1605;
+  font-family: 'Suwannaphum', serif;
+  font-weight: bold;
+}
+
 .basicBackground {
   background-color: #fff8e9;
 }
 
-.mainContainer,
+.content {
+  padding: 0rem 3rem 0rem 3rem;
+  max-width: 80rem;
+  margin-inline: auto;
+}
+
 .navigationBar {
   padding: 0rem 3rem 0rem 3rem;
 }
@@ -64,16 +154,73 @@ div.cardSelected {
   z-index: -2;
 }
 
+Button.buttonStyle3D.Mui-disabled {
+  color: white;
+  background-color: #808080;
+  border-color: #5d5d5d;
+}
+
 Button.buttonStyle3D,
 a.buttonStyle3D {
+  color: white;
+  transition: none;
+  box-sizing: content-box;
   display: block;
   background-color: #588a29;
   border: 0.15rem solid #286b1f;
   width: 100px;
   height: 44px;
   border-radius: 10px;
-  padding: 6px 10px;
-  font-size: 17px;
+  padding: 0px 10px;
+  font-size: 1.2rem;
+}
+
+a.active {
+  text-decoration: underline;
+  color: #9f4b24;
+}
+
+div.textFieldStyle3D {
+  background-color: #fefefe;
+  border-radius: 10px;
+  height: 50px;
+  border: 0.15rem solid #84582e;
+  flex-grow: 1;
+}
+
+div.textFieldStyle3D .MuiOutlinedInput-notchedOutline {
+  border-style: none;
+}
+
+div.textFieldStyle3D .Mui-focused fieldset {
+  border-color: #84582e;
+}
+
+div.textFieldStyle3D input::placeholder {
+  color: #808080;
+}
+
+div.textFieldStyle3D input {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+div.textFieldStyle3D .MuiInputBase-root {
+  height: stretch;
+}
+
+.textFieldStyle3D::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: -2px;
+  right: -2px;
+  bottom: -8px;
+  display: block;
+  border: 0.15rem solid #84582e;
+  background-color: #d1d1d1;
+  border-radius: 10px;
+  z-index: -1;
 }
 
 a.buttonStyle3D {
@@ -84,8 +231,8 @@ Button.buttonStyle3D.Mui-disabled,
 a.buttonStyle3D.Mui-disabled {
   top: 6px;
   left: 0px;
-  background-color: #808080;
-  border-color: #5d5d5d;
+  /* background-color: #808080;
+  border-color: #5d5d5d; */
 }
 
 Button.buttonStyle3D.Mui-disabled::after,
@@ -109,6 +256,44 @@ a.buttonStyle3D::after {
   background-color: #1e5c15;
   border-radius: 10px;
   z-index: -1;
+}
+
+.confirmDelete Button.buttonStyle3D.cancel {
+  background-color: #808080;
+  border-color: #414141;
+}
+
+.confirmDelete Button.buttonStyle3D.warning,
+.deckViewButtons Button.buttonStyle3D.warning,
+.accountPage Button.buttonStyle3D.warning {
+  background-color: #b43131;
+  border-color: #690f0f;
+}
+
+.homePage Button.buttonStyle3D.brown,
+.gameOverDialogue Button.buttonStyle3D.brown,
+.accountPage Button.buttonStyle3D.brown {
+  background-color: #b36c1b;
+  border-color: #834724;
+}
+
+.confirmDelete Button.buttonStyle3D.cancel:after {
+  background-color: #5d5d5d;
+  border-color: #414141;
+}
+
+.confirmDelete Button.buttonStyle3D.warning:after,
+.deckViewButtons Button.buttonStyle3D.warning:after,
+.accountPage Button.buttonStyle3D.warning:after {
+  background-color: #881c1c;
+  border-color: #690f0f;
+}
+
+.homePage Button.buttonStyle3D.brown:after,
+.gameOverDialogue Button.buttonStyle3D.brown:after,
+.accountPage Button.buttonStyle3D.brown:after {
+  background-color: #9d501c;
+  border-color: #834724;
 }
 
 Button.buttonStyle3D:hover,
@@ -137,18 +322,7 @@ a.buttonStyle3D:active::after {
   /* background-color: #0063cc;
   border: none;*/
   width: 10rem;
-  height: 4rem;
-}
-
-.homePage Button.buttonStyle3D:hover,
-.homePage a.buttonStyle3D :hover {
-  /* background-color: #0063cc; */
-}
-
-.homePage Button.buttonStyle3D::after,
-.homePage a.buttonStyle3D::after {
-  /* border: 0.15rem solid #ce8f07;
-  background-color: #3b82ce; */
+  height: 3rem;
 }
 
 div.parentStyle {
@@ -160,8 +334,9 @@ div.parentStyle {
 }
 
 .gameBoard {
-  width: min(calc(70vh * (2 / 1.43)), calc(100% - 20px));
+  /* width: min(calc(65vh * (2 / 1.48)), calc(100% - 20px)); */
   margin-inline: auto;
+  justify-self: center;
 }
 
 .headerContainer {
@@ -191,4 +366,7 @@ p.waitingForHint {
 p.cardText {
   font-size: 1.5rem;
   font-weight: bold;
+  width: 100%;
+  overflow-wrap: break-word;
+  text-align: center;
 }

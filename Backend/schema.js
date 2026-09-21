@@ -7,6 +7,7 @@ const typeDefs = /* GraphQL */ `
     getMyDecks: [Deck!]
     getMyDeck(deckID: ID!): Deck
     getAllDecks: AllDecks!
+    getOneDeck(deckID: ID!): Deck
     me: User
   }
 
@@ -48,6 +49,7 @@ const typeDefs = /* GraphQL */ `
     mistakes: Int!
     mistakeLimit: Int!
     remainingWires: Int!
+    deckID: ID!
   }
 
   scalar DateTime
@@ -64,23 +66,33 @@ const typeDefs = /* GraphQL */ `
     name: String!
     public: Boolean!
     cards: [String!]!
+    notes: String!
   }
 
   type Mutation { #player should be obtainable from context now if player is me
-    startGame(deckID: ID!, mistakeLimit: Int, turnLimit: Int): ID
+    startGame(
+      deckID: ID!
+      gridsX: Int
+      gridsY: Int
+      turnLimit: Int
+      mistakeLimit: Int
+      wordsPerHint: Int
+    ): ID
     joinGame(gameID: ID!): Game
     makeMove(gameID: ID!, index: Int!): Game
     endTurn(gameID: ID!): Game
     addUser(username: String!, email: String!, auth0_ID: String!): User
+    deleteUser: Boolean!
     updateUserInfo(username: String!): User
     sendMessage(gameID: ID!, text: String!): ChatMessage
     sendHint(gameID: ID!, hint: String!, count: Int!): Hint
-    makeDeck(name: String!, public: Boolean!, cards: [String!]!): Deck
+    makeDeck: Deck
     updateDeck(
       deckID: ID!
       name: String
       public: Boolean
       cards: [String!]
+      notes: String!
     ): Deck
     removeDeck(deckID: ID!): ID
     copyDeck(deckID: ID!): Deck
@@ -89,8 +101,9 @@ const typeDefs = /* GraphQL */ `
   type User {
     username: String
     email: String
-    auth0_ID: String!
+    auth0_ID: String
     id: ID!
+    isGuest: Boolean!
   }
 
   type GameUser {

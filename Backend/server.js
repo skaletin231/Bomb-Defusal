@@ -17,23 +17,18 @@ const User = require('./models/user')
 
 const { WebSocketServer } = require('ws')
 const { useServer } = require('graphql-ws/use/ws')
+const cookieParser = require('cookie-parser')
 
 const checkJwtOptional = (req, res, next) => {
-  //console.log('token', req.headers.authorization)
-  //console.log('token', req.headers.authorization?.split(' '))
   const token = req.headers.authorization?.split(' ')[1]
-  //console.log('token', token)
 
   if (!token) {
-    //console.log('null')
     req.user = null
     return next()
   }
 
   return checkJwt(req, res, (err) => {
-    //console.log(err)
     if (err) {
-      //console.log('null 2')
       req.user = null
       return next()
     }
@@ -93,27 +88,32 @@ const startServer = async (port) => {
     '/graphql',
     cors(),
     express.json(),
+    cookieParser(process.env.COOKIE_SECRET),
     checkJwtOptional,
     expressMiddleware(server, {
-      context: async ({ req }) => {
-        //console.log('request', req.auth)
+      context: async ({ req, res }) => {
         if (!req.auth) {
           return {
             auth: null,
             user: null,
+            res,
+            req,
           }
         }
         const auth = req.auth.payload
         const id = auth?.sub
 
         if (!id) {
+          //this would be a valid request by a guest i think?
           return {
             auth: null,
             user: null,
+            res,
+            req,
           }
         }
 
-        const user = await User.findOne({ auth0_ID: id })
+        let user = await User.findOne({ auth0_ID: id })
 
         if (!user) {
           const token = req.auth.token
@@ -132,12 +132,12 @@ const startServer = async (port) => {
             auth0_ID: id,
           })
 
-          await newUser.save()
+          user = await newUser.save()
 
-          return newUser
+          //return newUser
         }
 
-        return { auth, user }
+        return { auth, user, res, req }
       },
     }),
   )

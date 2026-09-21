@@ -16,6 +16,7 @@ const textSX = {
   maxWidth: '50%',
   borderRadius: '5px',
   padding: '.4rem',
+  overflowWrap: 'break-word',
 }
 
 const formStyle = {
@@ -103,9 +104,11 @@ const ChatWindow = ({ gameID, chatView }) => {
   if (chatResults.loading) return
 
   const trySendMessage = async (event) => {
-    event.preventDefault()
+    event?.preventDefault()
 
-    sendMessage({
+    if (messageToSend === '') return
+
+    await sendMessage({
       variables: {
         gameID: gameID,
         text: messageToSend,
@@ -127,40 +130,62 @@ const ChatWindow = ({ gameID, chatView }) => {
             {message.text}
           </Typography>
         ))}
-        <div ref={bottomRef} />
+        <Box ref={bottomRef} />
       </Stack>
       <Box
         sx={{
           display: 'flex',
-          height: '60px',
         }}
       >
         <form onSubmit={trySendMessage} style={formStyle}>
           <TextField
             fullWidth
             multiline
+            minRows={1}
+            maxRows={2}
             sx={{
               margin: '0',
               height: '100%',
+              '& .MuiInputBase-inputMultiline': {
+                height: '23px !important',
+                overflowY: 'auto !important',
+                boxSizing: 'border-box',
+              },
               '& .MuiInputLabel-root': {
-                transform: 'translate(14px, 20px) scale(1)',
+                transform: 'translate(14px, 100%) scale(1)',
               },
               '& .MuiInputLabel-shrink': {
                 transform: 'translate(14px, -9px) scale(0.75)',
               },
               '& .MuiOutlinedInput-notchedOutline': {
                 borderColor: '#84582E',
-                borderWidth: '3px 0',
+                borderWidth: '3px 0 0 0',
+                borderRadius: '0px',
+              },
+              '& .MuiOutlinedInput-notchedOutline:hover': {
+                borderColor: '#84582E',
+                borderWidth: '3px 0 0 0',
+                borderRadius: '0px',
               },
               '&:hover .MuiOutlinedInput-notchedOutline': {
                 borderColor: '#84582E',
-                borderWidth: '3px 0',
+                borderWidth: '3px 0 0 0',
+                borderRadius: '0px',
               },
               '& .Mui-focused .MuiOutlinedInput-notchedOutline': {
                 borderColor: '#84582E',
-                borderWidth: '3px 0',
+                borderWidth: '3px 0 0 0',
+                borderRadius: '0px',
+              },
+              '& .MuiInputBase-input': {
+                scrollbarWidth: 'none',
+
+                '&::-webkit-scrollbar': {
+                  display: 'none',
+                },
               },
             }}
+            value={messageToSend}
             variant='outlined'
             label='Message'
             onChange={({ target }) => setMessageToSend(target.value)}
@@ -168,12 +193,18 @@ const ChatWindow = ({ gameID, chatView }) => {
               input: {
                 endAdornment: (
                   <InputAdornment position='end'>
-                    <IconButton type='submit'>
+                    <IconButton type='submit' sx={{ alignSelf: 'center' }}>
                       <SendOutlinedIcon sx={{ color: '#84582E' }} />
                     </IconButton>
                   </InputAdornment>
                 ),
               },
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault()
+                trySendMessage()
+              }
             }}
           ></TextField>
         </form>

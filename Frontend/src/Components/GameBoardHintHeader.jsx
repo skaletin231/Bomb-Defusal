@@ -64,10 +64,6 @@ const hintCountBox = {
   },
 }
 
-const hintCountText = {
-  textAlign: 'center',
-}
-
 const GameBoardHintHeader = () => {
   const [hintText, setHintText] = useState('')
   const [error, setError] = useState(false)
@@ -154,10 +150,16 @@ const GameBoardHintHeader = () => {
   return (
     <Box
       className='GiveHintSection'
-      sx={{ display: 'flex', flexDirection: 'row', gap: '40px' }}
+      sx={{
+        display: 'flex',
+        flexDirection: 'row',
+        gap: '40px',
+        marginBlock: '10px',
+      }}
     >
       <Box className='HintInput'>
         <TextField
+          autoComplete='off'
           label='Hint'
           sx={hintTextBox}
           error={error}
@@ -213,9 +215,8 @@ const GameBoardHintHeader = () => {
       </Box>
       <Box className='HintSubmit'>
         <Button
-          className='HintSubmitButton'
           variant='contained'
-          className='buttonStyle3D'
+          className='HintSubmitButton buttonStyle3D'
           onClick={trySendHint}
         >
           Send Hint

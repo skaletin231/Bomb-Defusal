@@ -7,17 +7,20 @@
   "type": "commonjs",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "cross-env NODE_ENV=production node index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build:ui": "rm -rf dist && cd ../Frontend && npm run build && cp -r dist ../Backend",
     "deploy:full": "npm run build:ui && git add . && git commit -m uibuild && git push",
-    "dev": "node --watch index.js"
+    "dev": "cross-env NODE_ENV=development node --watch --watch-preserve-output index.js"
   },
   "dependencies": {
     "@apollo/server": "^5.5.1",
     "@as-integrations/express5": "^1.1.2",
     "@graphql-tools/schema": "^10.0.33",
+    "auth0": "^6.4.0",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.6",
+    "cross-env": "^10.1.0",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
     "express-oauth2-jwt-bearer": "^1.9.0",

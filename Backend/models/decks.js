@@ -11,6 +11,7 @@ const deckSchema = new mongoose.Schema({
     default: false,
   },
   cards: [String],
+  notes: String,
 })
 
 module.exports = mongoose.model('Deck', deckSchema)
