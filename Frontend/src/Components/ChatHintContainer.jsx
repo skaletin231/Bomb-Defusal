@@ -1,11 +1,11 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'
 import { Box, Button, Paper } from '@mui/material'
 import Collapse from '@mui/material/Collapse'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import { useState } from 'react'
 import ChatWindow from './ChatWindow'
 import HintWindow from './HintWindow'
-import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
-import ToggleButton from '@mui/material/ToggleButton'
 
 const containerSX = {
   display: 'flex',

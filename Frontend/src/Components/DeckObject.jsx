@@ -1,20 +1,16 @@
-import {
-  Button,
-  Card,
-  CardContent,
-  Box,
-  Typography,
-  CardActionArea,
-  CardActions,
-} from '@mui/material'
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
-import IconButton from '@mui/material/IconButton'
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
+import {
+  Box,
+  Card,
+  CardActionArea,
+  CardActions,
+  CardContent,
+  Typography,
+} from '@mui/material'
+import IconButton from '@mui/material/IconButton'
 import { Link } from 'react-router-dom'
-import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
-import { REMOVE_DECK } from '../queries'
-import NotificationPopup from './Popups/NotificationPopup'
 
 const deckCardSX = {
   width: '15rem',

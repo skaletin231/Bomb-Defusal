@@ -1,7 +1,10 @@
 import { useMutation, useQuery } from '@apollo/client/react'
+import CheckIcon from '@mui/icons-material/Check'
+import DownloadIcon from '@mui/icons-material/Download'
 import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
 import SaveOutlinedIcon from '@mui/icons-material/SaveOutlined'
 import SearchIcon from '@mui/icons-material/Search'
+import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft'
 import {
   Box,
   Button,
@@ -23,9 +26,6 @@ import { useParams } from 'react-router-dom'
 import { GET_MY_DECK, UPDATE_DECK } from '../queries'
 import NotificationPopup from './Popups/NotificationPopup'
 import SortMenu from './SortMenu'
-import SubdirectoryArrowLeftIcon from '@mui/icons-material/SubdirectoryArrowLeft'
-import DownloadIcon from '@mui/icons-material/Download'
-import CheckIcon from '@mui/icons-material/Check'
 
 const formStyle = {
   justifyContent: 'flex-start',

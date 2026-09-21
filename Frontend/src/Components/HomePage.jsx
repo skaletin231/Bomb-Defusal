@@ -1,19 +1,14 @@
+import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown'
 import { Box, Button, Container, Typography } from '@mui/material'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import JoinGameDialogue from './Popups/JoinGameDialogue'
-import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown'
-
 import fullScreenImageBig from '../../images/Full Screen Big.png'
-
+import '@fontsource/luckiest-guy'
 import gameplayGameOver from '../../images/GameplayGameOver.png'
 import gameplayGuess from '../../images/GameplayGuess.png'
 import gameplayHint from '../../images/GameplayHint.png'
 import makeDeck from '../../images/MakeDeck.png'
-import '@fontsource/luckiest-guy'
-import { useQuery } from '@apollo/client/react'
-import { ME } from '../queries'
-import SetUsernameDialogue from './Popups/SetUsernameDialogue'
 
 const boxStyle = {
   display: 'flex',

@@ -1,13 +1,13 @@
+import { useMutation } from '@apollo/client/react'
+import CloseIcon from '@mui/icons-material/Close'
+import { IconButton } from '@mui/material'
 import Button from '@mui/material/Button'
 import Dialog from '@mui/material/Dialog'
 import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import TextField from '@mui/material/TextField'
-import { IconButton, Typography } from '@mui/material'
-import { useMutation } from '@apollo/client/react'
-import { JOIN_GAME, ME } from '../../queries'
 import { useNavigate } from 'react-router-dom'
-import CloseIcon from '@mui/icons-material/Close'
+import { JOIN_GAME, ME } from '../../queries'
 
 function JoinGameDialogue({ open, setOpen }) {
   const handleClose = () => {

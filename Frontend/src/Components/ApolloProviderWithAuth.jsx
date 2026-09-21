@@ -1,5 +1,4 @@
 import { useAuth0 } from '@auth0/auth0-react'
-
 import {
   ApolloClient,
   ApolloLink,
@@ -8,11 +7,9 @@ import {
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import { ApolloProvider } from '@apollo/client/react'
-
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions'
 import { getMainDefinition } from '@apollo/client/utilities'
 import { createClient } from 'graphql-ws'
-
 import { useMemo } from 'react'
 
 function ApolloProviderWithAuth({ children }) {

@@ -1,10 +1,10 @@
+import { useApolloClient, useMutation, useQuery } from '@apollo/client/react'
+import { useAuth0 } from '@auth0/auth0-react'
 import { Box, Button, Typography } from '@mui/material'
 import Divider from '@mui/material/Divider'
-import { DELETE_USER, ME } from '../queries'
-import { useMutation, useQuery, useApolloClient } from '@apollo/client/react'
-import { useAuth0 } from '@auth0/auth0-react'
-import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
 import { useState } from 'react'
+import { DELETE_USER, ME } from '../queries'
+import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
 
 const AccountPage = () => {
   const result = useQuery(ME, {})

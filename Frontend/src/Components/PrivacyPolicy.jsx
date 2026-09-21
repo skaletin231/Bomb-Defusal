@@ -128,7 +128,12 @@ const PrivacyPolicy = () => {
         <Typography className='normalText'>
           For questions regarding the privacy policy, please contact us at:
         </Typography>
-        <Typography className='normalText'> [example@email.com] </Typography>
+        <Typography className='normalText'>
+          {' '}
+          <a href='mailto:play.bomb.defuser@gmail.com'>
+            play.bomb.defuser@gmail.com
+          </a>
+        </Typography>
       </Box>
     </Box>
   )

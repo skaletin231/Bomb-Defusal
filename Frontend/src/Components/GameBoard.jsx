@@ -39,8 +39,6 @@ const boardStyle = {
   marginInline: 'auto',
   position: 'relative',
   aspectRatio: '2/1.48',
-  // width: 'auto',
-  // height: '66vh',
 }
 
 const gameBoardHeader = {
@@ -334,8 +332,6 @@ const GameBoard = () => {
       }
     }
   }
-
-  console.log(game)
 
   const showHintHeader =
     game.gameState === gameStates.hint && game.currentPlayer?.id === me.id

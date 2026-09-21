@@ -5,7 +5,6 @@ import AddOutlinedIcon from '@mui/icons-material/AddOutlined'
 import { Box, Button, Divider, Typography } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { GET_MY_DECKS, MAKE_DECK } from '../queries'
-import NotificationPopup from './Popups/NotificationPopup'
 import ListOfMyDecks from './ListOfMyDecks'
 
 const MyDecks = () => {

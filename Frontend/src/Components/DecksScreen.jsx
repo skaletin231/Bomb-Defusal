@@ -1,19 +1,13 @@
 import { useQuery } from '@apollo/client/react'
-import {
-  Button,
-  Box,
-  ToggleButtonGroup,
-  ToggleButton,
-  Typography,
-} from '@mui/material'
+import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
+import Divider from '@mui/material/Divider'
+import Pagination from '@mui/material/Pagination'
 import { useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { GET_ALL_DECKS } from '../queries'
 import DeckObject from './DeckObject'
-import Pagination from '@mui/material/Pagination'
-import StartGameDrawer from './Popups/StartGameDrawer'
 import ListOfMyDecks from './ListOfMyDecks'
-import Divider from '@mui/material/Divider'
+import StartGameDrawer from './Popups/StartGameDrawer'
 
 const toggleButtonSX = {
   borderStyle: 'none',

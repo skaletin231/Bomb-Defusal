@@ -1,11 +1,11 @@
+import { useQuery } from '@apollo/client/react'
+import { useAuth0 } from '@auth0/auth0-react'
+import '@fontsource/madimi-one'
 import { Box, Button, Typography } from '@mui/material'
 import { Link, useLocation } from 'react-router-dom'
 import bomb from '../../images/Bomb No Text.png'
 import { ME } from '../queries'
-import { useQuery } from '@apollo/client/react'
-import { useAuth0 } from '@auth0/auth0-react'
 import AccountMenu from './AccountMenu'
-import '@fontsource/madimi-one'
 
 const buttonSX = {
   color: '#3A1605',

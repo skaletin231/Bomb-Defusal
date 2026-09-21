@@ -1,3 +1,5 @@
+import { useMutation, useQuery } from '@apollo/client/react'
+import '@fontsource/suwannaphum'
 import {
   Box,
   Button,
@@ -6,22 +8,18 @@ import {
   Pagination,
   Typography,
 } from '@mui/material'
-import { useMutation, useQuery } from '@apollo/client/react'
 import { COPY_DECK, REMOVE_DECK } from '../queries'
-import '@fontsource/suwannaphum'
-
-import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useParams } from 'react-router-dom'
-import { GET_ONE_DECK, ME } from '../queries'
-import { useMemo, useState } from 'react'
-import SortMenu from './SortMenu'
-import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
-import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
-import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
-import Divider from '@mui/material/Divider'
 import { gql } from '@apollo/client'
-import NotificationPopup from './Popups/NotificationPopup'
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded'
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
+import EditOutlinedIcon from '@mui/icons-material/EditOutlined'
+import Divider from '@mui/material/Divider'
+import { useMemo, useState } from 'react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { GET_ONE_DECK, ME } from '../queries'
+import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
+import NotificationPopup from './Popups/NotificationPopup'
+import SortMenu from './SortMenu'
 
 const deckCardsx = {
   height: '6rem',

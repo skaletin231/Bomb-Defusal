@@ -6,7 +6,7 @@ import DialogContent from '@mui/material/DialogContent'
 import DialogTitle from '@mui/material/DialogTitle'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { START_GAME, ME } from '../../queries'
+import { ME, START_GAME } from '../../queries'
 import NumberField from '../NumberField'
 
 function CreateGameDialogue({ id, setID }) {

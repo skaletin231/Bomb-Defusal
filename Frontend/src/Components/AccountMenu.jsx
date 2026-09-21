@@ -1,12 +1,11 @@
 import { useAuth0 } from '@auth0/auth0-react'
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined'
+import { Box, Divider } from '@mui/material'
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
-import { useNavigate } from 'react-router-dom'
-import { useState, useId } from 'react'
-import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined'
-import { Box, Divider } from '@mui/material'
-import { useLocation } from 'react-router-dom'
+import { useId, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 const menuSX = {
   '& .MuiPaper-root': {

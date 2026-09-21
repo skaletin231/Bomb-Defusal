@@ -4,12 +4,12 @@ import {
   useQuery,
   useSubscription,
 } from '@apollo/client/react'
-import { Box, Button, Stack, TextField, Typography } from '@mui/material'
+import SendOutlinedIcon from '@mui/icons-material/SendOutlined'
+import { Box, Stack, TextField, Typography } from '@mui/material'
+import IconButton from '@mui/material/IconButton'
+import InputAdornment from '@mui/material/InputAdornment'
 import { useEffect, useRef, useState } from 'react'
 import { GET_MESSAGES, ME, MESSAGE_UPDATE, SEND_MESSAGE } from '../queries'
-import InputAdornment from '@mui/material/InputAdornment'
-import SendOutlinedIcon from '@mui/icons-material/SendOutlined'
-import IconButton from '@mui/material/IconButton'
 
 const textSX = {
   width: 'auto',

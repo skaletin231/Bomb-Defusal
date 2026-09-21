@@ -1,24 +1,21 @@
-import Box from '@mui/material/Box'
-import Drawer from '@mui/material/Drawer'
+import { useMutation } from '@apollo/client/react'
+import AddIcon from '@mui/icons-material/Add'
+import EditIcon from '@mui/icons-material/Edit'
+import RemoveIcon from '@mui/icons-material/Remove'
+import VisibilityIcon from '@mui/icons-material/Visibility'
 import {
   Button,
   Checkbox,
   FormControlLabel,
   FormGroup,
-  MenuItem,
-  Select,
   TextField,
   Typography,
 } from '@mui/material'
+import Box from '@mui/material/Box'
+import Drawer from '@mui/material/Drawer'
 import { useState } from 'react'
-import AddIcon from '@mui/icons-material/Add'
-import RemoveIcon from '@mui/icons-material/Remove'
-import VisibilityIcon from '@mui/icons-material/Visibility'
-import EditIcon from '@mui/icons-material/Edit'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { START_GAME, ME } from '../../queries'
-import { useMutation } from '@apollo/client/react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { ME, START_GAME } from '../../queries'
 
 const hintCountButtonStyling = {
   minWidth: '0px',

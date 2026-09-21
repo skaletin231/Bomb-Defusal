@@ -1,8 +1,8 @@
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import { Box, Button, Divider } from '@mui/material'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
-import { useState, useId } from 'react'
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
+import { useId, useState } from 'react'
 
 const menuSX = {
   '& .MuiPaper-root': {
