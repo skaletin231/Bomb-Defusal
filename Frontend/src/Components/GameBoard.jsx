@@ -5,6 +5,8 @@ import {
   useSubscription,
 } from '@apollo/client/react'
 import '@fontsource/suwannaphum'
+import CheckIcon from '@mui/icons-material/Check'
+import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded'
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz'
 import {
   Box,
@@ -29,8 +31,6 @@ import ChatHintContainer from './ChatHintContainer'
 import GameBoardHintHeader from './GameBoardHintHeader'
 import GameCard from './GameCard'
 import GameOverScreen from './Popups/GameOverDialogue'
-import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded'
-import CheckIcon from '@mui/icons-material/Check'
 
 const boardStyle = {
   display: 'grid',
@@ -139,6 +139,7 @@ const GameBoard = () => {
               currentPlayer: currentPlayer,
               turnsRemaining: turnsRemaining,
               mistakes: update.mistakes ?? data.getGame.mistakes,
+              wiresFound: update.wiresFound ?? data.getGame.wiresFound,
             },
           }
         },
@@ -439,7 +440,7 @@ const GameBoard = () => {
     return (
       <Typography sx={gameBoardHeader}>
         Round {game.maxTurns - game.turnsRemaining}/{game.maxTurns} •{' '}
-        {game.remainingWires}/{15} guessed{' '}
+        {game.wiresFound}/{15} guessed{' '}
         {game.mistakeLimit !== -1 && (
           <>
             • {game.mistakes}/{game.mistakeLimit} mistakes made

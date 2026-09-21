@@ -48,7 +48,7 @@ const typeDefs = /* GraphQL */ `
     hints: [Hint!]!
     mistakes: Int!
     mistakeLimit: Int!
-    remainingWires: Int!
+    wiresFound: Int!
     deckID: ID!
   }
 
@@ -131,6 +131,7 @@ const typeDefs = /* GraphQL */ `
     mistakes: Int
     hintChange: Hint
     gameUser: GameUser
+    wiresFound: Int
   }
 
   type Subscription {

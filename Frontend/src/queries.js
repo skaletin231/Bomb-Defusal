@@ -25,7 +25,7 @@ const GAME_DETAILS = gql`
     maxTurns
     mistakes
     mistakeLimit
-    remainingWires
+    wiresFound
     id
     deckID
   }
@@ -198,6 +198,7 @@ export const GAME_UPDATE = gql`
       gameStateChange
       turnsRemainingChange
       mistakes
+      wiresFound
     }
   }
 `

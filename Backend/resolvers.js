@@ -800,6 +800,9 @@ const updateSpotWire = (context, game, spot, isPlayer1) => {
       },
     },
   ]
+  gameUpdate.wiresFound = game.board.spots.filter(
+    (spot) => spot.typeRevealed.player1 === 'wire',
+  ).length
 
   return gameUpdate
 }
@@ -913,7 +916,7 @@ const returnInfo = (game, context) => {
     },
     gameState: game.gameState,
     turnsRemaining: game.turnsRemaining,
-    remainingWires: game.board.spots.filter(
+    wiresFound: game.board.spots.filter(
       (spot) => spot.typeRevealed.player1 === 'wire',
     ).length,
     maxTurns: game.maxTurns,
