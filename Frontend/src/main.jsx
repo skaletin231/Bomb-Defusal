@@ -8,6 +8,7 @@ import { ThemeProvider, createTheme } from '@mui/material/styles'
 import '@fontsource/reddit-sans'
 import ApolloProviderWithAuth from './Components/ApolloProviderWithAuth.jsx'
 import React from 'react'
+import GeneralErrorScreen from './Components/GeneralErrorScreen.jsx'
 
 const theme = createTheme({
   typography: {
@@ -48,7 +49,7 @@ class ErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
-      return <h1>An error occurred</h1>
+      return <GeneralErrorScreen />
     }
 
     return this.props.children

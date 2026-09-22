@@ -5,6 +5,7 @@ import Divider from '@mui/material/Divider'
 import { useState } from 'react'
 import { DELETE_USER, ME } from '../queries'
 import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
+import LoadingScreen from './LoadingScreen'
 
 const AccountPage = () => {
   const result = useQuery(ME, {})
@@ -24,7 +25,7 @@ const AccountPage = () => {
   }
 
   if (result.loading) {
-    return <div>loading...</div>
+    return <LoadingScreen />
   }
 
   const user = result.data?.me

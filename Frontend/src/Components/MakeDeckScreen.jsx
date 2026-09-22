@@ -26,6 +26,7 @@ import { useParams } from 'react-router-dom'
 import { GET_MY_DECK, UPDATE_DECK } from '../queries'
 import NotificationPopup from './Popups/NotificationPopup'
 import SortMenu from './SortMenu'
+import LoadingScreen from './LoadingScreen'
 
 const formStyle = {
   justifyContent: 'flex-start',
@@ -200,7 +201,7 @@ const MakeDeckScreen = () => {
     }
   }, [deckResults.data])
 
-  if (deckResults.loading) return <div>loading...</div>
+  if (deckResults.loading) return <LoadingScreen />
 
   if (deckResults.error) {
     return <div>{deckResults.error.message}</div>

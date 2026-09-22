@@ -16,6 +16,7 @@ import TermsOfService from './Components/TermsOfService'
 import PrivacyPolicy from './Components/PrivacyPolicy'
 import SetUsernameDialogue from './Components/Popups/SetUsernameDialogue'
 import ScrollToTop from './Components/ScrollToTop'
+import LoadingScreen from './Components/LoadingScreen'
 
 function App() {
   const result = useQuery(ME, {})
@@ -25,7 +26,7 @@ function App() {
   }
 
   if (result.loading) {
-    return <p>loading...</p>
+    return <LoadingScreen />
   }
 
   const needToSetUsername =
@@ -34,7 +35,6 @@ function App() {
   return (
     <Box className='EntirePage flexColumn' sx={{ minHeight: '100vh' }}>
       <NavigationBar />
-      <div className='background'></div>
       <Box className='mainContainer'>
         <ScrollToTop />
         <Routes>

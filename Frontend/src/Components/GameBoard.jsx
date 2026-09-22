@@ -31,6 +31,7 @@ import ChatHintContainer from './ChatHintContainer'
 import GameBoardHintHeader from './GameBoardHintHeader'
 import GameCard from './GameCard'
 import GameOverScreen from './Popups/GameOverDialogue'
+import LoadingScreen from './LoadingScreen'
 
 const boardStyle = {
   display: 'grid',
@@ -230,10 +231,10 @@ const GameBoard = () => {
 
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (game.gameState === 'Win' || game.gameState === 'Lose') setOpen(true)
-  }, [gameResult.loading])
+  }, [game, gameResult.loading])
 
   if (gameResult.loading) {
-    return <div>loading...</div>
+    return <LoadingScreen />
   }
 
   if (!game) {

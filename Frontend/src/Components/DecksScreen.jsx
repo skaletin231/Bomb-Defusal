@@ -8,6 +8,7 @@ import { GET_ALL_DECKS } from '../queries'
 import DeckObject from './DeckObject'
 import ListOfMyDecks from './ListOfMyDecks'
 import StartGameDrawer from './Popups/StartGameDrawer'
+import LoadingScreen from './LoadingScreen'
 
 const toggleButtonSX = {
   borderStyle: 'none',
@@ -36,7 +37,7 @@ const DecksScreen = () => {
 
   const deckResults = useQuery(GET_ALL_DECKS)
 
-  if (deckResults.loading) return <div>LOADING...</div>
+  if (deckResults.loading) return <LoadingScreen />
 
   const myDecks = deckResults.data.getAllDecks.myDecks
   const publicDecks = deckResults.data.getAllDecks.publicDecks

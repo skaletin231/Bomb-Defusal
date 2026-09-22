@@ -6,6 +6,7 @@ import { Box, Button, Divider, Typography } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { GET_MY_DECKS, MAKE_DECK } from '../queries'
 import ListOfMyDecks from './ListOfMyDecks'
+import LoadingScreen from './LoadingScreen'
 
 const MyDecks = () => {
   const navigate = useNavigate()
@@ -48,7 +49,7 @@ const MyDecks = () => {
     },
   })
 
-  if (deckResults.loading) return <div>LOADING...</div>
+  if (deckResults.loading) return <LoadingScreen />
 
   const boxSX = {
     display: 'flex',

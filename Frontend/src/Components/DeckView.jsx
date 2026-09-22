@@ -20,6 +20,7 @@ import { GET_ONE_DECK, ME } from '../queries'
 import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
 import NotificationPopup from './Popups/NotificationPopup'
 import SortMenu from './SortMenu'
+import LoadingScreen from './LoadingScreen'
 
 const deckCardsx = {
   height: '6rem',
@@ -175,7 +176,7 @@ export default function DeckView() {
     currentLeftItem + cardsPerPage,
   )
 
-  if (deckResults.loading) return <div>loading...</div>
+  if (deckResults.loading) return <LoadingScreen />
 
   if (deckResults.error || !deck) {
     return <div>{deckResults.error.message}</div>

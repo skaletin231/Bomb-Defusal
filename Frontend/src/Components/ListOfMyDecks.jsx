@@ -6,6 +6,7 @@ import { COPY_DECK, GET_MY_DECKS, REMOVE_DECK } from '../queries'
 import DeckObject from './DeckObject'
 import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
 import NotificationPopup from './Popups/NotificationPopup'
+import LoadingScreen from './LoadingScreen'
 
 export default function ListOfMyDecks({ setSelectedDeck }) {
   const [openCreatePopup, setOpenCreatePopup] = useState(false)
@@ -81,7 +82,7 @@ export default function ListOfMyDecks({ setSelectedDeck }) {
     },
   })
 
-  if (deckResults.loading) return <div>LOADING...</div>
+  if (deckResults.loading) return <LoadingScreen />
 
   if (!deckResults.data) return <></>
 
