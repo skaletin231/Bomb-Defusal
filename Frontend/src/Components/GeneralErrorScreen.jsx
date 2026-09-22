@@ -1,6 +1,9 @@
 import { Box, Typography } from '@mui/material'
 
-const GeneralErrorScreen = () => {
+const GeneralErrorScreen = ({ noPageError = false }) => {
+  const pageError = noPageError
+    ? 'Error 404: Page Not Found'
+    : 'Something Went Wrong'
   return (
     <Box
       className='content'
@@ -9,7 +12,7 @@ const GeneralErrorScreen = () => {
         boxSizing: 'border-box',
       }}
     >
-      <Typography className='bigText'>Something Went Wrong </Typography>
+      <Typography className='bigText'>{pageError}</Typography>
     </Box>
   )
 }

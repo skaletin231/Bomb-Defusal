@@ -17,12 +17,13 @@ import PrivacyPolicy from './Components/PrivacyPolicy'
 import SetUsernameDialogue from './Components/Popups/SetUsernameDialogue'
 import ScrollToTop from './Components/ScrollToTop'
 import LoadingScreen from './Components/LoadingScreen'
+import GeneralErrorScreen from './Components/GeneralErrorScreen'
 
 function App() {
   const result = useQuery(ME, {})
 
   const noPageError = () => {
-    return <h1>Error 404: Page Not Found</h1>
+    return <GeneralErrorScreen noPageError={true} />
   }
 
   if (result.loading) {
