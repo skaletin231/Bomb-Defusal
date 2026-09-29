@@ -21,6 +21,7 @@ import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
 import NotificationPopup from './Popups/NotificationPopup'
 import SortMenu from './SortMenu'
 import LoadingScreen from './LoadingScreen'
+import PaginationComponent from './HelperTools/PaginationComponent'
 
 const deckCardsx = {
   height: '6rem',
@@ -46,6 +47,7 @@ const myButtonsSX = {
 const sortSX = { alignContent: 'center', marginTop: '4px', marginLeft: 'auto' }
 
 export default function DeckView() {
+  const cardsPerPage = 24
   const [openCreatePopup, setOpenCreatePopup] = useState(false)
   const { data: meData } = useQuery(ME, {})
   const me = meData.me
@@ -167,9 +169,7 @@ export default function DeckView() {
     })
   }, [deck, sortBy])
 
-  const cardsPerPage = 24
   const currentLeftItem = (currentPage - 1) * cardsPerPage
-  const paginationCount = Math.trunc(sortedCards.length / cardsPerPage) + 1
 
   const visibleCardsInDeck = sortedCards.slice(
     currentLeftItem,
@@ -317,7 +317,7 @@ export default function DeckView() {
       sx={{
         gap: '10px',
         marginInline: 'auto',
-        maxWidth: '80rem',
+        maxWidth: 'calc(65rem + 50px)',
         marginTop: '2vh',
       }}
     >
@@ -335,37 +335,12 @@ export default function DeckView() {
         }}
       />
       {deckLAyoutUI()}
-      <Box sx={{ justifyItems: 'center', marginTop: '30px' }}>
-        {paginationCount > 1 && (
-          <Pagination
-            sx={{
-              '& .MuiPaginationItem-root': {
-                color: '#84582E',
-                borderColor: '#84582E',
-              },
-              '& .MuiPaginationItem-root.Mui-selected': {
-                color: 'white',
-                backgroundColor: '#84582E',
-              },
-              '& .MuiPaginationItem-root.Mui-selected:hover': {
-                color: 'white',
-                backgroundColor: '#84582E',
-              },
-              '& .MuiPaginationItem-root:hover': {
-                color: 'white',
-                backgroundColor: '#84582E',
-              },
-              '& .MuiPaginationItem-previousNext': {
-                borderStyle: 'none',
-              },
-            }}
-            page={currentPage}
-            count={paginationCount}
-            variant='outlined'
-            onChange={handlePageChangePublic}
-          />
-        )}
-      </Box>
+      <PaginationComponent
+        countPerPage={cardsPerPage}
+        page={currentPage}
+        count={sortedCards.length}
+        onChange={handlePageChangePublic}
+      />
 
       <ConfirmDeleteDialogue
         open={deletePanelOpen}

@@ -337,6 +337,36 @@ export const GET_ALL_DECKS = gql`
         cards
         notes
       }
+      favoritedDecks {
+        id
+        owner {
+          username
+          id
+        }
+        name
+        public
+        cards
+        notes
+      }
+    }
+  }
+`
+
+export const FAVORITE_DECK = gql`
+  mutation favoriteDeck($deckID: ID!) {
+    favoriteDeck(deckID: $deckID) {
+      deck {
+        id
+        owner {
+          username
+          id
+        }
+        name
+        public
+        cards
+        notes
+      }
+      isFavorited
     }
   }
 `

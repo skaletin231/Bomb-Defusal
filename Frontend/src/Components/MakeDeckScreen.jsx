@@ -122,7 +122,7 @@ const deckCardsx = {
   color: '#84582E',
 }
 
-const maxCardSize = 15
+const maxCardSize = 20
 
 const MakeDeckScreen = () => {
   const { id: deckID } = useParams()

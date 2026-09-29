@@ -1,6 +1,8 @@
 const Game = require('./models/game')
 const User = require('./models/user')
 const Deck = require('./models/decks')
+const Favorite = require('./models/favorite')
+
 const Message = require('./models/message')
 const {
   deckNotFoundError,
@@ -151,24 +153,34 @@ const resolvers = {
       }
     },
     getAllDecks: async (root, __, context) => {
+      const user = context.user
       let myDecks = []
-      if (context.user)
+      if (user)
         myDecks = await Deck.find({
-          owner: context.user._id,
+          owner: user._id,
         }).populate('owner')
 
       const query = {
         public: true,
       }
+      const queryFav = {
+        userID: context.user._id,
+      }
 
-      if (context.user) {
-        query.owner = { $ne: context.user._id }
+      if (user) {
+        query.owner = { $ne: user._id }
       }
 
       const publicDecks = await Deck.find(query).populate('owner')
+      const favoritedDecks = await Favorite.find(queryFav).populate({
+        path: 'deckID',
+        populate: {
+          path: 'owner',
+        },
+      })
 
       const myDecksObject = myDecks.map((deck) => ({
-        id: deck.id,
+        id: deck._id,
         owner: {
           username: deck.owner.username,
           id: deck.owner._id,
@@ -177,6 +189,18 @@ const resolvers = {
         public: deck.public,
         cards: deck.cards,
         notes: deck.notes ?? '',
+      }))
+
+      const favoritedDecksObject = favoritedDecks.map((item) => ({
+        id: item.deckID.id,
+        owner: {
+          username: item.deckID.owner.username,
+          id: item.deckID.owner._id,
+        },
+        name: item.deckID.name,
+        public: item.deckID.public,
+        cards: item.deckID.cards,
+        notes: item.deckID.notes ?? '',
       }))
 
       const publicDecksObject = publicDecks.map((deck) => ({
@@ -194,6 +218,7 @@ const resolvers = {
       return {
         myDecks: myDecksObject,
         publicDecks: publicDecksObject,
+        favoritedDecks: favoritedDecksObject,
       }
     },
     getOneDeck: async (root, args, context) => {
@@ -688,6 +713,51 @@ const resolvers = {
         public: newDeck.public,
         cards: newDeck.cards,
         notes: newDeck.notes ?? '',
+      }
+    },
+    favoriteDeck: async (root, args, context) => {
+      checkIsLoggedIn(context)
+
+      let isFavorited = true
+      const deck = await Deck.findById(args.deckID).populate('owner')
+      if (!deck || !deck.public) cantAccessDeckError()
+
+      const user = context.user
+      const exists = await Favorite.exists({
+        userID: user.id,
+        deckID: deck._id,
+      })
+
+      if (exists !== null) {
+        await Favorite.findOneAndDelete({
+          userID: user._id,
+          deckID: deck._id,
+        })
+        isFavorited = false
+      } else {
+        const newFavorite = new Favorite({
+          userID: user.id,
+          deckID: deck._id,
+        })
+
+        await newFavorite.save()
+      }
+
+      const returnDeck = {
+        id: deck._id,
+        owner: {
+          username: deck.owner.username,
+          id: deck.owner.id,
+        },
+        name: deck.name,
+        public: deck.public,
+        cards: deck.cards,
+        notes: deck.notes ?? '',
+      }
+
+      return {
+        deck: returnDeck,
+        isFavorited,
       }
     },
   },

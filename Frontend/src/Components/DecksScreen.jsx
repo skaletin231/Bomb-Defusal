@@ -4,11 +4,12 @@ import Divider from '@mui/material/Divider'
 import Pagination from '@mui/material/Pagination'
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { GET_ALL_DECKS } from '../queries'
+import { GET_ALL_DECKS, ME } from '../queries'
 import DeckObject from './DeckObject'
 import ListOfMyDecks from './ListOfMyDecks'
 import StartGameDrawer from './Popups/StartGameDrawer'
 import LoadingScreen from './LoadingScreen'
+import PaginationComponent from './HelperTools/PaginationComponent'
 
 const toggleButtonSX = {
   borderStyle: 'none',
@@ -25,15 +26,17 @@ const toggleButtonSX = {
 }
 
 const DecksScreen = () => {
-  const decksPerPage = 8
+  const decksPerPage = 12
   const [currentPagePublic, setCurrentPagePublic] = useState(1)
+  const [leftPublic, setLeftPublic] = useState(0)
+
+  const [currentPageFavorite, setCurrentPageFavorite] = useState(1)
+  const [leftFavorite, setLeftFavorite] = useState(0)
+
   const [currentDeckTab, setCurrentDeckTab] = useState('mine')
   const navigate = useNavigate()
 
   const [searchParams] = useSearchParams()
-
-  //use to indicate the left most deck recorded for pagination purposes
-  const [leftPublic, setLeftPublic] = useState(0)
 
   const deckResults = useQuery(GET_ALL_DECKS)
 
@@ -41,6 +44,7 @@ const DecksScreen = () => {
 
   const myDecks = deckResults.data.getAllDecks.myDecks
   const publicDecks = deckResults.data.getAllDecks.publicDecks
+  const favoritedDecks = deckResults.data.getAllDecks.favoritedDecks ?? []
 
   const deckURL = searchParams.get('deck')
 
@@ -69,13 +73,20 @@ const DecksScreen = () => {
     setLeftPublic(decksPerPage * (value - 1))
   }
 
+  const handlePageChangeFavorite = (event, value) => {
+    setCurrentPageFavorite(value)
+    setLeftFavorite(decksPerPage * (value - 1))
+  }
+
   const visibleDecksPublic = publicDecks.slice(
     leftPublic,
     leftPublic + decksPerPage,
   )
 
-  const paginationCountPublic =
-    Math.trunc(publicDecks.length / decksPerPage) + 1
+  const visibleDecksFavorite = favoritedDecks.slice(
+    leftFavorite,
+    leftFavorite + decksPerPage,
+  )
 
   const handleDeckTab = (event, newAlignment) => {
     if (newAlignment !== null) {
@@ -106,14 +117,49 @@ const DecksScreen = () => {
     )
   }
 
-  const myDecksPage = () => {
+  const myDecksObjects = () => {
     if (myDecks.length === 0)
       return <Typography className='bigText'>No Decks Found ... </Typography>
 
+    return <ListOfMyDecks setSelectedDeck={openRightPanel} decksPerPage={12} />
+  }
+
+  const favoriteDecksObjects = () => {
+    if (visibleDecksFavorite.length === 0) return null
     return (
-      <Box sx={boxSX}>
-        <ListOfMyDecks setSelectedDeck={openRightPanel} />
-      </Box>
+      <>
+        <Divider
+          sx={{
+            margin: '2rem 0',
+          }}
+        />
+        <Box sx={boxSX}>
+          {visibleDecksFavorite.map((deck, i) => (
+            <DeckObject
+              key={i}
+              deck={deck}
+              type={'public'}
+              setSelectedDeck={openRightPanel}
+              isFavorited={favoritedDecks.some((x) => x.id === deck.id)}
+            />
+          ))}
+        </Box>
+        <PaginationComponent
+          countPerPage={decksPerPage}
+          page={currentPageFavorite}
+          count={favoritedDecks.length}
+          onChange={handlePageChangeFavorite}
+        />
+      </>
+    )
+  }
+
+  const myDecksPage = () => {
+    return (
+      <>
+        {myDecksObjects()}
+        {favoriteDecksObjects()}
+      </>
     )
   }
   const communityDecksPage = () => {
@@ -128,18 +174,17 @@ const DecksScreen = () => {
               deck={deck}
               type={'public'}
               setSelectedDeck={openRightPanel}
+              isFavorited={favoritedDecks.some((x) => x.id === deck.id)}
             />
           ))}
         </Box>
 
-        {paginationCountPublic > 1 && (
-          <Pagination
-            page={currentPagePublic}
-            count={paginationCountPublic}
-            variant='outlined'
-            onChange={handlePageChangePublic}
-          />
-        )}
+        <PaginationComponent
+          countPerPage={decksPerPage}
+          page={currentPagePublic}
+          count={publicDecks.length}
+          onChange={handlePageChangePublic}
+        />
       </>
     )
   }
