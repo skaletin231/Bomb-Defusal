@@ -97,7 +97,7 @@ const tutorialSectionUI = () => {
           </Typography>
           <Typography className='normalText' sx={tutorialTextContentSX}>
             Once you receive a hint from your partner, it’s up to you to{' '}
-            <strong>defuse</strong> by guessing which cards they mean. A
+            <strong>defuse</strong> by guessing which cards they mean. A{' '}
             <strong>successful defusal</strong> means you can either defuse
             again, or if you’ve run out of hints, <strong>end your turn</strong>
             . A <strong>mistake</strong> ends your turn. Defusals are shared
