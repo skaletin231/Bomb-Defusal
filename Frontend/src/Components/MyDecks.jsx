@@ -4,15 +4,21 @@ import '@fontsource/suwannaphum'
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined'
 import { Box, Button, Divider, Typography } from '@mui/material'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { GET_MY_DECKS, MAKE_DECK } from '../queries'
+import { GET_ALL_DECKS, GET_MY_DECKS, MAKE_DECK } from '../queries'
 import ListOfMyDecks from './ListOfMyDecks'
 import LoadingScreen from './LoadingScreen'
+import DeckObject from './DeckObject'
+import PaginationComponent from './HelperTools/PaginationComponent'
+import { useState } from 'react'
 
 const MyDecks = () => {
+  const decksPerPageFavorited = 12
+  const [currentPageFavorited, setCurrentPageFavorited] = useState(1)
+
   const navigate = useNavigate()
   const location = useLocation()
 
-  const deckResults = useQuery(GET_MY_DECKS)
+  const deckResults = useQuery(GET_ALL_DECKS)
 
   const [makeDeck] = useMutation(MAKE_DECK, {
     refetchQueries: [GET_MY_DECKS],
@@ -39,8 +45,11 @@ const MyDecks = () => {
           getMyDecks(existing = []) {
             return [...existing, newRef]
           },
-          getAllDecks(existing = []) {
-            return [...existing, newRef]
+          getAllDecks(existingDeckRefs = []) {
+            return {
+              ...existingDeckRefs,
+              myDecks: existingDeckRefs.myDecks.concat(newRef),
+            }
           },
         },
       })
@@ -50,12 +59,13 @@ const MyDecks = () => {
   })
 
   if (deckResults.loading) return <LoadingScreen />
+  const favoritedDecks = deckResults.data.getAllDecks.favoritedDecks ?? []
 
-  const boxSX = {
-    display: 'flex',
-    gap: '10px',
-    flexFlow: 'wrap',
-  }
+  const currentLeftItem = (currentPageFavorited - 1) * decksPerPageFavorited
+  const paginationDecksFavorited = favoritedDecks.slice(
+    currentLeftItem,
+    currentLeftItem + decksPerPageFavorited,
+  )
 
   const innerboxSX = {
     height: '100%',
@@ -99,6 +109,10 @@ const MyDecks = () => {
     })
   }
 
+  const handlePageChange = (event, value) => {
+    setCurrentPageFavorited(value)
+  }
+
   return (
     <Box className='content flexColumn' sx={{ gap: '20px' }}>
       <Typography className='mainHeader'>My Decks</Typography>
@@ -107,16 +121,36 @@ const MyDecks = () => {
           margin: '2rem 0',
         }}
       />
-      <Box sx={boxSX}>
+
+      <ListOfMyDecks setSelectedDeck={goToDeckPage}>
         <Button sx={buttonSX} onClick={tryMakeDeck}>
           <Box sx={innerboxSX}>
             <AddOutlinedIcon sx={{ fontSize: '2.5rem' }} />
             <Typography sx={textSX}>Add New Deck</Typography>
           </Box>
         </Button>
+      </ListOfMyDecks>
 
-        <ListOfMyDecks setSelectedDeck={goToDeckPage} />
+      <Typography className='secondaryHeader'>My Saved Decks</Typography>
+
+      <Box className='tableLayoutDeck'>
+        {paginationDecksFavorited.map((deck, i) => (
+          <DeckObject
+            key={i}
+            deck={deck}
+            type={'public'}
+            setSelectedDeck={goToDeckPage}
+            isFavorited={favoritedDecks.some((x) => x.id === deck.id)}
+          />
+        ))}
       </Box>
+
+      <PaginationComponent
+        countPerPage={decksPerPageFavorited}
+        page={currentPageFavorited}
+        count={favoritedDecks.length}
+        onChange={handlePageChange}
+      />
     </Box>
   )
 }

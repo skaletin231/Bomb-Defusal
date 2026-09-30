@@ -6,6 +6,13 @@ body {
   margin: 0px;
 }
 
+.tableLayoutDeck {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, calc(15rem + 26px));
+  justify-content: space-between;
+  gap: 10px;
+}
+
 hr.MuiDivider-root {
   border-bottom-width: 0.15rem;
   border-color: #84582e;
@@ -34,7 +41,7 @@ hr.MuiDivider-root {
 
 .accountMenu li,
 .sortMenu li {
-  justify-self: center;
+  justify-content: center;
 }
 
 .MuiTypography-root.smallText,

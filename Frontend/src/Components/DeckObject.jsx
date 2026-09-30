@@ -11,6 +11,11 @@ import {
 } from '@mui/material'
 import IconButton from '@mui/material/IconButton'
 import { Link } from 'react-router-dom'
+import LanguageIcon from '@mui/icons-material/Language'
+import FavoriteIcon from '@mui/icons-material/Favorite'
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
+import { FAVORITE_DECK } from '../queries'
+import { useMutation } from '@apollo/client/react'
 
 const deckCardSX = {
   width: '15rem',
@@ -21,7 +26,7 @@ const deckCardSX = {
   borderWidth: '3px',
   borderColor: '#84582e',
   padding: '10px',
-  borderRadius: '5%',
+  borderRadius: '10px',
   boxShadow: '0px 4px 7px 0px #00000091',
 }
 
@@ -68,8 +73,50 @@ const DeckObject = ({
   tryMakeDeck,
   setDeckToDelete,
   setSelectedDeck,
+  isFavorited,
 }) => {
-  // const [selected, setSelected] = useState(false)
+  const [favoriteDeck] = useMutation(FAVORITE_DECK, {
+    update(cache, { data }) {
+      cache.modify({
+        fields: {
+          getAllDecks(existingDeckRefs = [], { readField }) {
+            if (!data.favoriteDeck.isFavorited) {
+              const newData = existingDeckRefs.favoritedDecks.filter(
+                (deckRef) =>
+                  readField('id', deckRef) !== data.favoriteDeck.deck.id,
+              )
+
+              return {
+                ...existingDeckRefs,
+                favoritedDecks: newData,
+              }
+            }
+
+            return {
+              ...existingDeckRefs,
+              favoritedDecks: existingDeckRefs.favoritedDecks.concat(
+                data.favoriteDeck.deck,
+              ),
+            }
+          },
+          getOneDeck(existingDeck) {
+            return {
+              ...existingDeck,
+              isFavorited: data.favoriteDeck.isFavorited,
+            }
+          },
+        },
+      })
+    },
+  })
+
+  const tryFavoriteDeck = async (id) => {
+    await favoriteDeck({
+      variables: {
+        deckID: id,
+      },
+    })
+  }
 
   const myDeckButtons = () => {
     return (
@@ -109,6 +156,29 @@ const DeckObject = ({
     )
   }
 
+  const otherDeckButtons = () => {
+    return (
+      <Box sx={buttonHolderSX}>
+        <IconButton
+          sx={editButton}
+          className='likeButton'
+          variant='contained'
+          onClick={() => tryFavoriteDeck(deck.id)}
+        >
+          {isFavorited ? (
+            <FavoriteIcon
+              sx={{ color: '#ff0000', '&:hover': { color: '#ff0000' } }}
+            />
+          ) : (
+            <FavoriteBorderIcon
+              sx={{ color: '#ff0000', '&:hover': { color: '#ff0000' } }}
+            />
+          )}
+        </IconButton>
+      </Box>
+    )
+  }
+
   const cardClicked = () => {
     if (setSelectedDeck !== null) setSelectedDeck(deck)
   }
@@ -116,6 +186,17 @@ const DeckObject = ({
   return (
     <>
       <Card key={deck.name} sx={deckCardSX}>
+        {type === 'mine' && deck.public && (
+          <LanguageIcon
+            fontSize='medium'
+            sx={{
+              position: 'absolute',
+              top: '2px',
+              left: '2px',
+              color: 'text.secondary',
+            }}
+          />
+        )}
         <CardActionArea
           disableRipple
           onClick={cardClicked}
@@ -137,7 +218,10 @@ const DeckObject = ({
             </Typography>
           </CardContent>
         </CardActionArea>
-        <CardActions>{type === 'mine' && myDeckButtons()}</CardActions>
+        <CardActions>
+          {type === 'mine' && myDeckButtons()}
+          {type !== 'mine' && otherDeckButtons()}
+        </CardActions>
       </Card>
     </>
   )

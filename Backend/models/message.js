@@ -23,7 +23,9 @@ const messageSchema = new mongoose.Schema(
       required: true,
     },
   },
-  { timestamps: true },
+  {
+    timestamps: true,
+  },
 )
 
 messageSchema.index({ gameID: 1, createdAt: 1 })

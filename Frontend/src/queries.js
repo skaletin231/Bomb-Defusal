@@ -299,15 +299,18 @@ export const GET_MY_DECK = gql`
 export const GET_ONE_DECK = gql`
   query getOneDeck($deckID: ID!) {
     getOneDeck(deckID: $deckID) {
-      id
-      owner {
-        username
+      deck {
         id
+        owner {
+          username
+          id
+        }
+        name
+        public
+        cards
+        notes
       }
-      name
-      public
-      cards
-      notes
+      isFavorited
     }
   }
 `
@@ -337,6 +340,36 @@ export const GET_ALL_DECKS = gql`
         cards
         notes
       }
+      favoritedDecks {
+        id
+        owner {
+          username
+          id
+        }
+        name
+        public
+        cards
+        notes
+      }
+    }
+  }
+`
+
+export const FAVORITE_DECK = gql`
+  mutation favoriteDeck($deckID: ID!) {
+    favoriteDeck(deckID: $deckID) {
+      deck {
+        id
+        owner {
+          username
+          id
+        }
+        name
+        public
+        cards
+        notes
+      }
+      isFavorited
     }
   }
 `

@@ -7,8 +7,16 @@ import DeckObject from './DeckObject'
 import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
 import NotificationPopup from './Popups/NotificationPopup'
 import LoadingScreen from './LoadingScreen'
+import PaginationComponent from './HelperTools/PaginationComponent'
+import { Box } from '@mui/material'
 
-export default function ListOfMyDecks({ setSelectedDeck }) {
+export default function ListOfMyDecks({
+  setSelectedDeck,
+  children,
+  decksPerPage = 11,
+}) {
+  const [currentPage, setCurrentPage] = useState(1)
+
   const [openCreatePopup, setOpenCreatePopup] = useState(false)
   const [openRemovePopup, setOpenRemovePopup] = useState(false)
 
@@ -84,9 +92,15 @@ export default function ListOfMyDecks({ setSelectedDeck }) {
 
   if (deckResults.loading) return <LoadingScreen />
 
-  if (!deckResults.data) return <></>
+  if (!deckResults.data) return null
 
   const decks = deckResults.data.getMyDecks
+  const currentLeftItem = (currentPage - 1) * decksPerPage
+
+  const paginationDecks = decks.slice(
+    currentLeftItem,
+    currentLeftItem + decksPerPage,
+  )
 
   const tryMakeCopy = async (deckID) => {
     await copyDeck({
@@ -105,18 +119,33 @@ export default function ListOfMyDecks({ setSelectedDeck }) {
     setDeckToDelete(null)
   }
 
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value)
+  }
+
   return (
     <>
-      {decks.map((deck, i) => (
-        <DeckObject
-          key={i}
-          deck={deck}
-          type={'mine'}
-          tryMakeDeck={tryMakeCopy}
-          setDeckToDelete={setDeckToDelete}
-          setSelectedDeck={setSelectedDeck}
-        />
-      ))}
+      <Box className='tableLayoutDeck'>
+        {children}
+
+        {paginationDecks.map((deck, i) => (
+          <DeckObject
+            key={i}
+            deck={deck}
+            type={'mine'}
+            tryMakeDeck={tryMakeCopy}
+            setDeckToDelete={setDeckToDelete}
+            setSelectedDeck={setSelectedDeck}
+          />
+        ))}
+      </Box>
+
+      <PaginationComponent
+        countPerPage={decksPerPage}
+        page={currentPage}
+        count={decks.length}
+        onChange={handlePageChange}
+      />
 
       <ConfirmDeleteDialogue
         open={deckToDelete !== null}

@@ -122,7 +122,7 @@ const deckCardsx = {
   color: '#84582E',
 }
 
-const maxCardSize = 15
+const maxCardSize = 20
 
 const MakeDeckScreen = () => {
   const { id: deckID } = useParams()
@@ -312,7 +312,10 @@ const MakeDeckScreen = () => {
             control={
               <Checkbox
                 checked={isPublicDeck}
-                onChange={(event) => setIsPublicDeck(event.target.checked)}
+                onChange={(event) => {
+                  setNeedsSave(true)
+                  setIsPublicDeck(event.target.checked)
+                }}
                 sx={{ color: '#84582E' }}
               />
             }

@@ -7,8 +7,13 @@ const typeDefs = /* GraphQL */ `
     getMyDecks: [Deck!]
     getMyDeck(deckID: ID!): Deck
     getAllDecks: AllDecks!
-    getOneDeck(deckID: ID!): Deck
+    getOneDeck(deckID: ID!): OneDeckReturn
     me: User
+  }
+
+  type OneDeckReturn {
+    deck: Deck
+    isFavorited: Boolean
   }
 
   type Revealed {
@@ -19,6 +24,7 @@ const typeDefs = /* GraphQL */ `
   type AllDecks {
     myDecks: [Deck!]
     publicDecks: [Deck!]
+    favoritedDecks: [Deck!]
   }
 
   type Spot {
@@ -96,6 +102,12 @@ const typeDefs = /* GraphQL */ `
     ): Deck
     removeDeck(deckID: ID!): ID
     copyDeck(deckID: ID!): Deck
+    favoriteDeck(deckID: ID): favoriteDeckReturn
+  }
+
+  type favoriteDeckReturn {
+    deck: Deck
+    isFavorited: Boolean
   }
 
   type User {

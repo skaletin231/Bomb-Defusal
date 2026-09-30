@@ -5,10 +5,11 @@ import {
   Button,
   Card,
   CardContent,
+  IconButton,
   Pagination,
   Typography,
 } from '@mui/material'
-import { COPY_DECK, REMOVE_DECK } from '../queries'
+import { COPY_DECK, FAVORITE_DECK, REMOVE_DECK } from '../queries'
 import { gql } from '@apollo/client'
 import ContentCopyRoundedIcon from '@mui/icons-material/ContentCopyRounded'
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
@@ -21,6 +22,9 @@ import ConfirmDeleteDialogue from './Popups/ConfrimDeleteDialogue'
 import NotificationPopup from './Popups/NotificationPopup'
 import SortMenu from './SortMenu'
 import LoadingScreen from './LoadingScreen'
+import PaginationComponent from './HelperTools/PaginationComponent'
+import FavoriteIcon from '@mui/icons-material/Favorite'
+import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder'
 
 const deckCardsx = {
   height: '6rem',
@@ -46,6 +50,7 @@ const myButtonsSX = {
 const sortSX = { alignContent: 'center', marginTop: '4px', marginLeft: 'auto' }
 
 export default function DeckView() {
+  const cardsPerPage = 24
   const [openCreatePopup, setOpenCreatePopup] = useState(false)
   const { data: meData } = useQuery(ME, {})
   const me = meData.me
@@ -61,10 +66,55 @@ export default function DeckView() {
     variables: { deckID: deckID },
     skip: !deckID,
   })
-  const deck = deckResults.data?.getOneDeck
+  const deck = deckResults.data?.getOneDeck?.deck
+  const favorited = deckResults.data?.getOneDeck?.isFavorited
   const myDeck = me?.id === deck?.owner?.id
 
   const from = location.state?.from
+
+  const [favoriteDeck] = useMutation(FAVORITE_DECK, {
+    update(cache, { data }) {
+      cache.modify({
+        fields: {
+          getAllDecks(existingDeckRefs = [], { readField }) {
+            if (!data.favoriteDeck.isFavorited) {
+              const newData = existingDeckRefs.favoritedDecks.filter(
+                (deckRef) =>
+                  readField('id', deckRef) !== data.favoriteDeck.deck.id,
+              )
+
+              return {
+                ...existingDeckRefs,
+                favoritedDecks: newData,
+              }
+            }
+
+            return {
+              ...existingDeckRefs,
+              favoritedDecks: existingDeckRefs.favoritedDecks.concat(
+                data.favoriteDeck.deck,
+              ),
+            }
+          },
+          getOneDeck(existingDeck) {
+            return {
+              ...existingDeck,
+              isFavorited: data.favoriteDeck.isFavorited,
+            }
+          },
+        },
+      })
+    },
+  })
+
+  const tryFavoriteDeck = async (id) => {
+    await favoriteDeck({
+      variables: {
+        deckID: id,
+      },
+    })
+  }
+
   const [removeDeck] = useMutation(REMOVE_DECK, {
     update: (cache, response) => {
       cache.modify({
@@ -167,9 +217,7 @@ export default function DeckView() {
     })
   }, [deck, sortBy])
 
-  const cardsPerPage = 24
   const currentLeftItem = (currentPage - 1) * cardsPerPage
-  const paginationCount = Math.trunc(sortedCards.length / cardsPerPage) + 1
 
   const visibleCardsInDeck = sortedCards.slice(
     currentLeftItem,
@@ -189,7 +237,42 @@ export default function DeckView() {
   const headerUI = () => {
     return (
       <Box className='flexColumn' sx={{ gap: '15px' }}>
-        <Typography className='mainHeader'>{deck.name}</Typography>
+        <Box className='flexRow' sx={{ gap: '20px' }}>
+          <Typography className='mainHeader'>{deck.name}</Typography>
+          {!myDeck && (
+            <IconButton
+              sx={{
+                '&:hover': {
+                  backgroundColor: 'transparent',
+                  '& svg': {
+                    transform: 'scale(1.1)',
+                  },
+                },
+              }}
+              className='likeButton'
+              variant='contained'
+              onClick={() => tryFavoriteDeck(deck.id)}
+            >
+              {favorited ? (
+                <FavoriteIcon
+                  sx={{
+                    fontSize: '3rem',
+                    color: '#ff0000',
+                    '&:hover': { color: '#ff0000' },
+                  }}
+                />
+              ) : (
+                <FavoriteBorderIcon
+                  sx={{
+                    fontSize: '3rem',
+                    color: '#ff0000',
+                    '&:hover': { color: '#ff0000' },
+                  }}
+                />
+              )}
+            </IconButton>
+          )}
+        </Box>
         <Box className='flexRow' sx={{ gap: '10px' }}>
           <Typography sx={{ color: '#737373' }}>
             by {deck.owner.username}
@@ -317,7 +400,7 @@ export default function DeckView() {
       sx={{
         gap: '10px',
         marginInline: 'auto',
-        maxWidth: '80rem',
+        maxWidth: 'calc(65rem + 50px)',
         marginTop: '2vh',
       }}
     >
@@ -335,37 +418,12 @@ export default function DeckView() {
         }}
       />
       {deckLAyoutUI()}
-      <Box sx={{ justifyItems: 'center', marginTop: '30px' }}>
-        {paginationCount > 1 && (
-          <Pagination
-            sx={{
-              '& .MuiPaginationItem-root': {
-                color: '#84582E',
-                borderColor: '#84582E',
-              },
-              '& .MuiPaginationItem-root.Mui-selected': {
-                color: 'white',
-                backgroundColor: '#84582E',
-              },
-              '& .MuiPaginationItem-root.Mui-selected:hover': {
-                color: 'white',
-                backgroundColor: '#84582E',
-              },
-              '& .MuiPaginationItem-root:hover': {
-                color: 'white',
-                backgroundColor: '#84582E',
-              },
-              '& .MuiPaginationItem-previousNext': {
-                borderStyle: 'none',
-              },
-            }}
-            page={currentPage}
-            count={paginationCount}
-            variant='outlined'
-            onChange={handlePageChangePublic}
-          />
-        )}
-      </Box>
+      <PaginationComponent
+        countPerPage={cardsPerPage}
+        page={currentPage}
+        count={sortedCards.length}
+        onChange={handlePageChangePublic}
+      />
 
       <ConfirmDeleteDialogue
         open={deletePanelOpen}

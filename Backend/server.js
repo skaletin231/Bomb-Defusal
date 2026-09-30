@@ -130,6 +130,7 @@ const startServer = async (port) => {
             username: null,
             email: profile.email,
             auth0_ID: id,
+            favoritedDecks: [],
           })
 
           user = await newUser.save()
