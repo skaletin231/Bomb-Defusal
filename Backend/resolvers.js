@@ -227,16 +227,24 @@ const resolvers = {
       if (!deck || !(deck.owner._id.equals(context.user?._id) || deck.public))
         deckNotFoundError()
 
+      const favorited = await Favorite.exists({
+        userID: context.user._id,
+        deckID: deck._id,
+      })
+
       return {
-        id: deck._id,
-        owner: {
-          username: deck.owner.username,
-          id: deck.owner._id,
+        deck: {
+          id: deck._id,
+          owner: {
+            username: deck.owner.username,
+            id: deck.owner._id,
+          },
+          name: deck.name,
+          public: deck.public,
+          cards: deck.cards,
+          notes: deck.notes ?? '',
         },
-        name: deck.name,
-        public: deck.public,
-        cards: deck.cards,
-        notes: deck.notes ?? '',
+        isFavorited: favorited !== null,
       }
     },
   },

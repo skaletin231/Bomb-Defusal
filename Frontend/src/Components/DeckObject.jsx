@@ -99,6 +99,12 @@ const DeckObject = ({
               ),
             }
           },
+          getOneDeck(existingDeck) {
+            return {
+              ...existingDeck,
+              isFavorited: data.favoriteDeck.isFavorited,
+            }
+          },
         },
       })
     },

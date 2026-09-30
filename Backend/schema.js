@@ -7,8 +7,13 @@ const typeDefs = /* GraphQL */ `
     getMyDecks: [Deck!]
     getMyDeck(deckID: ID!): Deck
     getAllDecks: AllDecks!
-    getOneDeck(deckID: ID!): Deck
+    getOneDeck(deckID: ID!): OneDeckReturn
     me: User
+  }
+
+  type OneDeckReturn {
+    deck: Deck
+    isFavorited: Boolean
   }
 
   type Revealed {
