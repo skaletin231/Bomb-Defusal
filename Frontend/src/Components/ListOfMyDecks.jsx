@@ -10,13 +10,6 @@ import LoadingScreen from './LoadingScreen'
 import PaginationComponent from './HelperTools/PaginationComponent'
 import { Box } from '@mui/material'
 
-const boxSX = {
-  gap: '10px',
-  justifyContent: 'center',
-  gridTemplateColumns: 'repeat(auto-fit, calc(15rem + 26px))',
-  display: 'grid',
-}
-
 export default function ListOfMyDecks({
   setSelectedDeck,
   children,
@@ -132,7 +125,7 @@ export default function ListOfMyDecks({
 
   return (
     <>
-      <Box sx={boxSX}>
+      <Box className='tableLayoutDeck'>
         {children}
 
         {paginationDecks.map((deck, i) => (

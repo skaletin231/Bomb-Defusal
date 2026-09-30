@@ -509,6 +509,14 @@ const resolvers = {
     deleteUser: async (root, _, context) => {
       checkIsLoggedIn(context)
       const userID = context.user.auth0_ID
+
+      const allDecks = await Deck.find({ owner: context.user._id })
+      const allIDs = allDecks.map((deck) => deck._id)
+
+      await Favorite.deleteMany({
+        $or: [{ deckID: { $in: allIDs } }, { userID: context.user._id }],
+      })
+
       await Deck.deleteMany({ owner: context.user._id })
       await context.user.deleteOne()
 
@@ -657,6 +665,12 @@ const resolvers = {
       const deck = await Deck.findById(args.deckID)
       if (!deck || !deck.owner.equals(context.user._id)) cantAccessDeckError()
 
+      if (deck.public && args.public === false) {
+        await Favorite.deleteMany({
+          deckID: deck._id,
+        })
+      }
+
       deck.name = args.name !== undefined ? args.name : deck.name
       deck.public = args.public !== undefined ? args.public : deck.public
       deck.cards = args.cards !== undefined ? args.cards : deck.cards
@@ -681,6 +695,10 @@ const resolvers = {
 
       const deck = await Deck.findById(args.deckID)
       if (!deck || !deck.owner.equals(context.user._id)) cantAccessDeckError()
+
+      await Favorite.deleteMany({
+        deckID: deck._id,
+      })
 
       const deleted = await Deck.findByIdAndDelete(args.deckID)
 

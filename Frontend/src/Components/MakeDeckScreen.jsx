@@ -312,7 +312,10 @@ const MakeDeckScreen = () => {
             control={
               <Checkbox
                 checked={isPublicDeck}
-                onChange={(event) => setIsPublicDeck(event.target.checked)}
+                onChange={(event) => {
+                  setNeedsSave(true)
+                  setIsPublicDeck(event.target.checked)
+                }}
                 sx={{ color: '#84582E' }}
               />
             }

@@ -54,15 +54,6 @@ const DecksScreen = () => {
     deckToDisplay = publicDecks.find((x) => x.id === deckURL) ?? null
   } else canEdit = true
 
-  const boxSX = {
-    gridTemplateColumns: 'repeat(auto-fill, 266px)',
-    display: 'grid',
-    justifyContent: 'space-between',
-    height: 'auto',
-    flexFlow: 'wrap',
-    gap: '10px',
-  }
-
   const openRightPanel = (deck) => {
     if (deck === null) navigate('/startgame', { replace: true })
     else navigate(`?deck=${deck.id}`, { replace: true })
@@ -128,12 +119,8 @@ const DecksScreen = () => {
     if (visibleDecksFavorite.length === 0) return null
     return (
       <>
-        <Divider
-          sx={{
-            margin: '2rem 0',
-          }}
-        />
-        <Box sx={boxSX}>
+        <Typography className='secondaryHeader'>My Saved Decks</Typography>
+        <Box className='tableLayoutDeck'>
           {visibleDecksFavorite.map((deck, i) => (
             <DeckObject
               key={i}
@@ -167,7 +154,7 @@ const DecksScreen = () => {
       return <Typography className='bigText'>No Decks Found ... </Typography>
     return (
       <>
-        <Box sx={boxSX}>
+        <Box className='tableLayoutDeck'>
           {visibleDecksPublic.map((deck, i) => (
             <DeckObject
               key={i}

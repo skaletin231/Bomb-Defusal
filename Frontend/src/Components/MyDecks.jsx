@@ -130,26 +130,10 @@ const MyDecks = () => {
           </Box>
         </Button>
       </ListOfMyDecks>
-      <Divider
-        sx={{
-          margin: '2rem 0',
-        }}
-      />
-      <Typography
-        className='secondaryHeader'
-        sx={{ '&&': { fontSize: '2.5rem' } }}
-      >
-        My Saved Decks
-      </Typography>
 
-      <Box
-        sx={{
-          gap: '10px',
-          justifyContent: 'center',
-          gridTemplateColumns: 'repeat(auto-fit, calc(15rem + 26px))',
-          display: 'grid',
-        }}
-      >
+      <Typography className='secondaryHeader'>My Saved Decks</Typography>
+
+      <Box className='tableLayoutDeck'>
         {paginationDecksFavorited.map((deck, i) => (
           <DeckObject
             key={i}
