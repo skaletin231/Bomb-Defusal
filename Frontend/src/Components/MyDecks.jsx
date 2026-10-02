@@ -14,58 +14,66 @@ import { useState } from 'react'
 const MyDecks = () => {
   const decksPerPageFavorited = 12
   const [currentPageFavorited, setCurrentPageFavorited] = useState(1)
+  const [snapshotTime, setSnapshotTime] = useState(null)
 
   const navigate = useNavigate()
   const location = useLocation()
 
-  const deckResults = useQuery(GET_ALL_DECKS)
+  const deckResults = useQuery(GET_ALL_DECKS, {
+    variables: {
+      pageFavorite: currentPageFavorited,
+      pagePublic: 1,
+      pageSize: decksPerPageFavorited,
+      snapshotTime: snapshotTime,
+    },
+    onCompleted: (data) => {
+      setSnapshotTime(data.getAllDecks.pageInfo.snapshotTime)
+    },
+  })
 
   const [makeDeck] = useMutation(MAKE_DECK, {
     refetchQueries: [GET_MY_DECKS],
     update(cache, { data }) {
-      const newRef = cache.writeFragment({
-        data: data.makeDeck,
-        fragment: gql`
-          fragment Deck on Deck {
-            id
-            owner {
-              __typename
-              username
-              id
-            }
-            name
-            public
-            cards
-          }
-        `,
-      })
+      // const newRef = cache.writeFragment({
+      //   data: data.makeDeck,
+      //   fragment: gql`
+      //     fragment Deck on Deck {
+      //       id
+      //       owner {
+      //         __typename
+      //         username
+      //         id
+      //       }
+      //       name
+      //       public
+      //       cards
+      //     }
+      //   `,
+      // })
 
-      cache.modify({
-        fields: {
-          getMyDecks(existing = []) {
-            return [...existing, newRef]
-          },
-          getAllDecks(existingDeckRefs = []) {
-            return {
-              ...existingDeckRefs,
-              myDecks: existingDeckRefs.myDecks.concat(newRef),
-            }
-          },
-        },
-      })
+      // cache.modify({
+      //   fields: {
+      //     getMyDecks(existing = []) {
+      //       return [...existing, newRef]
+      //     },
+      //     getAllDecks(existingDeckRefs = []) {
+      //       return {
+      //         ...existingDeckRefs,
+      //         myDecks: existingDeckRefs.myDecks.concat(newRef),
+      //       }
+      //     },
+      //   },
+      // })
 
       navigate(`/mydecks/${data.makeDeck.id}`)
     },
   })
 
   if (deckResults.loading) return <LoadingScreen />
-  const favoritedDecks = deckResults.data.getAllDecks.favoritedDecks ?? []
-
-  const currentLeftItem = (currentPageFavorited - 1) * decksPerPageFavorited
-  const paginationDecksFavorited = favoritedDecks.slice(
-    currentLeftItem,
-    currentLeftItem + decksPerPageFavorited,
-  )
+  const favoritedDecks =
+    deckResults.data.getAllDecks.allDecks.favoritedDecks ?? []
+  const favoritedPageCount =
+    deckResults.data.getAllDecks.pageInfo.totalPagesFavorite
 
   const innerboxSX = {
     height: '100%',
@@ -134,7 +142,7 @@ const MyDecks = () => {
       <Typography className='secondaryHeader'>My Saved Decks</Typography>
 
       <Box className='tableLayoutDeck'>
-        {paginationDecksFavorited.map((deck, i) => (
+        {favoritedDecks.map((deck, i) => (
           <DeckObject
             key={i}
             deck={deck}
@@ -146,9 +154,8 @@ const MyDecks = () => {
       </Box>
 
       <PaginationComponent
-        countPerPage={decksPerPageFavorited}
         page={currentPageFavorited}
-        count={favoritedDecks.length}
+        count={favoritedPageCount}
         onChange={handlePageChange}
       />
     </Box>

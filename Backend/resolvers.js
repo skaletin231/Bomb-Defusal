@@ -113,14 +113,23 @@ const resolvers = {
         count: fullHint.count,
       }))
     },
-    getMyDecks: async (root, __, context) => {
+    getMyDecks: async (root, args, context) => {
       checkIsLoggedIn(context)
 
-      const myDecks = await Deck.find({ owner: context.user._id }).populate(
-        'owner',
-      )
+      const filter = {
+        owner: context.user._id,
+      }
+      const [myDecks, totalDecks] = await Promise.all([
+        Deck.find(filter)
+          .sort({ createdAt: -1, _id: -1 })
+          .skip((args.page - 1) * args.pageSize)
+          .limit(args.pageSize)
+          .populate('owner'),
 
-      return myDecks.map((deck) => ({
+        Deck.countDocuments(filter),
+      ])
+
+      const deckInfo = myDecks.map((deck) => ({
         id: deck._id,
         owner: {
           username: deck.owner.username,
@@ -131,10 +140,16 @@ const resolvers = {
         cards: deck.cards,
         notes: deck.notes ?? '',
       }))
+
+      return {
+        decks: deckInfo,
+        pageInfo: {
+          totalPages: Math.ceil(totalDecks / args.pageSize),
+        },
+      }
     },
     getMyDeck: async (root, args, context) => {
       checkIsLoggedIn(context)
-
       const myDeck = await Deck.findById(args.deckID).populate('owner')
 
       if (!myDeck || !myDeck.owner._id.equals(context.user._id))
@@ -152,14 +167,9 @@ const resolvers = {
         notes: myDeck.notes ?? '',
       }
     },
-    getAllDecks: async (root, __, context) => {
+    getAllDecks: async (root, args, context) => {
+      const snapshotTime = args.snapshotTime ?? new Date()
       const user = context.user
-      let myDecks = []
-      if (user)
-        myDecks = await Deck.find({
-          owner: user._id,
-        }).populate('owner')
-
       const query = {
         public: true,
       }
@@ -167,29 +177,45 @@ const resolvers = {
         userID: context.user._id,
       }
 
+      let favoritedDecks = []
+      let publicDecks = []
+      let totalPagesFavorite = 0
+      let totalPagesPublic = 0
       if (user) {
         query.owner = { $ne: user._id }
+        ;[favoritedDecks, publicDecks, totalPagesFavorite, totalPagesPublic] =
+          await Promise.all([
+            Favorite.find(queryFav)
+              .sort({ createdAt: -1, _id: -1 })
+              .skip((args.pageFavorite - 1) * args.pageSize)
+              .limit(args.pageSize)
+              .populate({
+                path: 'deckID',
+                populate: {
+                  path: 'owner',
+                },
+              }),
+
+            Deck.find(query)
+              .sort({ createdAt: -1, _id: -1 })
+              .skip((args.pagePublic - 1) * args.pageSize)
+              .limit(args.pageSize)
+              .populate('owner'),
+
+            Favorite.countDocuments(queryFav),
+            Deck.countDocuments(query),
+          ])
+      } else {
+        ;[publicDecks, totalPagesPublic] = await Promise.all([
+          Deck.find(query)
+            .sort({ createdAt: -1, _id: -1 })
+            .skip((args.pagePublic - 1) * args.pageSize)
+            .limit(args.pageSize)
+            .populate('owner'),
+
+          Deck.countDocuments(query),
+        ])
       }
-
-      const publicDecks = await Deck.find(query).populate('owner')
-      const favoritedDecks = await Favorite.find(queryFav).populate({
-        path: 'deckID',
-        populate: {
-          path: 'owner',
-        },
-      })
-
-      const myDecksObject = myDecks.map((deck) => ({
-        id: deck._id,
-        owner: {
-          username: deck.owner.username,
-          id: deck.owner._id,
-        },
-        name: deck.name,
-        public: deck.public,
-        cards: deck.cards,
-        notes: deck.notes ?? '',
-      }))
 
       const favoritedDecksObject = favoritedDecks.map((item) => ({
         id: item.deckID.id,
@@ -215,10 +241,18 @@ const resolvers = {
         notes: deck.notes ?? '',
       }))
 
-      return {
-        myDecks: myDecksObject,
-        publicDecks: publicDecksObject,
+      const decksTogether = {
         favoritedDecks: favoritedDecksObject,
+        publicDecks: publicDecksObject,
+      }
+
+      return {
+        allDecks: decksTogether,
+        pageInfo: {
+          totalPagesFavorite,
+          totalPagesPublic,
+          snapshotTime,
+        },
       }
     },
     getOneDeck: async (root, args, context) => {

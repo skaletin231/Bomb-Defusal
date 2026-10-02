@@ -31,6 +31,20 @@ const GAME_DETAILS = gql`
   }
 `
 
+const DECK_DETAILS = gql`
+  fragment DeckFields on Deck {
+    id
+    owner {
+      username
+      id
+    }
+    name
+    public
+    cards
+    notes
+  }
+`
+
 export const GET_GAME = gql`
   query getGame($id: ID!) {
     getGame(id: $id) {
@@ -265,19 +279,18 @@ export const NEW_PLAYER_JOINED = gql`
 //#region Deck Related Stuff
 
 export const GET_MY_DECKS = gql`
-  query getMyDecks {
-    getMyDecks {
-      id
-      owner {
-        username
-        id
+  query getMyDecks($page: Int!, $pageSize: Int!) {
+    getMyDecks(page: $page, pageSize: $pageSize) {
+      decks {
+        ...DeckFields
       }
-      name
-      public
-      cards
-      notes
+      pageInfo {
+        totalPages
+      }
     }
   }
+
+  ${DECK_DETAILS}
 `
 
 export const GET_MY_DECK = gql`
@@ -316,43 +329,35 @@ export const GET_ONE_DECK = gql`
 `
 
 export const GET_ALL_DECKS = gql`
-  query {
-    getAllDecks {
-      myDecks {
-        id
-        owner {
-          username
-          id
+  query getAllDecks(
+    $pageFavorite: Int!
+    $pagePublic: Int!
+    $pageSize: Int!
+    $snapshotTime: DateTime
+  ) {
+    getAllDecks(
+      pageFavorite: $pageFavorite
+      pagePublic: $pagePublic
+      pageSize: $pageSize
+      snapshotTime: $snapshotTime
+    ) {
+      allDecks {
+        publicDecks {
+          ...DeckFields
         }
-        name
-        public
-        cards
-        notes
+        favoritedDecks {
+          ...DeckFields
+        }
       }
-      publicDecks {
-        id
-        owner {
-          username
-          id
-        }
-        name
-        public
-        cards
-        notes
-      }
-      favoritedDecks {
-        id
-        owner {
-          username
-          id
-        }
-        name
-        public
-        cards
-        notes
+      pageInfo {
+        totalPagesFavorite
+        totalPagesPublic
+        snapshotTime
       }
     }
   }
+
+  ${DECK_DETAILS}
 `
 
 export const FAVORITE_DECK = gql`

@@ -3,7 +3,7 @@ import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import Divider from '@mui/material/Divider'
 import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { GET_ALL_DECKS } from '../queries'
+import { GET_ALL_DECKS, GET_MY_DECK } from '../queries'
 import DeckObject from './DeckObject'
 import ListOfMyDecks from './ListOfMyDecks'
 import StartGameDrawer from './Popups/StartGameDrawer'
@@ -26,32 +26,49 @@ const toggleButtonSX = {
 
 const DecksScreen = () => {
   const decksPerPage = 12
+  const [snapshotTime, setSnapshotTime] = useState(null)
   const [currentPagePublic, setCurrentPagePublic] = useState(1)
-  const [leftPublic, setLeftPublic] = useState(0)
-
   const [currentPageFavorite, setCurrentPageFavorite] = useState(1)
-  const [leftFavorite, setLeftFavorite] = useState(0)
 
   const [currentDeckTab, setCurrentDeckTab] = useState('mine')
   const navigate = useNavigate()
 
   const [searchParams] = useSearchParams()
-
-  const deckResults = useQuery(GET_ALL_DECKS)
-
-  if (deckResults.loading) return <LoadingScreen />
-
-  const myDecks = deckResults.data.getAllDecks.myDecks
-  const publicDecks = deckResults.data.getAllDecks.publicDecks
-  const favoritedDecks = deckResults.data.getAllDecks.favoritedDecks ?? []
-
   const deckURL = searchParams.get('deck')
 
-  let canEdit = false
-  let deckToDisplay = myDecks.find((x) => x.id === deckURL)
+  const myDeckResults = useQuery(GET_MY_DECK, {
+    variables: { deckID: deckURL },
+    skip: !deckURL,
+  })
+
+  const deckResults = useQuery(GET_ALL_DECKS, {
+    variables: {
+      pageFavorite: currentPageFavorite,
+      pagePublic: currentPagePublic,
+      pageSize: decksPerPage,
+      snapshotTime: snapshotTime,
+    },
+    onCompleted: (data) => {
+      setSnapshotTime(data.getAllDecks.pageInfo.snapshotTime)
+    },
+  })
+
+  if (deckResults.loading || myDeckResults.loading) return <LoadingScreen />
+
+  const publicDecks = deckResults.data.getAllDecks.allDecks.publicDecks
+  const favoritedDecks =
+    deckResults.data.getAllDecks.allDecks.favoritedDecks ?? []
+
+  const favoritedPageCount =
+    deckResults.data.getAllDecks.pageInfo.totalPagesFavorite
+  const publicPageCount = deckResults.data.getAllDecks.pageInfo.totalPagesPublic
+
+  let editButtonDisplays = false
+
+  let deckToDisplay = myDeckResults.data?.getMyDeck
   if (deckToDisplay === undefined) {
     deckToDisplay = publicDecks.find((x) => x.id === deckURL) ?? null
-  } else canEdit = true
+  } else editButtonDisplays = true
 
   const openRightPanel = (deck) => {
     if (deck === null) navigate('/startgame', { replace: true })
@@ -60,23 +77,11 @@ const DecksScreen = () => {
 
   const handlePageChangePublic = (event, value) => {
     setCurrentPagePublic(value)
-    setLeftPublic(decksPerPage * (value - 1))
   }
 
   const handlePageChangeFavorite = (event, value) => {
     setCurrentPageFavorite(value)
-    setLeftFavorite(decksPerPage * (value - 1))
   }
-
-  const visibleDecksPublic = publicDecks.slice(
-    leftPublic,
-    leftPublic + decksPerPage,
-  )
-
-  const visibleDecksFavorite = favoritedDecks.slice(
-    leftFavorite,
-    leftFavorite + decksPerPage,
-  )
 
   const handleDeckTab = (event, newAlignment) => {
     if (newAlignment !== null) {
@@ -108,19 +113,16 @@ const DecksScreen = () => {
   }
 
   const myDecksObjects = () => {
-    if (myDecks.length === 0)
-      return <Typography className='bigText'>No Decks Found ... </Typography>
-
     return <ListOfMyDecks setSelectedDeck={openRightPanel} decksPerPage={12} />
   }
 
   const favoriteDecksObjects = () => {
-    if (visibleDecksFavorite.length === 0) return null
+    if (favoritedDecks.length === 0) return null
     return (
       <>
         <Typography className='secondaryHeader'>My Saved Decks</Typography>
         <Box className='tableLayoutDeck'>
-          {visibleDecksFavorite.map((deck, i) => (
+          {favoritedDecks.map((deck, i) => (
             <DeckObject
               key={i}
               deck={deck}
@@ -131,9 +133,8 @@ const DecksScreen = () => {
           ))}
         </Box>
         <PaginationComponent
-          countPerPage={decksPerPage}
           page={currentPageFavorite}
-          count={favoritedDecks.length}
+          count={favoritedPageCount}
           onChange={handlePageChangeFavorite}
         />
       </>
@@ -149,12 +150,12 @@ const DecksScreen = () => {
     )
   }
   const communityDecksPage = () => {
-    if (visibleDecksPublic.length === 0)
+    if (publicDecks.length === 0)
       return <Typography className='bigText'>No Decks Found ... </Typography>
     return (
       <>
         <Box className='tableLayoutDeck'>
-          {visibleDecksPublic.map((deck, i) => (
+          {publicDecks.map((deck, i) => (
             <DeckObject
               key={i}
               deck={deck}
@@ -166,9 +167,8 @@ const DecksScreen = () => {
         </Box>
 
         <PaginationComponent
-          countPerPage={decksPerPage}
           page={currentPagePublic}
-          count={publicDecks.length}
+          count={publicPageCount}
           onChange={handlePageChangePublic}
         />
       </>
@@ -195,7 +195,7 @@ const DecksScreen = () => {
         open={deckToDisplay !== null}
         setSelectedDeck={openRightPanel}
         selectedDeck={deckToDisplay}
-        canEdit={canEdit}
+        canEdit={editButtonDisplays}
       />
     </Box>
   )
