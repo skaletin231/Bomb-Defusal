@@ -4,11 +4,33 @@ const typeDefs = /* GraphQL */ `
     getUser(auth0_ID: String!): User
     getMessages(gameID: ID!): [ChatMessage!]
     getHints(gameID: ID!): [Hint!]
-    getMyDecks: [Deck!]
+    getMyDecks(page: Int!, pageSize: Int!): MyDecksConnection!
     getMyDeck(deckID: ID!): Deck
-    getAllDecks: AllDecks!
+    getAllDecks(
+      pageFavorite: Int!
+      pagePublic: Int!
+      pageSize: Int!
+      snapshotTime: DateTime
+    ): AllDecksConnection!
     getOneDeck(deckID: ID!): OneDeckReturn
     me: User
+  }
+
+  type AllDecksConnection {
+    allDecks: AllDecks!
+    pageInfo: PageInfo!
+  }
+
+  type MyDecksConnection {
+    decks: [Deck!]!
+    pageInfo: PageInfo!
+  }
+
+  type PageInfo {
+    totalPages: Int
+    totalPagesFavorite: Int
+    totalPagesPublic: Int
+    snapshotTime: DateTime
   }
 
   type OneDeckReturn {
@@ -22,7 +44,6 @@ const typeDefs = /* GraphQL */ `
   }
 
   type AllDecks {
-    myDecks: [Deck!]
     publicDecks: [Deck!]
     favoritedDecks: [Deck!]
   }
@@ -73,6 +94,7 @@ const typeDefs = /* GraphQL */ `
     public: Boolean!
     cards: [String!]!
     notes: String!
+    favorited: Boolean
   }
 
   type Mutation { #player should be obtainable from context now if player is me
@@ -102,13 +124,13 @@ const typeDefs = /* GraphQL */ `
     ): Deck
     removeDeck(deckID: ID!): ID
     copyDeck(deckID: ID!): Deck
-    favoriteDeck(deckID: ID): favoriteDeckReturn
+    favoriteDeck(deckID: ID): OneDeckReturn
   }
 
-  type favoriteDeckReturn {
-    deck: Deck
-    isFavorited: Boolean
-  }
+  # type favoriteDeckReturn {
+  #   deck: Deck
+  #   isFavorited: Boolean
+  # }
 
   type User {
     username: String

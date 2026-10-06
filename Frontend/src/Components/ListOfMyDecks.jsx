@@ -1,4 +1,3 @@
-import { gql } from '@apollo/client'
 import { useMutation, useQuery } from '@apollo/client/react'
 import '@fontsource/suwannaphum'
 import { useState } from 'react'
@@ -21,67 +20,34 @@ export default function ListOfMyDecks({
   const [openRemovePopup, setOpenRemovePopup] = useState(false)
 
   const [deckToDelete, setDeckToDelete] = useState(null)
-  const deckResults = useQuery(GET_MY_DECKS)
+  const { isLoading: myDecksIsLoading, data: myDecksData } = useQuery(
+    GET_MY_DECKS,
+    {
+      variables: {
+        page: currentPage,
+        pageSize: decksPerPage,
+      },
+    },
+  )
 
   const [copyDeck] = useMutation(COPY_DECK, {
-    update(cache, { data }) {
-      const newRef = cache.writeFragment({
-        data: data.copyDeck,
-        fragment: gql`
-          fragment Deck on Deck {
-            id
-            owner {
-              __typename
-              username
-              id
-            }
-            name
-            public
-            cards
-          }
-        `,
+    update(cache) {
+      cache.evict({
+        fieldName: 'getMyDecks',
       })
-
-      //if i ever add pagination, this may not be a good thing to do anymore
-      cache.modify({
-        fields: {
-          getMyDecks(existing = []) {
-            return [...existing, newRef]
-          },
-          getAllDecks(existing) {
-            if (!existing) return existing
-            return { ...existing, myDecks: [existing.myDecks, newRef] }
-          },
-        },
-      })
+      cache.gc()
 
       setOpenCreatePopup(true)
     },
   })
 
   const [removeDeck] = useMutation(REMOVE_DECK, {
-    update: (cache, response) => {
-      cache.modify({
-        fields: {
-          getMyDecks(existingDeckRefs = [], { readField }) {
-            return existingDeckRefs.filter(
-              (deckRef) =>
-                readField('id', deckRef) !== response.data.removeDeck,
-            )
-          },
-          getAllDecks(existingDeckRefs, { readField }) {
-            if (!existingDeckRefs) return existingDeckRefs
-
-            return {
-              ...existingDeckRefs,
-              myDecks: existingDeckRefs.myDecks.filter(
-                (deckRef) =>
-                  readField('id', deckRef) !== response.data.removeDeck,
-              ),
-            }
-          },
-        },
+    refetchQueries: [GET_MY_DECKS],
+    update: (cache) => {
+      cache.evict({
+        fieldName: 'getMyDecks',
       })
+      cache.gc()
 
       setOpenRemovePopup(true)
     },
@@ -90,17 +56,18 @@ export default function ListOfMyDecks({
     },
   })
 
-  if (deckResults.loading) return <LoadingScreen />
+  //Only runs when there is nothing to display yet
+  if (myDecksIsLoading && !myDecksData)
+    return (
+      <Box className='tableLayoutDeck'>
+        <LoadingScreen />
+      </Box>
+    )
 
-  if (!deckResults.data) return null
+  if (!myDecksData) return null
 
-  const decks = deckResults.data.getMyDecks
-  const currentLeftItem = (currentPage - 1) * decksPerPage
-
-  const paginationDecks = decks.slice(
-    currentLeftItem,
-    currentLeftItem + decksPerPage,
-  )
+  const decks = myDecksData.getMyDecks?.decks ?? []
+  const count = myDecksData.getMyDecks?.pageInfo?.totalPages ?? 0
 
   const tryMakeCopy = async (deckID) => {
     await copyDeck({
@@ -111,11 +78,14 @@ export default function ListOfMyDecks({
   }
 
   const tryRemoveDeck = async () => {
+    const previousDeckCount = decks.length
     await removeDeck({
       variables: {
         deckID: deckToDelete,
       },
     })
+    if (previousDeckCount === 1 && currentPage > 1)
+      setCurrentPage(currentPage - 1)
     setDeckToDelete(null)
   }
 
@@ -128,7 +98,7 @@ export default function ListOfMyDecks({
       <Box className='tableLayoutDeck'>
         {children}
 
-        {paginationDecks.map((deck, i) => (
+        {decks.map((deck, i) => (
           <DeckObject
             key={i}
             deck={deck}
@@ -141,9 +111,8 @@ export default function ListOfMyDecks({
       </Box>
 
       <PaginationComponent
-        countPerPage={decksPerPage}
         page={currentPage}
-        count={decks.length}
+        count={count}
         onChange={handlePageChange}
       />
 

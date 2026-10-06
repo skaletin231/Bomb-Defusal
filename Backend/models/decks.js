@@ -19,6 +19,6 @@ const deckSchema = new mongoose.Schema(
   },
 )
 
-deckSchema.index({ public: 1, createdAt: -11 })
+deckSchema.index({ public: 1, createdAt: -1 })
 
 module.exports = mongoose.model('Deck', deckSchema)

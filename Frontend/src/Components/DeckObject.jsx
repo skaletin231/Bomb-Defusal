@@ -76,37 +76,11 @@ const DeckObject = ({
   isFavorited,
 }) => {
   const [favoriteDeck] = useMutation(FAVORITE_DECK, {
-    update(cache, { data }) {
-      cache.modify({
-        fields: {
-          getAllDecks(existingDeckRefs = [], { readField }) {
-            if (!data.favoriteDeck.isFavorited) {
-              const newData = existingDeckRefs.favoritedDecks.filter(
-                (deckRef) =>
-                  readField('id', deckRef) !== data.favoriteDeck.deck.id,
-              )
-
-              return {
-                ...existingDeckRefs,
-                favoritedDecks: newData,
-              }
-            }
-
-            return {
-              ...existingDeckRefs,
-              favoritedDecks: existingDeckRefs.favoritedDecks.concat(
-                data.favoriteDeck.deck,
-              ),
-            }
-          },
-          getOneDeck(existingDeck) {
-            return {
-              ...existingDeck,
-              isFavorited: data.favoriteDeck.isFavorited,
-            }
-          },
-        },
+    update(cache) {
+      cache.evict({
+        fieldName: 'getAllDecks',
       })
+      cache.gc()
     },
   })
 

@@ -20,7 +20,7 @@ import LoadingScreen from './Components/LoadingScreen'
 import GeneralErrorScreen from './Components/GeneralErrorScreen'
 
 function App() {
-  const result = useQuery(ME, {})
+  const result = useQuery(ME)
 
   const noPageError = () => {
     return <GeneralErrorScreen noPageError={true} />

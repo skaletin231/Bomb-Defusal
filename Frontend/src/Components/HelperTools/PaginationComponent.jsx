@@ -1,9 +1,7 @@
 import { Box, Pagination } from '@mui/material'
 
-const PaginationComponent = ({ countPerPage, page, count, onChange }) => {
-  const paginationCount = Math.ceil(count / countPerPage)
-
-  if (paginationCount <= 1) return null
+const PaginationComponent = ({ page, count, onChange }) => {
+  if (count <= 1) return null
 
   return (
     <Box sx={{ justifyItems: 'center', marginTop: '30px' }}>
@@ -30,7 +28,7 @@ const PaginationComponent = ({ countPerPage, page, count, onChange }) => {
           },
         }}
         page={page}
-        count={paginationCount}
+        count={count}
         variant='outlined'
         onChange={onChange}
       />
