@@ -84,7 +84,6 @@ export default function ListOfMyDecks({
         deckID: deckToDelete,
       },
     })
-    console.log(previousDeckCount, currentPage)
     if (previousDeckCount === 1 && currentPage > 1)
       setCurrentPage(currentPage - 1)
     setDeckToDelete(null)

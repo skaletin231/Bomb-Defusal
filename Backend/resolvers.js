@@ -129,8 +129,6 @@ const resolvers = {
         Deck.countDocuments(filter),
       ])
 
-      console.log((args.page - 1) * args.pageSize)
-
       const deckInfo = myDecks.map((deck) => ({
         id: deck._id,
         owner: {
