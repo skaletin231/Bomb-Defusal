@@ -3,7 +3,10 @@ require('dotenv').config()
 const startServer = require('./server')
 const connectToDatabase = require('./db')
 
-const MONGODB_URI = process.env.MONGODB_URI
+const MONGODB_URI =
+  process.env.NODE_ENV === 'development'
+    ? process.env.TEST_MONGODB_URI
+    : process.env.MONGODB_URI
 
 const PORT = process.env.PORT || 4000
 

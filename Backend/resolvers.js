@@ -129,6 +129,8 @@ const resolvers = {
         Deck.countDocuments(filter),
       ])
 
+      console.log((args.page - 1) * args.pageSize)
+
       const deckInfo = myDecks.map((deck) => ({
         id: deck._id,
         owner: {
@@ -170,64 +172,57 @@ const resolvers = {
     getAllDecks: async (root, args, context) => {
       const snapshotTime = args.snapshotTime ?? new Date()
       const user = context.user
-      const query = {
-        public: true,
-      }
-      const queryFav = {
-        userID: context.user._id,
-      }
 
-      let favoritedDecks = []
-      let publicDecks = []
+      const query = user
+        ? {
+            public: true,
+            owner: { $ne: user._id },
+          }
+        : {
+            public: true,
+          }
+
+      const [publicDecks, totalPagesPublic] = await Promise.all([
+        Deck.find(query)
+          .sort({ createdAt: -1, _id: -1 })
+          .skip((args.pagePublic - 1) * args.pageSize)
+          .limit(args.pageSize)
+          .populate('owner'),
+
+        Deck.countDocuments(query),
+      ])
+
+      let favoritedDecksToDisplay = []
+      let publicDeckFavoriteTag = new Set()
       let totalPagesFavorite = 0
-      let totalPagesPublic = 0
       if (user) {
-        query.owner = { $ne: user._id }
-        ;[favoritedDecks, publicDecks, totalPagesFavorite, totalPagesPublic] =
-          await Promise.all([
-            Favorite.find(queryFav)
-              .sort({ createdAt: -1, _id: -1 })
-              .skip((args.pageFavorite - 1) * args.pageSize)
-              .limit(args.pageSize)
-              .populate({
-                path: 'deckID',
-                populate: {
-                  path: 'owner',
-                },
-              }),
-
-            Deck.find(query)
-              .sort({ createdAt: -1, _id: -1 })
-              .skip((args.pagePublic - 1) * args.pageSize)
-              .limit(args.pageSize)
-              .populate('owner'),
-
-            Favorite.countDocuments(queryFav),
-            Deck.countDocuments(query),
-          ])
-      } else {
-        ;[publicDecks, totalPagesPublic] = await Promise.all([
-          Deck.find(query)
+        const queryFav = {
+          userID: context.user._id,
+        }
+        ;[favoritedDecksToDisplay, totalPagesFavorite] = await Promise.all([
+          Favorite.find(queryFav)
             .sort({ createdAt: -1, _id: -1 })
-            .skip((args.pagePublic - 1) * args.pageSize)
+            .skip((args.pageFavorite - 1) * args.pageSize)
             .limit(args.pageSize)
-            .populate('owner'),
+            .populate({
+              path: 'deckID',
+              populate: {
+                path: 'owner',
+              },
+            }),
 
-          Deck.countDocuments(query),
+          Favorite.countDocuments(queryFav),
         ])
-      }
 
-      const favoritedDecksObject = favoritedDecks.map((item) => ({
-        id: item.deckID.id,
-        owner: {
-          username: item.deckID.owner.username,
-          id: item.deckID.owner._id,
-        },
-        name: item.deckID.name,
-        public: item.deckID.public,
-        cards: item.deckID.cards,
-        notes: item.deckID.notes ?? '',
-      }))
+        let allFavorites = await Favorite.find({
+          userID: user._id,
+          deckID: { $in: publicDecks.map((deck) => deck._id) },
+        })
+
+        publicDeckFavoriteTag = new Set(
+          allFavorites.map((favoriteData) => favoriteData.deckID.toString()),
+        )
+      }
 
       const publicDecksObject = publicDecks.map((deck) => ({
         id: deck.id,
@@ -239,6 +234,19 @@ const resolvers = {
         public: deck.public,
         cards: deck.cards,
         notes: deck.notes ?? '',
+        favorited: publicDeckFavoriteTag.has(deck._id.toString()),
+      }))
+
+      const favoritedDecksObject = favoritedDecksToDisplay.map((item) => ({
+        id: item.deckID.id,
+        owner: {
+          username: item.deckID.owner.username,
+          id: item.deckID.owner._id,
+        },
+        name: item.deckID.name,
+        public: item.deckID.public,
+        cards: item.deckID.cards,
+        notes: item.deckID.notes ?? '',
       }))
 
       const decksTogether = {
@@ -249,8 +257,8 @@ const resolvers = {
       return {
         allDecks: decksTogether,
         pageInfo: {
-          totalPagesFavorite,
-          totalPagesPublic,
+          totalPagesFavorite: Math.ceil(totalPagesFavorite / args.pageSize),
+          totalPagesPublic: Math.ceil(totalPagesPublic / args.pageSize),
           snapshotTime,
         },
       }

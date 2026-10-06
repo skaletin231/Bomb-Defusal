@@ -1,4 +1,3 @@
-import { gql } from '@apollo/client'
 import { useMutation, useQuery } from '@apollo/client/react'
 import '@fontsource/suwannaphum'
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined'
@@ -32,48 +31,20 @@ const MyDecks = () => {
   })
 
   const [makeDeck] = useMutation(MAKE_DECK, {
-    refetchQueries: [GET_MY_DECKS],
     update(cache, { data }) {
-      // const newRef = cache.writeFragment({
-      //   data: data.makeDeck,
-      //   fragment: gql`
-      //     fragment Deck on Deck {
-      //       id
-      //       owner {
-      //         __typename
-      //         username
-      //         id
-      //       }
-      //       name
-      //       public
-      //       cards
-      //     }
-      //   `,
-      // })
-
-      // cache.modify({
-      //   fields: {
-      //     getMyDecks(existing = []) {
-      //       return [...existing, newRef]
-      //     },
-      //     getAllDecks(existingDeckRefs = []) {
-      //       return {
-      //         ...existingDeckRefs,
-      //         myDecks: existingDeckRefs.myDecks.concat(newRef),
-      //       }
-      //     },
-      //   },
-      // })
+      cache.evict({
+        fieldName: 'getMyDecks',
+      })
+      cache.gc()
 
       navigate(`/mydecks/${data.makeDeck.id}`)
     },
   })
 
-  if (deckResults.loading) return <LoadingScreen />
   const favoritedDecks =
-    deckResults.data.getAllDecks.allDecks.favoritedDecks ?? []
+    deckResults.data?.getAllDecks?.allDecks?.favoritedDecks ?? []
   const favoritedPageCount =
-    deckResults.data.getAllDecks.pageInfo.totalPagesFavorite
+    deckResults.data?.getAllDecks?.pageInfo?.totalPagesFavorite
 
   const innerboxSX = {
     height: '100%',
@@ -121,6 +92,26 @@ const MyDecks = () => {
     setCurrentPageFavorited(value)
   }
 
+  const favoritedDecksObject = () => {
+    if (deckResults.loading) {
+      return <LoadingScreen />
+    }
+
+    return (
+      <>
+        {favoritedDecks.map((deck, i) => (
+          <DeckObject
+            key={i}
+            deck={deck}
+            type={'public'}
+            setSelectedDeck={goToDeckPage}
+            isFavorited={favoritedDecks.some((x) => x.id === deck.id)}
+          />
+        ))}
+      </>
+    )
+  }
+
   return (
     <Box className='content flexColumn' sx={{ gap: '20px' }}>
       <Typography className='mainHeader'>My Decks</Typography>
@@ -141,17 +132,7 @@ const MyDecks = () => {
 
       <Typography className='secondaryHeader'>My Saved Decks</Typography>
 
-      <Box className='tableLayoutDeck'>
-        {favoritedDecks.map((deck, i) => (
-          <DeckObject
-            key={i}
-            deck={deck}
-            type={'public'}
-            setSelectedDeck={goToDeckPage}
-            isFavorited={favoritedDecks.some((x) => x.id === deck.id)}
-          />
-        ))}
-      </Box>
+      <Box className='tableLayoutDeck'>{favoritedDecksObject()}</Box>
 
       <PaginationComponent
         page={currentPageFavorited}

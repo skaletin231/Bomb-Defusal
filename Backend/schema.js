@@ -94,6 +94,7 @@ const typeDefs = /* GraphQL */ `
     public: Boolean!
     cards: [String!]!
     notes: String!
+    favorited: Boolean
   }
 
   type Mutation { #player should be obtainable from context now if player is me

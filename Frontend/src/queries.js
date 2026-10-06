@@ -344,6 +344,7 @@ export const GET_ALL_DECKS = gql`
       allDecks {
         publicDecks {
           ...DeckFields
+          favorited
         }
         favoritedDecks {
           ...DeckFields

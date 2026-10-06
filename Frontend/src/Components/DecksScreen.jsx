@@ -1,9 +1,9 @@
-import { useQuery } from '@apollo/client/react'
+import { useLazyQuery, useQuery } from '@apollo/client/react'
 import { Box, ToggleButton, ToggleButtonGroup, Typography } from '@mui/material'
 import Divider from '@mui/material/Divider'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { GET_ALL_DECKS, GET_MY_DECK } from '../queries'
+import { GET_ALL_DECKS, GET_MY_DECK, GET_ONE_DECK, ME } from '../queries'
 import DeckObject from './DeckObject'
 import ListOfMyDecks from './ListOfMyDecks'
 import StartGameDrawer from './Popups/StartGameDrawer'
@@ -26,7 +26,7 @@ const toggleButtonSX = {
 
 const DecksScreen = () => {
   const decksPerPage = 12
-  const [snapshotTime, setSnapshotTime] = useState(null)
+  const snapshotTime = useRef(null)
   const [currentPagePublic, setCurrentPagePublic] = useState(1)
   const [currentPageFavorite, setCurrentPageFavorite] = useState(1)
 
@@ -36,39 +36,55 @@ const DecksScreen = () => {
   const [searchParams] = useSearchParams()
   const deckURL = searchParams.get('deck')
 
-  const myDeckResults = useQuery(GET_MY_DECK, {
+  const { data: meData } = useQuery(ME, {})
+
+  const oneDeckResults = useQuery(GET_ONE_DECK, {
     variables: { deckID: deckURL },
     skip: !deckURL,
   })
 
-  const deckResults = useQuery(GET_ALL_DECKS, {
-    variables: {
-      pageFavorite: currentPageFavorite,
-      pagePublic: currentPagePublic,
-      pageSize: decksPerPage,
-      snapshotTime: snapshotTime,
-    },
-    onCompleted: (data) => {
-      setSnapshotTime(data.getAllDecks.pageInfo.snapshotTime)
-    },
-  })
+  const [getDecks, { isLoading: decksIsLoading, data: decksData }] =
+    useLazyQuery(GET_ALL_DECKS)
 
-  if (deckResults.loading || myDeckResults.loading) return <LoadingScreen />
+  useEffect(() => {
+    getDecks({
+      variables: {
+        pageFavorite: 1,
+        pagePublic: 1,
+        pageSize: decksPerPage,
+        snapshotTime: null,
+      },
+    }).then((result) => {
+      snapshotTime.current = result.data.getAllDecks.snapshotTime
+    })
+  }, [getDecks])
 
-  const publicDecks = deckResults.data.getAllDecks.allDecks.publicDecks
-  const favoritedDecks =
-    deckResults.data.getAllDecks.allDecks.favoritedDecks ?? []
+  const loadDecks = (pageFavorite, pagePublic) => {
+    getDecks({
+      variables: {
+        pageFavorite,
+        pagePublic,
+        pageSize: decksPerPage,
+        snapshotTime: snapshotTime.current,
+      },
+    })
+  }
+
+  if (meData.isLoading) return <LoadingScreen />
+  const me = meData.me
+
+  const publicDecks = decksData?.getAllDecks?.allDecks?.publicDecks ?? []
+  const favoritedDecks = decksData?.getAllDecks?.allDecks?.favoritedDecks ?? []
 
   const favoritedPageCount =
-    deckResults.data.getAllDecks.pageInfo.totalPagesFavorite
-  const publicPageCount = deckResults.data.getAllDecks.pageInfo.totalPagesPublic
+    decksData?.getAllDecks?.pageInfo?.totalPagesFavorite ?? 1
+  const publicPageCount =
+    decksData?.getAllDecks?.pageInfo?.totalPagesPublic ?? 1
 
   let editButtonDisplays = false
 
-  let deckToDisplay = myDeckResults.data?.getMyDeck
-  if (deckToDisplay === undefined) {
-    deckToDisplay = publicDecks.find((x) => x.id === deckURL) ?? null
-  } else editButtonDisplays = true
+  let deckToDisplay = oneDeckResults.data?.getOneDeck?.deck ?? null
+  if (deckToDisplay) editButtonDisplays = deckToDisplay.id === me.id
 
   const openRightPanel = (deck) => {
     if (deck === null) navigate('/startgame', { replace: true })
@@ -77,10 +93,12 @@ const DecksScreen = () => {
 
   const handlePageChangePublic = (event, value) => {
     setCurrentPagePublic(value)
+    loadDecks(currentPageFavorite, value)
   }
 
   const handlePageChangeFavorite = (event, value) => {
     setCurrentPageFavorite(value)
+    loadDecks(value, currentPagePublic)
   }
 
   const handleDeckTab = (event, newAlignment) => {
@@ -117,6 +135,12 @@ const DecksScreen = () => {
   }
 
   const favoriteDecksObjects = () => {
+    if (decksIsLoading)
+      return (
+        <Box className='tableLayoutDeck'>
+          <LoadingScreen />
+        </Box>
+      )
     if (favoritedDecks.length === 0) return null
     return (
       <>
@@ -150,6 +174,12 @@ const DecksScreen = () => {
     )
   }
   const communityDecksPage = () => {
+    if (decksIsLoading)
+      return (
+        <Box className='tableLayoutDeck'>
+          <LoadingScreen />
+        </Box>
+      )
     if (publicDecks.length === 0)
       return <Typography className='bigText'>No Decks Found ... </Typography>
     return (
@@ -161,7 +191,7 @@ const DecksScreen = () => {
               deck={deck}
               type={'public'}
               setSelectedDeck={openRightPanel}
-              isFavorited={favoritedDecks.some((x) => x.id === deck.id)}
+              isFavorited={deck.favorited}
             />
           ))}
         </Box>
