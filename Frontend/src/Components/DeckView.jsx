@@ -419,9 +419,8 @@ export default function DeckView() {
       />
       {deckLAyoutUI()}
       <PaginationComponent
-        countPerPage={cardsPerPage}
         page={currentPage}
-        count={sortedCards.length}
+        count={Math.ceil(sortedCards.length / cardsPerPage)}
         onChange={handlePageChangePublic}
       />
 
