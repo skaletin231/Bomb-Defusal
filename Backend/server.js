@@ -12,7 +12,7 @@ const {
 } = require('@apollo/server/plugin/drainHttpServer')
 
 const { auth } = require('express-oauth2-jwt-bearer')
-
+const path = require('path')
 const User = require('./models/user')
 
 const { WebSocketServer } = require('ws')
@@ -142,6 +142,10 @@ const startServer = async (port) => {
       },
     }),
   )
+
+  app.get('/{*splat}', (req, res) => {
+    res.sendFile(path.resolve('dist', 'index.html'))
+  })
 
   httpServer.listen(port, () => console.log(`Server is now running on ${port}`))
 }
