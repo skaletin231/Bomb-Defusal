@@ -268,7 +268,7 @@ const resolvers = {
         deckNotFoundError()
 
       const favorited = await Favorite.exists({
-        userID: context.user._id,
+        userID: context?.user?._id,
         deckID: deck._id,
       })
 

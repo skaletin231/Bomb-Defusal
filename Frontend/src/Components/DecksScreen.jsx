@@ -84,7 +84,7 @@ const DecksScreen = () => {
   let editButtonDisplays = false
 
   let deckToDisplay = oneDeckResults.data?.getOneDeck?.deck ?? null
-  if (deckToDisplay) editButtonDisplays = deckToDisplay.id === me.id
+  if (deckToDisplay) editButtonDisplays = deckToDisplay?.id === me?.id
 
   const openRightPanel = (deck) => {
     if (deck === null) navigate('/startgame', { replace: true })
